@@ -1,53 +1,41 @@
-# 收敛后 Hard HiWA 与 Soft-GCOT 对照
+# 收敛后 Hard HiWA 与 Soft-GCOT HiWA 对照
 
-_固定数值参数、多 seed 神经 smoke · 2026-07-11_
+_固定 `audit` 协议、seeds 50–54、96×96 神经子集；2026-07-11_
 
 ---
 
-## 🔎 结论
+## 结论
 
-5 个 Soft-GCOT seed 都达到预先固定的双残差阈值，但没有显示稳定性能优势。平均方向准确率差为 −0.025，平均 movement $R^2$ 差为 −0.252。
+五个 seed 的 Hard HiWA、Soft-GCOT HiWA、Sparse approximation 与 Soft-GCOT HiWA + ROCA 均达到统一的 global-plus-primal ADMM 停止条件。因而这是一轮可比较的负结果：
 
-这是一轮有效的、收敛后的负结果：在当前 96-by-96 神经 smoke 设置中，TACO-faithful full-support Soft-GCOT 不优于 Hard HiWA。
+| 方法 | 收敛 | 方向准确率 | movement $R^2$ |
+|---|---:|---:|---:|
+| Hard HiWA | 5/5 | 0.3375 | -0.2319 |
+| Soft-GCOT HiWA | 5/5 | 0.3083 | -0.4903 |
+| Sparse approximation | 5/5 | 0.2208 | -0.9399 |
+| Soft-GCOT HiWA + ROCA | 5/5 | 0.0833 | -1.6571 |
 
-## 🧪 固定协议
+相对 Hard HiWA，Soft-GCOT HiWA 的平均方向准确率为 -0.0292、平均 $R^2$ 为 -0.2584。Sparse approximation 更差，不能替代 full support。
 
-- seeds：50--54
-- full-support Soft-GCOT；4 组；temperature=1.0；entropy weight=0.05
-- Soft：$\mu=0.05$、outer budget=200、tolerance=$10^{-2}$、group Sinkhorn=300、local Sinkhorn=80
-- Soft 纳入条件：global residual 与 ADMM primal residual 都不大于 $10^{-2}$
-- prototype、OT formulation、ROCA 均未改变；标签只用于最终评价
+## 收敛与数值检查
 
-```mermaid
-flowchart LR
-    accTitle: Converged comparison protocol
-    accDescr: Each seed learns unlabeled groups, fits both methods, and enters paired evaluation only when Soft-GCOT passes both residual thresholds.
+- Soft-GCOT HiWA 的最终 primal residual 为 0.00940–0.00990；最大 Sinkhorn marginal error 为 $4.3\times10^{-14}$ 至 $9.4\times10^{-14}$。
+- Hard HiWA 的最终 global residual 为 $1.0\times10^{-4}$ 至 $1.3\times10^{-4}$。
+- 所有全局旋转的正交误差约为 $10^{-15}$。
+- JSON 保存每个 seed 的 global/primal/dual residual、transport objective、Sinkhorn error、$P$、group cost 和 ROCA 几何诊断；收敛图显示各外层迭代轨迹。
 
-    groups["Learn unlabeled groups"] --> hard["Fit Hard HiWA"]
-    groups --> soft["Fit full Soft-GCOT"]
-    soft --> gate{"Both residuals pass?"}
-    gate -->|Yes| evaluate["Evaluate paired seed"]
-    gate -->|No| exclude["Report non-convergence"]
-    hard --> evaluate
-```
+## ROCA 适用性
 
-## 📊 结果
+本次纯 Soft-GCOT HiWA 基线上的 ROCA 不满足可用条件：5/5 触发 `high_assignment_entropy` warning，尽管 simplex condition number 仅为 2.33–5.23、oriented-volume margin 约为 26.79，几何并未退化。
 
-| Seed | Soft iter. | Soft primal | Hard acc. | Soft acc. | Δ acc. | Hard $R^2$ | Soft $R^2$ | Δ $R^2$ |
-|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 50 | 73 | 0.00940 | 0.5208 | 0.1042 | -0.4167 | 0.6117 | -1.5149 | -2.1266 |
-| 51 | 77 | 0.00974 | 0.2500 | 0.4063 | +0.1563 | -0.8000 | -0.0447 | +0.7553 |
-| 52 | 76 | 0.00948 | 0.2500 | 0.4063 | +0.1563 | -0.8032 | -0.0446 | +0.7587 |
-| 53 | 78 | 0.00956 | 0.3958 | 0.3854 | -0.0104 | 0.6009 | -0.0469 | -0.6478 |
-| 54 | 74 | 0.00990 | 0.2500 | 0.2396 | -0.0104 | -0.8028 | -0.8003 | +0.0025 |
-| Mean | — | — | — | — | **-0.0250** | — | — | **-0.2516** |
+因此，这里的失败不是代表点 simplex 退化，而是当前纯 soft grouping 接口下的 branch selection 与历史已验证的代表点/分量流程不等价。不能把此前 ROCA 的成功直接移植为“纯 Soft-GCOT HiWA + ROCA 已成功”。
 
-所有 Soft run 的 Sinkhorn marginal error 均约为 $10^{-13}$ 至 $10^{-14}$。
+## 可保留与不可混合的结论
 
-## 🎯 解释边界
+- 可保留：历史的代表点方向选择在其原始流程中有 20-seed 确认和 30-case 坐标翻转证据。
+- 可保留：当前纯 Soft-GCOT HiWA full-support 代码在统一 ADMM 协议下可收敛。
+- 不可混合：两套结果的初始化、代表点/分量处理和运行协议不同；不能合并为单一性能结论。
 
-这否定的是一个具体命题：在这个固定、已收敛的神经 smoke 协议里，full-support Soft-GCOT 没有带来稳定平均提升。
+下一步不是调参或增加模块，而是做实现谱系核对：将历史成功流程逐项映射到当前 runner，确认 ROCA 接口在何处发生改变，再决定是否存在一个可复现的 `Soft-GCOT HiWA + ROCA` 条目。
 
-它不证明 soft grouping 在其他任务、噪声或组重叠条件下无用。下一步应扩大到预先指定的更多 seed；在看到稳定增益前，不应把 Soft-GCOT 表述为优于 Hard HiWA。
-
-原始结果：`experiments/results/taco_faithful_converged_full_seeds_50_54.json`。
+结果文件：[audit JSON](../../experiments/results/taco_faithful_baseline_audit_seeds_50_54.json)，[accuracy figure](../../experiments/figures/taco_faithful_baseline_audit_seeds_50_54.png)，[convergence figure](../../experiments/figures/taco_faithful_convergence_audit_seeds_50_54.png)。
