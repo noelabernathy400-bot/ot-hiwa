@@ -25,4 +25,4 @@ description: Use when safely operating this Obsidian vault: creating Markdown no
 - 不删除原始资料。
 - 不覆盖已有文件。
 - 不修改日记正文，除非用户明确确认。
-- 批量移动、删除、重命名前必须先列计划。
+- 批量移动、删除、重命名时说明范围并保留可追溯记录；用户明确请求时可直接执行。

@@ -65,6 +65,14 @@ class SoftGroupTests(unittest.TestCase):
         np.testing.assert_allclose(model.diagnostics["source_retained_mass"], [1.0, 1.0])
         self.assertLess(model.diagnostics["max_sinkhorn_marginal_error"].max(), 1e-7)
         self.assertLess(model.diagnostics["group_transport_row_marginal_error"], 1e-7)
+        self.assertEqual(
+            len(model.diagnostics["admm_dual_residual"]),
+            len(model.diagnostics["admm_primal_residual"]),
+        )
+        self.assertEqual(
+            len(model.diagnostics["transport_objective_history"]),
+            len(model.diagnostics["Rg_norm"]),
+        )
 
 
 class WeightedTransportTests(unittest.TestCase):

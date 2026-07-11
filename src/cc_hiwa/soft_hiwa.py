@@ -275,6 +275,8 @@ class SoftHiWA:
         residuals: list[float] = []
         max_marginal_errors: list[float] = []
         admm_primal_residuals: list[float] = []
+        admm_dual_residuals: list[float] = []
+        transport_objectives: list[float] = []
         component_cost_means: list[float] = []
         component_cost_maxima: list[float] = []
 
@@ -386,6 +388,12 @@ class SoftHiWA:
             residuals.append(residual)
             max_marginal_errors.append(iteration_error)
             admm_primal_residuals.append(primal_residual)
+            admm_dual_residuals.append(
+                (self.mu / np.sqrt(high_dim))
+                * np.sqrt(n_groups_x * n_groups_y)
+                * residual
+            )
+            transport_objectives.append(float(np.sum(group_transport * mixed_group_cost)))
             if iteration_component_cost_means:
                 component_cost_means.append(float(np.mean(iteration_component_cost_means)))
                 component_cost_maxima.append(float(np.max(iteration_component_cost_maxima)))
@@ -401,6 +409,8 @@ class SoftHiWA:
         self.diagnostics = {
             "Rg_norm": np.asarray(residuals),
             "admm_primal_residual": np.asarray(admm_primal_residuals),
+            "admm_dual_residual": np.asarray(admm_dual_residuals),
+            "transport_objective_history": np.asarray(transport_objectives),
             "C": group_cost,
             "representative_cost": representative_cost,
             "mixed_group_cost": mixed_group_cost,
@@ -447,6 +457,11 @@ class SoftHiWA:
             ),
             "transport_objective": float(np.sum(group_transport * group_cost)),
             "guided_transport_objective": float(np.sum(group_transport * mixed_group_cost)),
+            "admm_converged": bool(
+                residuals
+                and residuals[-1] <= self.tol
+                and admm_primal_residuals[-1] <= self.tol
+            ),
             "local_global_consensus_mean": float(np.mean(local_global_distances)),
             "local_global_consensus_max": float(np.max(local_global_distances)),
             "local_global_consensus_weighted_rms": float(

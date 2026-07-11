@@ -175,6 +175,10 @@ class HiWA:
 
         diagnostics = {'gamma': np.zeros(self.maxiter, dtype=float),
                        'Rg_norm': np.zeros(self.maxiter, dtype=float),
+                       'admm_primal_residual': np.zeros(self.maxiter, dtype=float),
+                       'admm_dual_residual': np.zeros(self.maxiter, dtype=float),
+                       'transport_objective': np.zeros(self.maxiter, dtype=float),
+                       'group_sinkhorn_marginal_error': np.zeros(self.maxiter, dtype=float),
                        'rMSE': np.zeros(self.maxiter, dtype=float),
                        'R2': np.zeros(self.maxiter, dtype=float),
                        'C': np.zeros(C.shape, dtype=float)}
@@ -211,12 +215,33 @@ class HiWA:
 
             diagnostics['gamma'][n] = self.shorn_gamma
             diagnostics['Rg_norm'][n] = np.linalg.norm(Rg_prev - Rg, 'fro')
+            local_global = np.linalg.norm(
+                R - Rg[:, :, np.newaxis, np.newaxis], axis=(0, 1)
+            )
+            diagnostics['admm_primal_residual'][n] = np.max(local_global)
+            diagnostics['admm_dual_residual'][n] = (
+                (self.mu / np.sqrt(h_dim))
+                * np.sqrt(num_clusters_x * num_clusters_y)
+                * diagnostics['Rg_norm'][n]
+            )
+            diagnostics['transport_objective'][n] = np.sum(P * C)
+            diagnostics['group_sinkhorn_marginal_error'][n] = max(
+                np.max(np.abs(P.sum(axis=1) - 1 / num_clusters_x)),
+                np.max(np.abs(P.sum(axis=0) - 1 / num_clusters_y)),
+            )
             diagnostics['rMSE'][n] = _rMSE(X, Rg, self.Rgt)
             diagnostics['R2'][n] = _eval_R2(X, Rg, self.Rgt)
 
-            if (np.isnan(P).any() or diagnostics['Rg_norm'][n] <= self.tol) and n >= 5:
+            if (np.isnan(P).any() or (
+                    diagnostics['Rg_norm'][n] <= self.tol
+                    and diagnostics['admm_primal_residual'][n] <= self.tol
+            )) and n >= 5:
                 diagnostics['gamma'] = diagnostics['gamma'][0:n + 1]
                 diagnostics['Rg_norm'] = diagnostics['Rg_norm'][0:n + 1]
+                diagnostics['admm_primal_residual'] = diagnostics['admm_primal_residual'][0:n + 1]
+                diagnostics['admm_dual_residual'] = diagnostics['admm_dual_residual'][0:n + 1]
+                diagnostics['transport_objective'] = diagnostics['transport_objective'][0:n + 1]
+                diagnostics['group_sinkhorn_marginal_error'] = diagnostics['group_sinkhorn_marginal_error'][0:n + 1]
                 diagnostics['rMSE'] = diagnostics['rMSE'][0:n + 1]
                 diagnostics['R2'] = diagnostics['R2'][0:n + 1]
                 diagnostics['C'] = C

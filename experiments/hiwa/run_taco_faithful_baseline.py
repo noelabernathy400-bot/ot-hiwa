@@ -1,4 +1,4 @@
-"""Frozen neural comparison: Hard HiWA, pure Soft-GCOT, and Soft-GCOT + ROCA.
+"""Frozen neural comparison: Hard HiWA, Soft-GCOT HiWA, and Soft-GCOT HiWA + ROCA.
 
 The two Soft-GCOT baselines use only learned prototypes, normalized soft group
 measures, per-pair Q_ij, group P, and the inherited HiWA ADMM consensus.  They
@@ -33,16 +33,22 @@ from run_neural import least_squares_rotation, load_demo, movement_to_3d, remove
 from run_soft_neural import PROFILES, run_hard, run_soft
 from soft_groups import assignment_entropy, learn_soft_groups
 
-# A bounded smoke profile for the required four-way neural comparison.  It is
-# intentionally a reproducibility check, not a convergence-claiming benchmark.
+# Historical bounded smoke profile retained only for reproducing its prior output.
 PROFILES.setdefault(
     "baseline-mini",
     dict(maxiter=6, tol=1e-2, mu=2e-2, shorn_maxiter=30, sa_maxiter=4, sa_shorn_maxiter=12),
 )
+# Fixed numerical budget for a comparable baseline audit.  It changes no loss,
+# prototype, OT, or ROCA setting; it only gives ADMM enough iterations to meet
+# the common stopping rule.
+PROFILES.setdefault(
+    "audit",
+    dict(maxiter=200, tol=1e-2, mu=5e-2, shorn_maxiter=300, sa_maxiter=40, sa_shorn_maxiter=80),
+)
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", choices=PROFILES, default="baseline-mini")
+    parser.add_argument("--profile", choices=PROFILES, default="audit")
     parser.add_argument("--seeds", nargs="+", type=int, default=[0])
     parser.add_argument("--groups", type=int, default=4)
     parser.add_argument("--temperature", type=float, default=1.0)
@@ -124,7 +130,7 @@ def _roca_selector(source: np.ndarray, a: np.ndarray, target: np.ndarray, b: np.
 
 def _plot(records: list[dict], path: Path) -> None:
     names = ["hard_hiwa", "soft_gcot_full", "soft_gcot_sparse", "soft_gcot_roca"]
-    labels = ["Hard\nHiWA", "Soft-GCOT\nfull", "Soft-GCOT\nsparse", "Soft-GCOT\n+ ROCA"]
+    labels = ["Hard\nHiWA", "Soft-GCOT\nHiWA", "Sparse\napproximation", "Soft-GCOT HiWA\n+ ROCA"]
     means = {name: [] for name in names}
     for row in records:
         means[row["method"]].append(row["after_direction_accuracy"])
@@ -133,6 +139,40 @@ def _plot(records: list[dict], path: Path) -> None:
     ax.set(ylabel="direction accuracy", title="Frozen TACO-faithful Soft-GCOT HiWA baseline")
     ax.set_ylim(0, 1)
     ax.grid(axis="y", alpha=0.2)
+    fig.savefig(path, dpi=180)
+    plt.close(fig)
+
+
+def _plot_convergence(records: list[dict], path: Path) -> None:
+    """Plot mean outer-loop traces; individual traces remain in the JSON."""
+    names = ["hard_hiwa", "soft_gcot_full", "soft_gcot_sparse", "soft_gcot_roca"]
+    labels = {
+        "hard_hiwa": "Hard HiWA",
+        "soft_gcot_full": "Soft-GCOT HiWA",
+        "soft_gcot_sparse": "Sparse approximation",
+        "soft_gcot_roca": "Soft-GCOT HiWA + ROCA",
+    }
+    curves = (
+        ("admm_global_residual_curve", "global residual"),
+        ("admm_primal_residual_curve", "primal residual"),
+        ("admm_dual_residual_curve", "dual residual"),
+        ("transport_objective_curve", "transport objective"),
+    )
+    fig, axes = plt.subplots(2, 2, figsize=(9, 6), constrained_layout=True)
+    for axis, (key, title) in zip(axes.flat, curves):
+        for name in names:
+            values = [np.asarray(row[key], dtype=float) for row in records if row["method"] == name]
+            if not values:
+                continue
+            padded = np.full((len(values), max(map(len, values))), np.nan)
+            for index, value in enumerate(values):
+                padded[index, :len(value)] = value
+            axis.plot(np.nanmean(padded, axis=0), label=labels[name])
+        axis.set(title=title, xlabel="outer iteration")
+        if "residual" in key:
+            axis.set_yscale("log")
+        axis.grid(alpha=0.2)
+    axes[0, 0].legend(fontsize=7)
     fig.savefig(path, dpi=180)
     plt.close(fig)
 
@@ -150,9 +190,12 @@ def main() -> None:
         target_groups = learn_soft_groups(movement, args.groups, args.temperature, args.entropy_weight, seed=seed)
         hard, _ = run_hard("hard_hiwa", neural, np.argmax(source_groups.assignments, axis=1), movement, np.argmax(target_groups.assignments, axis=1), target_transform, oracle_rotation, seed, args.profile, evaluation)
         records.append(hard)
+        hard["display_name"] = "Hard HiWA"
         full, _ = run_soft(neural, source_groups.assignments, movement, target_groups.assignments, target_transform, oracle_rotation, seed, args.profile, args.retain_mass, args.max_support_factor, evaluation, method="soft_gcot_full", support_mode="full")
         sparse, _ = run_soft(neural, source_groups.assignments, movement, target_groups.assignments, target_transform, oracle_rotation, seed, args.profile, args.retain_mass, args.max_support_factor, evaluation, method="soft_gcot_sparse", support_mode="sparse")
         records.extend([full, sparse])
+        full["display_name"] = "Soft-GCOT HiWA"
+        sparse["display_name"] = "Soft-GCOT HiWA (sparse approximation)"
         candidates = []
         for sign in (-1, 1):
             candidate, _ = run_soft(neural, source_groups.assignments, movement, target_groups.assignments, target_transform, oracle_rotation, seed, args.profile, args.retain_mass, args.max_support_factor, evaluation, method=f"soft_gcot_roca_candidate_det_{sign:+d}", determinant_sign=sign, support_mode="full")
@@ -160,6 +203,7 @@ def main() -> None:
         selection = _roca_selector(neural, source_groups.assignments, movement, target_groups.assignments, [row["transport_P"] for row in candidates])
         chosen = next(row for row in candidates if int(round(row["rotation_determinant"])) == selection["selected_determinant_sign"])
         chosen["method"] = "soft_gcot_roca"
+        chosen["display_name"] = "Soft-GCOT HiWA + ROCA"
         chosen["roca"] = selection
         records.append(chosen)
         roca.append({"seed": seed, **selection, "candidate_determinants": [row["rotation_determinant"] for row in candidates]})
@@ -167,18 +211,27 @@ def main() -> None:
     suffix = f"_{args.tag}" if args.tag else ""
     json_path = RESULTS_DIR / f"taco_faithful_baseline{suffix}.json"
     figure_path = FIGURES_DIR / f"taco_faithful_baseline{suffix}.png"
+    convergence_path = FIGURES_DIR / f"taco_faithful_convergence{suffix}.png"
     payload = {
         "experiment": "taco_faithful_soft_gcot_hiwa_neural_baseline",
+        "method_names": {
+            "hard_hiwa": "Hard HiWA",
+            "soft_gcot_full": "Soft-GCOT HiWA",
+            "soft_gcot_sparse": "Soft-GCOT HiWA (sparse approximation)",
+            "soft_gcot_roca": "Soft-GCOT HiWA + ROCA",
+        },
         "label_usage": "labels are used only for final direction-accuracy and movement-R2 evaluation; never for fitting, branch selection, or hyperparameter selection",
         "frozen_configuration": {"representative_guidance_weight": 0.0, "representative_rotation_weight": 0.0, "component_conditioning_weight": 0.0, "rotation_anchor_weight": 0.0, "joint_prototypes": False},
         "parameters": vars(args),
         "environment": {"python": platform.python_version(), "numpy": np.__version__, "scipy": scipy.__version__, "scikit_learn": sklearn.__version__},
+        "convergence_rule": "A run is comparable only when both global and primal ADMM residuals are at or below tol; dual residual and objective are diagnostic traces.",
         "results": records,
         "roca": roca,
     }
     write_json(json_path, payload)
     _plot(records, figure_path)
-    print(f"saved: {json_path}\nsaved: {figure_path}")
+    _plot_convergence(records, convergence_path)
+    print(f"saved: {json_path}\nsaved: {figure_path}\nsaved: {convergence_path}")
 
 
 if __name__ == "__main__":

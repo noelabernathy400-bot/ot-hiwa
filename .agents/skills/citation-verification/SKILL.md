@@ -24,7 +24,7 @@ description: Use when verifying citations, references, bibliographic metadata, D
 - 遇到 DOI、BibTeX、参考文献真假、题名/作者/年份/期刊核验时，优先使用 `refcheck` MCP。
 - 遇到“我的文献库”“Zotero”“已收藏论文”“文献集合”“注释”“笔记”“citation key”时，优先使用只读 `zotero` MCP。
 - 使用 `zotero` MCP 时，默认只读：可以检索条目、集合、标签、注释、笔记、全文、PDF 目录和重复项；不得默认创建、删除、更新、添加、合并或批量改标签。
-- 如果需要写入 Zotero，必须先说明目标、影响范围和回滚方式，并等待用户明确确认。
+- 写入 Zotero 时简要说明目标和影响范围；用户当前请求已明确授权时可直接执行。
 - `refcheck` 和 `zotero` 给出的 BibTeX 仍需在正式写入论文前检查字段、大小写、页码和特殊字符。
 
 ## 检查项

@@ -122,16 +122,27 @@ def run_hard(
     )
     elapsed = time.perf_counter() - started
     residuals = model.diagnostics["Rg_norm"]
+    primal_residuals = model.diagnostics["admm_primal_residual"]
     result = {
         "method": method,
         "seed": seed,
         **evaluate(aligned=aligned, neural_3d=neural_3d, movement_3d=movement_3d, **evaluation_args),
         "iterations": int(len(residuals)),
         "final_residual": float(residuals[-1]),
-        "converged": bool(residuals[-1] <= PROFILES[profile]["tol"]),
+        "converged": bool(
+            residuals[-1] <= PROFILES[profile]["tol"]
+            and primal_residuals[-1] <= PROFILES[profile]["tol"]
+        ),
         "elapsed_seconds": elapsed,
         "transport_P": model.P,
         "rotation_R": model.Rg,
+        "admm_global_residual_curve": residuals.tolist(),
+        "admm_primal_residual_curve": primal_residuals.tolist(),
+        "admm_dual_residual_curve": model.diagnostics["admm_dual_residual"].tolist(),
+        "transport_objective_curve": model.diagnostics["transport_objective"].tolist(),
+        "group_sinkhorn_marginal_error_curve": model.diagnostics[
+            "group_sinkhorn_marginal_error"
+        ].tolist(),
     }
     return result, aligned
 
@@ -201,7 +212,7 @@ def run_soft(
         **evaluate(aligned=aligned, neural_3d=neural_3d, movement_3d=movement_3d, **evaluation_args),
         "iterations": int(len(residuals)),
         "final_residual": float(residuals[-1]),
-        "converged": bool(residuals[-1] <= PROFILES[profile]["tol"]),
+        "converged": bool(model.diagnostics["admm_converged"]),
         "elapsed_seconds": elapsed,
         "max_sinkhorn_marginal_error": float(np.max(marginal_errors)),
         "support_mode": model.diagnostics["support_mode"],
@@ -214,6 +225,13 @@ def run_soft(
             "group_transport_column_marginal_error"
         ],
         "admm_primal_residual": float(model.diagnostics["admm_primal_residual"][-1]),
+        "admm_global_residual_curve": residuals.tolist(),
+        "admm_primal_residual_curve": model.diagnostics["admm_primal_residual"].tolist(),
+        "admm_dual_residual_curve": model.diagnostics["admm_dual_residual"].tolist(),
+        "transport_objective_curve": model.diagnostics[
+            "transport_objective_history"
+        ].tolist(),
+        "sinkhorn_marginal_error_curve": marginal_errors.tolist(),
         "source_support_sizes": model.diagnostics["source_support_sizes"],
         "target_support_sizes": model.diagnostics["target_support_sizes"],
         "source_retained_mass": model.diagnostics["source_retained_mass"],

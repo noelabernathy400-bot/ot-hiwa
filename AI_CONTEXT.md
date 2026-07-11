@@ -11,7 +11,7 @@ Establish whether the MiHiA implementation faithfully transfers TACO soft protot
 - `soft_groups.py`: independently learned prototypes with reconstruction plus assignment-entropy regularization.
 - Normalized assignment columns define the soft empirical measures; every $(i,j)$ has a weighted Sinkhorn $Q_{ij}$.
 - $P$ uses the TACO Birkhoff (uniform-group) marginal. “Soft group marginals” means the $Q_{ij}$ marginals, not non-uniform $P$ marginals.
-- HiWA provides $R_{ij}$, global orthogonal $R$, and ADMM. Stopping requires both global change and ADMM primal residual.
+- HiWA provides $R_{ij}$, global orthogonal $R$, and ADMM. Hard and Soft both record global, primal, and dual residuals, transport objective, and group/Sinkhorn marginal error; comparable stopping requires global and primal residuals.
 - `support_mode="sparse"` is a declared approximation; `full` is the comparison reference.
 
 Pure baseline settings: representative guidance/rotation, component conditioning, and rotation anchor all zero; Joint-Prototype and ROCA off. ROCA may only choose `det(R)=-1/+1` without labels; labels are final evaluation only.
@@ -33,4 +33,4 @@ python -m pytest tests -q
 python experiments/hiwa/run_taco_faithful_baseline.py --seeds 0
 ```
 
-Record accuracy, $R^2$, residuals, Sinkhorn errors, $P$, group costs, determinant, orthogonality, support mode, ROCA volume/condition/warning, and runtime. Never use labels for a branch or hyperparameter choice.
+Use only these visible names: `Hard HiWA`, `Soft-GCOT HiWA`, and `Soft-GCOT HiWA + ROCA`; call sparse support an approximation, not a separate method. Record accuracy, $R^2$, residuals, Sinkhorn errors, $P$, group costs, determinant, orthogonality, support mode, ROCA volume/condition/warning, and runtime. Never use labels for a branch or hyperparameter choice.
