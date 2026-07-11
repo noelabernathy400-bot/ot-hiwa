@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual env
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Personal config
+.obsidian/
+.claude/
+.claudian/
+.opencode/
+
+# Logs & temp
+*.log
+*.err.log
+tmp/
+*.tmp
+
+# Large data
+*.h5ad
+*.h5
+
+# Archives
+*.7z
+*.zip
+*.tar.gz
+
+# Secrets
+.env
+credentials.json
