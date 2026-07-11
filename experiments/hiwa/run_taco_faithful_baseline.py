@@ -33,7 +33,7 @@ if str(ROCA_DIR) not in sys.path:
 from common import FIGURES_DIR, RESULTS_DIR, ensure_output_dirs, write_json
 from run_neural import least_squares_rotation, load_demo, movement_to_3d, remove_constant_columns
 from run_soft_neural import PROFILES, run_hard, run_soft
-from soft_groups import assignment_entropy, learn_soft_groups
+from soft_groups import assignment_entropy, assignments_from_prototypes, learn_soft_groups
 
 # Historical bounded smoke profile retained only for reproducing its prior output.
 PROFILES.setdefault(
@@ -54,10 +54,28 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seeds", nargs="+", type=int, default=[0])
     parser.add_argument("--groups", type=int, default=4)
     parser.add_argument("--temperature", type=float, default=1.0)
+    parser.add_argument(
+        "--temperature-path",
+        nargs="+",
+        type=float,
+        default=None,
+        help="optional fixed soft-assignment path; each stage inherits the preceding state",
+    )
     parser.add_argument("--entropy-weight", type=float, default=0.05)
     parser.add_argument("--retain-mass", type=float, default=0.90)
     parser.add_argument("--max-support-factor", type=float, default=1.5)
     parser.add_argument("--max-samples", type=int, default=96, help="Deterministic per-domain neural smoke subset; 0 uses all samples.")
+    parser.add_argument(
+        "--warm-start-hard",
+        action="store_true",
+        help="initialize the first soft stage from the Hard HiWA rotation and transport",
+    )
+    parser.add_argument(
+        "--roca-support-mode",
+        choices=("full", "sparse"),
+        default="full",
+        help="support used only for Soft-GCOT HiWA + ROCA; full is the default baseline",
+    )
     parser.add_argument("--tag", default="")
     parser.add_argument(
         "--sync-results",
@@ -100,6 +118,71 @@ def _simplex_diagnostics(values: np.ndarray, assignments: np.ndarray) -> dict:
         "condition_number": float(singular.max() / max(singular.min(), 1e-12)),
         "mean_assignment_entropy": float(assignment_entropy(assignments).mean()),
     }
+
+
+def _assignment_stages(values: np.ndarray, args: argparse.Namespace, seed: int) -> tuple[np.ndarray, list[np.ndarray]]:
+    """Return hard labels and one or more soft-assignment stages without labels."""
+    path = args.temperature_path or [args.temperature]
+    learned = learn_soft_groups(values, args.groups, path[0], args.entropy_weight, seed=seed)
+    if args.temperature_path is None:
+        return np.argmax(learned.assignments, axis=1), [learned.assignments]
+    standardized = (values - values.mean(axis=0, keepdims=True)) / np.maximum(
+        values.std(axis=0, keepdims=True), 1e-12
+    )
+    stages = [
+        assignments_from_prototypes(standardized, learned.prototypes_standardized, temperature)
+        for temperature in path
+    ]
+    hard = learn_soft_groups(values, args.groups, path[-1], args.entropy_weight, seed=seed)
+    return np.argmax(hard.assignments, axis=1), stages
+
+
+def _run_soft_stages(
+    *,
+    neural: np.ndarray,
+    movement: np.ndarray,
+    source_stages: list[np.ndarray],
+    target_stages: list[np.ndarray],
+    hard: dict,
+    target_transform: np.ndarray,
+    oracle_rotation: np.ndarray,
+    evaluation: dict,
+    args: argparse.Namespace,
+    seed: int,
+    method: str,
+    support_mode: str,
+    determinant_sign: int | None = None,
+) -> tuple[dict, list[dict]]:
+    previous_rotation = np.asarray(hard["rotation_R"]) if args.warm_start_hard else None
+    previous_transport = np.asarray(hard["transport_P"]) if args.warm_start_hard else None
+    stages: list[dict] = []
+    for index, (source_assignments, target_assignments) in enumerate(zip(source_stages, target_stages)):
+        result, _ = run_soft(
+            neural,
+            source_assignments,
+            movement,
+            target_assignments,
+            target_transform,
+            oracle_rotation,
+            seed,
+            args.profile,
+            args.retain_mass,
+            args.max_support_factor,
+            evaluation,
+            method=method,
+            initial_rotation=previous_rotation,
+            initial_transport=previous_transport,
+            warm_start_local=previous_rotation is not None,
+            determinant_sign=determinant_sign,
+            support_mode=support_mode,
+        )
+        result["stage"] = index
+        result["temperature"] = (args.temperature_path or [args.temperature])[index]
+        result["warm_start_hard"] = args.warm_start_hard
+        stages.append(result)
+        previous_rotation = np.asarray(result["rotation_R"])
+        previous_transport = np.asarray(result["transport_P"])
+    return stages[-1], stages
 
 
 def _roca_selector(source: np.ndarray, a: np.ndarray, target: np.ndarray, b: np.ndarray, transports: list[np.ndarray]) -> dict:
@@ -193,22 +276,25 @@ def main() -> None:
     neural, movement, target_transform, oracle_rotation, evaluation = _problem(args.max_samples)
     records: list[dict] = []
     roca: list[dict] = []
+    stage_records: list[dict] = []
     for seed in args.seeds:
-        source_groups = learn_soft_groups(neural, args.groups, args.temperature, args.entropy_weight, seed=seed)
-        target_groups = learn_soft_groups(movement, args.groups, args.temperature, args.entropy_weight, seed=seed)
-        hard, _ = run_hard("hard_hiwa", neural, np.argmax(source_groups.assignments, axis=1), movement, np.argmax(target_groups.assignments, axis=1), target_transform, oracle_rotation, seed, args.profile, evaluation)
+        source_hard, source_stages = _assignment_stages(neural, args, seed)
+        target_hard, target_stages = _assignment_stages(movement, args, seed)
+        hard, _ = run_hard("hard_hiwa", neural, source_hard, movement, target_hard, target_transform, oracle_rotation, seed, args.profile, evaluation)
         records.append(hard)
         hard["display_name"] = "Hard HiWA"
-        full, _ = run_soft(neural, source_groups.assignments, movement, target_groups.assignments, target_transform, oracle_rotation, seed, args.profile, args.retain_mass, args.max_support_factor, evaluation, method="soft_gcot_full", support_mode="full")
-        sparse, _ = run_soft(neural, source_groups.assignments, movement, target_groups.assignments, target_transform, oracle_rotation, seed, args.profile, args.retain_mass, args.max_support_factor, evaluation, method="soft_gcot_sparse", support_mode="sparse")
+        full, full_stages = _run_soft_stages(neural=neural, movement=movement, source_stages=source_stages, target_stages=target_stages, hard=hard, target_transform=target_transform, oracle_rotation=oracle_rotation, evaluation=evaluation, args=args, seed=seed, method="soft_gcot_full", support_mode="full")
+        sparse, sparse_stages = _run_soft_stages(neural=neural, movement=movement, source_stages=source_stages, target_stages=target_stages, hard=hard, target_transform=target_transform, oracle_rotation=oracle_rotation, evaluation=evaluation, args=args, seed=seed, method="soft_gcot_sparse", support_mode="sparse")
+        stage_records.extend(full_stages + sparse_stages)
         records.extend([full, sparse])
         full["display_name"] = "Soft-GCOT HiWA"
         sparse["display_name"] = "Soft-GCOT HiWA (sparse approximation)"
         candidates = []
         for sign in (-1, 1):
-            candidate, _ = run_soft(neural, source_groups.assignments, movement, target_groups.assignments, target_transform, oracle_rotation, seed, args.profile, args.retain_mass, args.max_support_factor, evaluation, method=f"soft_gcot_roca_candidate_det_{sign:+d}", determinant_sign=sign, support_mode="full")
+            candidate, candidate_stages = _run_soft_stages(neural=neural, movement=movement, source_stages=source_stages, target_stages=target_stages, hard=hard, target_transform=target_transform, oracle_rotation=oracle_rotation, evaluation=evaluation, args=args, seed=seed, method=f"soft_gcot_roca_candidate_det_{sign:+d}", support_mode=args.roca_support_mode, determinant_sign=sign)
             candidates.append(candidate)
-        selection = _roca_selector(neural, source_groups.assignments, movement, target_groups.assignments, [row["transport_P"] for row in candidates])
+            stage_records.extend(candidate_stages)
+        selection = _roca_selector(neural, source_stages[-1], movement, target_stages[-1], [row["transport_P"] for row in candidates])
         chosen = next(row for row in candidates if int(round(row["rotation_determinant"])) == selection["selected_determinant_sign"])
         chosen["method"] = "soft_gcot_roca"
         chosen["display_name"] = "Soft-GCOT HiWA + ROCA"
@@ -231,6 +317,7 @@ def main() -> None:
         "label_usage": "labels are used only for final direction-accuracy and movement-R2 evaluation; never for fitting, branch selection, or hyperparameter selection",
         "frozen_configuration": {"representative_guidance_weight": 0.0, "representative_rotation_weight": 0.0, "component_conditioning_weight": 0.0, "rotation_anchor_weight": 0.0, "joint_prototypes": False},
         "parameters": vars(args),
+        "stage_results": stage_records,
         "environment": {"python": platform.python_version(), "numpy": np.__version__, "scipy": scipy.__version__, "scikit_learn": sklearn.__version__},
         "convergence_rule": "A run is comparable only when both global and primal ADMM residuals are at or below tol; dual residual and objective are diagnostic traces.",
         "results": records,
