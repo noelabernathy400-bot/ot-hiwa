@@ -19,6 +19,8 @@ python experiments/hiwa/run_taco_faithful_baseline.py --seeds 50 51 52 53 54 --t
 
 The runner compares Hard HiWA, Soft-GCOT HiWA, its declared sparse approximation, and Soft-GCOT HiWA + ROCA. The default `audit` profile uses a fixed numerical budget and a common global-plus-primal ADMM stopping rule. It writes JSON plus accuracy and convergence figures. The deterministic 96-by-96 neural subset is a bounded audit subset; use `--max-samples 0` for the full data at substantially greater cost.
 
+Successful mainline runs automatically commit and push only their generated JSON and figures. Use `--no-sync-results` only for a local dry run; automatic sync refuses to proceed if unrelated changes are already staged.
+
 | Method | Contract |
 |---|---|
 | Hard HiWA | Original HiWA using hard labels from unlabeled learned prototypes. |

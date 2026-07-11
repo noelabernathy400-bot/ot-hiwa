@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import platform
+import subprocess
 import sys
 from pathlib import Path
 
@@ -24,6 +25,7 @@ from scipy.optimize import linear_sum_assignment
 from sklearn.decomposition import FactorAnalysis
 
 HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[1]
 ROCA_DIR = HERE.parent / "roca"
 if str(ROCA_DIR) not in sys.path:
     sys.path.insert(0, str(ROCA_DIR))
@@ -57,6 +59,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-support-factor", type=float, default=1.5)
     parser.add_argument("--max-samples", type=int, default=96, help="Deterministic per-domain neural smoke subset; 0 uses all samples.")
     parser.add_argument("--tag", default="")
+    parser.add_argument(
+        "--sync-results",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="commit and push only this run's JSON and figures after a successful run",
+    )
     return parser.parse_args()
 
 
@@ -232,6 +240,19 @@ def main() -> None:
     _plot(records, figure_path)
     _plot_convergence(records, convergence_path)
     print(f"saved: {json_path}\nsaved: {figure_path}\nsaved: {convergence_path}")
+    if args.sync_results:
+        subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "tools" / "sync_result_artifacts.py"),
+                str(json_path),
+                str(figure_path),
+                str(convergence_path),
+                "--message",
+                "record soft-gcot audit results",
+            ],
+            check=True,
+        )
 
 
 if __name__ == "__main__":
