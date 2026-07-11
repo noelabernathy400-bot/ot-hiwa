@@ -1,57 +1,29 @@
-# OT-HiWA — Optimal Transport for Multi-Modal Distribution Alignment
+# OT-HiWA
 
-Hierarchical Wasserstein Alignment (**HiWA**, NeurIPS 2019) and extensions.
+The current primary line is **TACO-faithful Soft-GCOT HiWA** for MiHiA macaque neural--movement alignment: learned soft prototypes, weighted group empirical measures, group transport $P$, one weighted sample transport $Q_{ij}$ per group pair, and the original HiWA local/global orthogonal ADMM consensus.
 
-- **HiWA**: base algorithm — cluster-guided OT + Procrustes rotation
-- **CC-HiWA**: component-conditioned HiWA with soft assignments
-- **Soft-HiWA**: temperature-annealed prototype assignment
-- **ROCA-HiWA**: rotation-oriented component-aware with determinant validation
-- **GI-CC-HiWA**: graph-informed CC-HiWA for single-cell multi-omics (PBMC)
+## Priority
 
-## Quick Start
+1. Reproduce and audit TACO-faithful Soft-GCOT HiWA.
+2. Test ROCA only on that unchanged baseline.
+3. Retain Joint-Prototype, CC-HiWA, PBMC, and GI-CC-HiWA as exploratory extensions.
 
-```bash
+## Quick start
+
+```powershell
 pip install -r requirements.txt
-
-# PowerShell: expose the migrated source and experiment modules.
 $env:PYTHONPATH = "$PWD\src;$PWD\src\cc_hiwa;$PWD\experiments\hiwa;$PWD\experiments\roca"
-
-# Unit tests
 python -m pytest tests -q
-
-# HiWA on synthetic data
-python experiments/hiwa/run_synthetic.py --profile quick --seeds 0 1 2
-
-# HiWA on neural data
-python experiments/hiwa/run_neural.py --profile quick --seeds 0
+python experiments/hiwa/run_taco_faithful_baseline.py --seeds 0
 ```
 
-## Structure
+The runner compares Hard HiWA, full-support Soft-GCOT, sparse-support Soft-GCOT, and full-support Soft-GCOT + ROCA. The default deterministic 96-by-96 neural subset is a bounded smoke experiment; use `--max-samples 0` for the full data at substantially greater cost.
 
-```
-├── src/             ← Core algorithms
-├── experiments/     ← Run & analyze scripts
-├── tests/           ← Unit tests
-├── docs/            ← Reading notes & reports
-├── papers/          ← Reference PDFs
-├── data/            ← Demo data
-├── README.md        ← You are here
-└── AI_CONTEXT.md    ← AI agent guide
-```
+| Method | Contract |
+|---|---|
+| Hard HiWA | Original HiWA using hard labels from unlabeled learned prototypes. |
+| Soft-GCOT (full) | Weighted full-support soft groups, $P$, all $Q_{ij}$, and HiWA ADMM. Representative guidance, anchors, component conditioning, Joint-Prototype, and ROCA are off. |
+| Soft-GCOT (sparse) | Computational top-membership approximation to full support; never a silent replacement. |
+| Soft-GCOT + ROCA | Full baseline over both determinant components; unlabeled representative orientation selects the branch and emits a warning. |
 
-## References
-
-- Lee et al. (2019). *Hierarchical Optimal Transport for Multimodal Distribution Alignment.* NeurIPS. [arXiv:1906.11768](https://arxiv.org/abs/1906.11768)
-- *TACO: Learning Geometric Knowledge from Text for Geometry-Free Adsorption Screening.* TPAMI.
-
-## Status
-
-| Method | Status |
-|--------|--------|
-| HiWA reproduction (synthetic + neural) | ✅ matches paper |
-| Soft-Prototype HiWA | ✅ pilot done |
-| ROCA-HiWA (synthetic validation) | ✅ |
-| CC-HiWA PBMC smoke tests | ✅ |
-| GI-CC-HiWA (graph-informed) | 🔧 in progress |
-
-> **Note:** Report results across ≥5 random seeds. HiWA is non-convex.
+Key paths: `src/hiwa/` (reference HiWA), `src/cc_hiwa/` (soft and exploratory extensions), `experiments/hiwa/` (runners), `docs/taco/` and `docs/hiwa/` (paper notes). See `docs/research/TACO-faithful_Soft-GCOT_HiWA_audit_2026-07-11.md` and `experiments/results/taco_faithful_baseline_20260711_minimal.md`.

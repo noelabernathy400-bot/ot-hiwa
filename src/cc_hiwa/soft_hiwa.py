@@ -103,7 +103,12 @@ def _unit_scale_cost(cost: np.ndarray) -> np.ndarray:
 
 
 class SoftHiWA:
-    """Sparse soft-group extension of the original NumPy HiWA implementation."""
+    """TACO-style soft-group HiWA with an explicit full-support reference mode.
+
+    ``support_mode='full'`` is the faithful GCOT reference: each Q_ij uses all
+    samples with the normalized soft assignment column as its marginal.
+    ``'sparse'`` preserves the previous top-membership approximation.
+    """
 
     def __init__(
         self,
@@ -120,6 +125,7 @@ class SoftHiWA:
         sa_shorn_gamma: float = 1e-1,
         retain_mass: float = 0.90,
         max_support_factor: float = 1.5,
+        support_mode: str = "sparse",
         random_state: int = 0,
         warm_start_local: bool = False,
         rotation_anchor_weight: float = 0.0,
@@ -142,6 +148,9 @@ class SoftHiWA:
         self.sa_shorn_gamma = sa_shorn_gamma
         self.retain_mass = retain_mass
         self.max_support_factor = max_support_factor
+        if support_mode not in {"full", "sparse"}:
+            raise ValueError("support_mode must be 'full' or 'sparse'")
+        self.support_mode = support_mode
         self.random_state = random_state
         self.warm_start_local = warm_start_local
         if rotation_anchor_weight < 0:
@@ -197,16 +206,24 @@ class SoftHiWA:
         n_groups_y = b.shape[1]
         x_mbed = (x_transform @ x_transform.T @ x_fit.T).T / np.sqrt(high_dim)
         y_mbed = (y_transform @ y_transform.T @ y_fit.T).T / np.sqrt(high_dim)
-        x_indices, x_weights, x_retained = build_sparse_group_supports(
-            a,
-            retain_mass=self.retain_mass,
-            max_support_factor=self.max_support_factor,
-        )
-        y_indices, y_weights, y_retained = build_sparse_group_supports(
-            b,
-            retain_mass=self.retain_mass,
-            max_support_factor=self.max_support_factor,
-        )
+        if self.support_mode == "full":
+            x_indices = [np.arange(x_mbed.shape[0]) for _ in range(n_groups_x)]
+            y_indices = [np.arange(y_mbed.shape[0]) for _ in range(n_groups_y)]
+            x_weights = [a[:, group] / np.maximum(a[:, group].sum(), EPS) for group in range(n_groups_x)]
+            y_weights = [b[:, group] / np.maximum(b[:, group].sum(), EPS) for group in range(n_groups_y)]
+            x_retained = [1.0] * n_groups_x
+            y_retained = [1.0] * n_groups_y
+        else:
+            x_indices, x_weights, x_retained = build_sparse_group_supports(
+                a,
+                retain_mass=self.retain_mass,
+                max_support_factor=self.max_support_factor,
+            )
+            y_indices, y_weights, y_retained = build_sparse_group_supports(
+                b,
+                retain_mass=self.retain_mass,
+                max_support_factor=self.max_support_factor,
+            )
 
         # Match the legacy HiWA RandomState stream so paired hard/soft runs
         # start from the same global and local rotation draws.
@@ -257,6 +274,7 @@ class SoftHiWA:
         mixed_group_cost = np.zeros_like(group_cost)
         residuals: list[float] = []
         max_marginal_errors: list[float] = []
+        admm_primal_residuals: list[float] = []
         component_cost_means: list[float] = []
         component_cost_maxima: list[float] = []
 
@@ -357,12 +375,21 @@ class SoftHiWA:
                 - global_rotation[:, :, None, None]
             )
             residual = float(np.linalg.norm(previous - global_rotation, "fro"))
+            primal_residual = float(
+                np.max(
+                    np.linalg.norm(
+                        local_rotations - global_rotation[:, :, None, None],
+                        axis=(0, 1),
+                    )
+                )
+            )
             residuals.append(residual)
             max_marginal_errors.append(iteration_error)
+            admm_primal_residuals.append(primal_residual)
             if iteration_component_cost_means:
                 component_cost_means.append(float(np.mean(iteration_component_cost_means)))
                 component_cost_maxima.append(float(np.max(iteration_component_cost_maxima)))
-            if residual <= self.tol and len(residuals) >= 6:
+            if residual <= self.tol and primal_residual <= self.tol and len(residuals) >= 6:
                 break
 
         local_global_distances = np.linalg.norm(
@@ -373,6 +400,7 @@ class SoftHiWA:
         self.P = group_transport
         self.diagnostics = {
             "Rg_norm": np.asarray(residuals),
+            "admm_primal_residual": np.asarray(admm_primal_residuals),
             "C": group_cost,
             "representative_cost": representative_cost,
             "mixed_group_cost": mixed_group_cost,
@@ -381,7 +409,16 @@ class SoftHiWA:
             "target_support_sizes": [int(len(item)) for item in y_indices],
             "source_retained_mass": x_retained,
             "target_retained_mass": y_retained,
-            "sparse_approximation": True,
+            "support_mode": self.support_mode,
+            "sparse_approximation": self.support_mode == "sparse",
+            "source_soft_group_mass": (a.sum(axis=0) / a.sum()).tolist(),
+            "target_soft_group_mass": (b.sum(axis=0) / b.sum()).tolist(),
+            "group_transport_row_marginal_error": float(
+                np.max(np.abs(group_transport.sum(axis=1) - 1.0 / n_groups_x))
+            ),
+            "group_transport_column_marginal_error": float(
+                np.max(np.abs(group_transport.sum(axis=0) - 1.0 / n_groups_y))
+            ),
             "rotation_anchor_weight": self.rotation_anchor_weight,
             "rotation_anchor_distance": (
                 float(np.linalg.norm(global_rotation - rotation_anchor, "fro"))

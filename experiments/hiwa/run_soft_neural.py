@@ -159,6 +159,7 @@ def run_soft(
     representative_guidance_weight: float = 0.0,
     representative_rotation_weight: float = 0.0,
     component_conditioning_weight: float = 0.0,
+    support_mode: str = "sparse",
 ) -> tuple[dict, np.ndarray]:
     model = SoftHiWA(
         dim_red_method=Isomap(n_components=2, n_neighbors=12),
@@ -168,6 +169,7 @@ def run_soft(
         sa_shorn_gamma=1e-1,
         retain_mass=retain_mass,
         max_support_factor=max_support_factor,
+        support_mode=support_mode,
         random_state=seed,
         warm_start_local=warm_start_local,
         rotation_anchor_weight=rotation_anchor_weight,
@@ -202,6 +204,16 @@ def run_soft(
         "converged": bool(residuals[-1] <= PROFILES[profile]["tol"]),
         "elapsed_seconds": elapsed,
         "max_sinkhorn_marginal_error": float(np.max(marginal_errors)),
+        "support_mode": model.diagnostics["support_mode"],
+        "source_soft_group_mass": model.diagnostics["source_soft_group_mass"],
+        "target_soft_group_mass": model.diagnostics["target_soft_group_mass"],
+        "group_transport_row_marginal_error": model.diagnostics[
+            "group_transport_row_marginal_error"
+        ],
+        "group_transport_column_marginal_error": model.diagnostics[
+            "group_transport_column_marginal_error"
+        ],
+        "admm_primal_residual": float(model.diagnostics["admm_primal_residual"][-1]),
         "source_support_sizes": model.diagnostics["source_support_sizes"],
         "target_support_sizes": model.diagnostics["target_support_sizes"],
         "source_retained_mass": model.diagnostics["source_retained_mass"],

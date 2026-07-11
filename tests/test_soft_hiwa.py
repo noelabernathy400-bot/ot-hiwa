@@ -52,6 +52,20 @@ class SoftGroupTests(unittest.TestCase):
         np.testing.assert_allclose(np.sort(weights[1]), [1 / 3, 1 / 3, 1 / 3])
         np.testing.assert_allclose(retained, [1.0, 1.0])
 
+    def test_full_support_keeps_every_sample_and_exact_soft_marginals(self) -> None:
+        assignments = np.asarray([[0.8, 0.2], [0.3, 0.7], [0.1, 0.9]])
+        source = np.asarray([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
+        model = SoftHiWA(
+            normalize=False, maxiter=6, tol=10.0, sa_maxiter=2,
+            shorn_maxiter=300, sa_shorn_maxiter=300, support_mode="full",
+            random_state=3,
+        ).fit(source, assignments, source, assignments)
+        self.assertEqual(model.diagnostics["support_mode"], "full")
+        self.assertEqual(model.diagnostics["source_support_sizes"], [3, 3])
+        np.testing.assert_allclose(model.diagnostics["source_retained_mass"], [1.0, 1.0])
+        self.assertLess(model.diagnostics["max_sinkhorn_marginal_error"].max(), 1e-7)
+        self.assertLess(model.diagnostics["group_transport_row_marginal_error"], 1e-7)
+
 
 class WeightedTransportTests(unittest.TestCase):
     def test_sinkhorn_respects_nonuniform_marginals(self) -> None:

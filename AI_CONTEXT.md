@@ -1,60 +1,36 @@
-# AI_CONTEXT — OT-HiWA Research Project
+# AI context: OT-HiWA
 
-> For Claude Code, ChatGPT, Codex. Read this first.
+## Frozen primary objective
 
-## Project
+Establish whether the MiHiA implementation faithfully transfers TACO soft prototypes and GCOT into HiWA. Priority: (1) Soft-GCOT HiWA, (2) ROCA on that fixed baseline, (3) exploratory Joint-Prototype, CC-HiWA, PBMC, and GI-CC-HiWA. Do not delete prior work or present an extension as the baseline.
 
-Optimal Transport research: **HiWA** (hierarchical Wasserstein alignment) → **CC-HiWA** → **ROCA-HiWA** → **GI-CC-HiWA**, inspired by **TACO**.
+## Baseline contract
 
-- Python 3.13 | numpy 2.4 | scipy 1.17 | scikit-learn 1.9
-- Notes in Chinese, code/math in English
+`SoftHiWA(..., support_mode="full")` is the reference.
 
-## Code Map
+- `soft_groups.py`: independently learned prototypes with reconstruction plus assignment-entropy regularization.
+- Normalized assignment columns define the soft empirical measures; every $(i,j)$ has a weighted Sinkhorn $Q_{ij}$.
+- $P$ uses the TACO Birkhoff (uniform-group) marginal. “Soft group marginals” means the $Q_{ij}$ marginals, not non-uniform $P$ marginals.
+- HiWA provides $R_{ij}$, global orthogonal $R$, and ADMM. Stopping requires both global change and ADMM primal residual.
+- `support_mode="sparse"` is a declared approximation; `full` is the comparison reference.
 
-```
-src/hiwa/               ← Base HiWA (stable reference, 2 files)
-src/cc_hiwa/            ← Our extensions (active dev, 5 files)
+Pure baseline settings: representative guidance/rotation, component conditioning, and rotation anchor all zero; Joint-Prototype and ROCA off. ROCA may only choose `det(R)=-1/+1` without labels; labels are final evaluation only.
 
-experiments/hiwa/       ← HiWA reproduction + Soft-HiWA (7 scripts)
-experiments/roca/       ← ROCA-HiWA experiments (16 scripts)
-experiments/pbmc/       ← PBMC CC-HiWA (3 scripts)
-tests/                  ← Unit tests (4 files)
+## Main paths and checks
 
-docs/hiwa/              ← HiWA paper 13-chapter reading notes
-docs/taco/              ← TACO paper reading notes
-docs/research/          ← CC-HiWA, ROCA, Soft research reports
-docs/pbmc/              ← PBMC experiment documentation
-docs/methodology/       ← Reading methods, literature survey
-papers/                 ← Reference PDFs
-data/                   ← Demo data
+```text
+src/hiwa/hiwa.py                         hard HiWA reference
+src/cc_hiwa/soft_groups.py               prototype learning
+src/cc_hiwa/soft_hiwa.py                 full/sparse Soft-GCOT HiWA
+src/cc_hiwa/cc_hiwa.py                   exploratory S = A P B^T extension
+src/cc_hiwa/joint_prototypes.py          exploratory module
+experiments/hiwa/run_taco_faithful_baseline.py  unified runner
 ```
 
-## Key Docs
-
-| File | Content |
-|------|---------|
-| `docs/hiwa/第一章 论文主要公式解释.md` | HiWA math foundations |
-| `docs/research/从HiWA到ROCA-HiWA学习总览-*.md` | Complete learning path |
-| `docs/research/CC-HiWA研究骨干与TACO迁移总纲-*.md` | Research roadmap |
-| `docs/research/ROCA-HiWA阶段性研究报告-*.md` | ROCA phase report |
-
-## Rules
-
-1. **Never delete/overwrite** data, reference PDFs, or existing results
-2. **Do not modify `src/hiwa.py`** without explicit instruction — stable reference
-3. **Always ≥5 random seeds** for results; single-seed = invalid
-4. **Run tests** before and after modifying `src/`: `python -m pytest tests/`
-5. **Log all runs** including failures; don't cherry-pick
-6. **Don't fabricate** paper details — mark unknowns `TBD`
-
-## Current Priority
-
-1. Improve CC-HiWA on PBMC — add graph/structure information (Procrustes baseline still stronger)
-2. TACO-style component-conditioned sample OT for neural data
-3. GI-CC-HiWA method iteration
-
-## Environment
-
-```bash
-pip install -r requirements.txt
+```powershell
+$env:PYTHONPATH = "$PWD\src;$PWD\src\cc_hiwa;$PWD\experiments\hiwa;$PWD\experiments\roca"
+python -m pytest tests -q
+python experiments/hiwa/run_taco_faithful_baseline.py --seeds 0
 ```
+
+Record accuracy, $R^2$, residuals, Sinkhorn errors, $P$, group costs, determinant, orthogonality, support mode, ROCA volume/condition/warning, and runtime. Never use labels for a branch or hyperparameter choice.

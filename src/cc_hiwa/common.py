@@ -11,7 +11,10 @@ from sklearn.neighbors import NearestNeighbors
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-PYHIWA_ROOT = PROJECT_ROOT / "最优传输" / "PyHiWA"
+# The migrated demo is versioned in this repository.  The previous path pointed
+# to a workstation-local pre-migration checkout and made every neural runner
+# fail after cloning the repository.
+PYHIWA_ROOT = PROJECT_ROOT
 RESULTS_DIR = PROJECT_ROOT / "experiments" / "results"
 FIGURES_DIR = PROJECT_ROOT / "experiments" / "figures"
 

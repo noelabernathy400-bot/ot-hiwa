@@ -1,0 +1,472 @@
+{
+  "experiment": "taco_faithful_soft_gcot_hiwa_neural_baseline",
+  "label_usage": "labels are used only for final direction-accuracy and movement-R2 evaluation; never for fitting, branch selection, or hyperparameter selection",
+  "frozen_configuration": {
+    "representative_guidance_weight": 0.0,
+    "representative_rotation_weight": 0.0,
+    "component_conditioning_weight": 0.0,
+    "rotation_anchor_weight": 0.0,
+    "joint_prototypes": false
+  },
+  "parameters": {
+    "profile": "baseline-mini",
+    "seeds": [
+      0
+    ],
+    "groups": 4,
+    "temperature": 1.0,
+    "entropy_weight": 0.05,
+    "retain_mass": 0.9,
+    "max_support_factor": 1.5,
+    "max_samples": 96,
+    "tag": "20260711_minimal"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "scikit_learn": "1.9.0"
+  },
+  "results": [
+    {
+      "method": "hard_hiwa",
+      "seed": 0,
+      "before_direction_accuracy": 0.2708333333333333,
+      "after_direction_accuracy": 0.5729166666666666,
+      "before_velocity_r2": -1.170327701520784,
+      "after_velocity_r2": 0.5587065071301562,
+      "iterations": 6,
+      "final_residual": 2.0004831537918712,
+      "converged": false,
+      "elapsed_seconds": 0.5346638000000894,
+      "transport_P": [
+        [
+          0.00013252456689734164,
+          5.5505884221690335e-06,
+          0.2477896255975873,
+          0.005452263826710995
+        ],
+        [
+          0.15970823608306742,
+          0.02172335956990512,
+          7.767676942305593e-06,
+          0.06743262307549319
+        ],
+        [
+          0.07181391944120165,
+          7.42365327747362e-14,
+          9.134279113991774e-06,
+          0.1771151130668816
+        ],
+        [
+          0.018345319908833608,
+          0.22827108984159847,
+          0.0021934724463564524,
+          3.091425066652808e-11
+        ]
+      ],
+      "rotation_R": [
+        [
+          -0.2681069273027379,
+          -0.5916107675319064,
+          -0.7603389870791799
+        ],
+        [
+          0.962771924876968,
+          -0.19278438568135298,
+          -0.18948456746173692
+        ],
+        [
+          0.034480374142152416,
+          0.7828351553026806,
+          -0.6212730667116074
+        ]
+      ]
+    },
+    {
+      "method": "soft_gcot_full",
+      "seed": 0,
+      "before_direction_accuracy": 0.2708333333333333,
+      "after_direction_accuracy": 0.5625,
+      "before_velocity_r2": -1.170327701520784,
+      "after_velocity_r2": 0.5307134235740143,
+      "iterations": 6,
+      "final_residual": 2.001664083783154,
+      "converged": false,
+      "elapsed_seconds": 0.7630044999999654,
+      "max_sinkhorn_marginal_error": 0.00016179961694760825,
+      "support_mode": "full",
+      "source_soft_group_mass": [
+        0.2766376827389656,
+        0.2672436455741482,
+        0.21954289584529127,
+        0.23657577584159495
+      ],
+      "target_soft_group_mass": [
+        0.2237110610821416,
+        0.22699861688633807,
+        0.3468839852946726,
+        0.2024063367368476
+      ],
+      "group_transport_row_marginal_error": 0.001633029945454778,
+      "group_transport_column_marginal_error": 5.551115123125783e-17,
+      "admm_primal_residual": 2.828011830593582,
+      "source_support_sizes": [
+        96,
+        96,
+        96,
+        96
+      ],
+      "target_support_sizes": [
+        96,
+        96,
+        96,
+        96
+      ],
+      "source_retained_mass": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "target_retained_mass": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "transport_P": [
+        [
+          5.280315260498854e-05,
+          1.6810693999373167e-05,
+          0.24399744264459702,
+          0.0075659734542533694
+        ],
+        [
+          0.03212034165375655,
+          0.20264361286164864,
+          2.2840003389137242e-05,
+          0.014544689007955316
+        ],
+        [
+          0.021596130729544777,
+          2.533611797370715e-12,
+          0.00012680225410629985,
+          0.22788929185886547
+        ],
+        [
+          0.19623072446409368,
+          0.04733957644181837,
+          0.005852915097907552,
+          4.5678925780366876e-08
+        ]
+      ],
+      "rotation_R": [
+        [
+          0.055846752138256725,
+          -0.604560992252047,
+          -0.7945987332753739
+        ],
+        [
+          0.9951900129164655,
+          -0.030448581576585008,
+          0.09311134233432151
+        ],
+        [
+          0.08048588986234397,
+          0.7959766896883316,
+          -0.5999526072998367
+        ]
+      ],
+      "rotation_anchor_weight": 0.0,
+      "rotation_anchor_distance": null,
+      "determinant_sign_constraint": null,
+      "rotation_determinant": -1.0,
+      "rotation_orthogonality_error": 6.973490068105009e-16,
+      "transport_objective": 0.9227532771547433,
+      "guided_transport_objective": 0.9227532771547433,
+      "representative_guidance_weight": 0.0,
+      "representative_rotation_weight": 0.0,
+      "representative_rotation_cross_norm": 0.4045055683335385,
+      "component_conditioning_weight": 0.0,
+      "component_conditioning_cost_mean": 0.0,
+      "component_conditioning_cost_max": 0.0,
+      "representative_cost_mean": 0.0,
+      "representative_cost_max": 0.0,
+      "local_global_consensus_mean": 2.007237611797505,
+      "local_global_consensus_max": 2.828011830593582,
+      "local_global_consensus_weighted_rms": 2.000834257001918
+    },
+    {
+      "method": "soft_gcot_sparse",
+      "seed": 0,
+      "before_direction_accuracy": 0.2708333333333333,
+      "after_direction_accuracy": 0.3333333333333333,
+      "before_velocity_r2": -1.170327701520784,
+      "after_velocity_r2": 0.19726890132419006,
+      "iterations": 6,
+      "final_residual": 2.0032310590590665,
+      "converged": false,
+      "elapsed_seconds": 0.47760889999995015,
+      "max_sinkhorn_marginal_error": 2.4045900611092963e-05,
+      "support_mode": "sparse",
+      "source_soft_group_mass": [
+        0.2766376827389656,
+        0.2672436455741482,
+        0.21954289584529127,
+        0.23657577584159495
+      ],
+      "target_soft_group_mass": [
+        0.2237110610821416,
+        0.22699861688633807,
+        0.3468839852946726,
+        0.2024063367368476
+      ],
+      "group_transport_row_marginal_error": 0.0021355816298261887,
+      "group_transport_column_marginal_error": 5.551115123125783e-17,
+      "admm_primal_residual": 2.5373396743841004,
+      "source_support_sizes": [
+        32,
+        31,
+        31,
+        34
+      ],
+      "target_support_sizes": [
+        35,
+        26,
+        36,
+        36
+      ],
+      "source_retained_mass": [
+        0.9046452457887888,
+        0.9070990138731363,
+        0.9037281183917402,
+        0.9025725004107201
+      ],
+      "target_retained_mass": [
+        0.90394866309809,
+        0.9061584422958453,
+        0.8455780569153527,
+        0.8565224328910102
+      ],
+      "transport_P": [
+        [
+          4.1231515026009476e-05,
+          2.3220504603098104e-06,
+          0.24391231790373494,
+          0.008179710160604904
+        ],
+        [
+          0.08536911791930424,
+          0.11517191492765111,
+          1.785878397003075e-05,
+          0.048687225567125625
+        ],
+        [
+          0.025862940615705276,
+          0.030259032373650213,
+          7.206563056155606e-05,
+          0.19313306220159357
+        ],
+        [
+          0.13872670994996447,
+          0.10456673064823839,
+          0.005997757681733485,
+          2.070675895071384e-09
+        ]
+      ],
+      "rotation_R": [
+        [
+          -0.7574811218581738,
+          -0.4174118565046046,
+          -0.5019857488792508
+        ],
+        [
+          0.6517361440261268,
+          -0.4384347932235454,
+          -0.6188820005954146
+        ],
+        [
+          -0.03824066681477494,
+          0.7959536884394762,
+          -0.6041484728617255
+        ]
+      ],
+      "rotation_anchor_weight": 0.0,
+      "rotation_anchor_distance": null,
+      "determinant_sign_constraint": null,
+      "rotation_determinant": -1.0000000000000004,
+      "rotation_orthogonality_error": 7.484347061494264e-16,
+      "transport_objective": 0.92716486547888,
+      "guided_transport_objective": 0.92716486547888,
+      "representative_guidance_weight": 0.0,
+      "representative_rotation_weight": 0.0,
+      "representative_rotation_cross_norm": 0.25850644004375123,
+      "component_conditioning_weight": 0.0,
+      "component_conditioning_cost_mean": 0.0,
+      "component_conditioning_cost_max": 0.0,
+      "representative_cost_mean": 0.0,
+      "representative_cost_max": 0.0,
+      "local_global_consensus_mean": 1.9233476091491744,
+      "local_global_consensus_max": 2.5373396743841004,
+      "local_global_consensus_weighted_rms": 1.9481070542193082
+    },
+    {
+      "method": "soft_gcot_roca",
+      "seed": 0,
+      "before_direction_accuracy": 0.2708333333333333,
+      "after_direction_accuracy": 0.28125,
+      "before_velocity_r2": -1.170327701520784,
+      "after_velocity_r2": -1.2193147792492849,
+      "iterations": 6,
+      "final_residual": 2.7486915002333605,
+      "converged": false,
+      "elapsed_seconds": 0.6512797999999975,
+      "max_sinkhorn_marginal_error": 7.361175276714149e-06,
+      "support_mode": "full",
+      "source_soft_group_mass": [
+        0.2766376827389656,
+        0.2672436455741482,
+        0.21954289584529127,
+        0.23657577584159495
+      ],
+      "target_soft_group_mass": [
+        0.2237110610821416,
+        0.22699861688633807,
+        0.3468839852946726,
+        0.2024063367368476
+      ],
+      "group_transport_row_marginal_error": 0.00102091510204394,
+      "group_transport_column_marginal_error": 2.7755575615628914e-17,
+      "admm_primal_residual": 2.809815515064778,
+      "source_support_sizes": [
+        96,
+        96,
+        96,
+        96
+      ],
+      "target_support_sizes": [
+        96,
+        96,
+        96,
+        96
+      ],
+      "source_retained_mass": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "target_retained_mass": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "transport_P": [
+        [
+          0.010044212132883675,
+          0.0002542391713119863,
+          0.24072089911033037,
+          1.56468751786948e-06
+        ],
+        [
+          0.09971528069847752,
+          0.05058460936015668,
+          0.00040681725195428807,
+          0.09894206506213493
+        ],
+        [
+          3.256782474465719e-11,
+          0.09964165088061527,
+          5.181054860314203e-06,
+          0.14995070024149182
+        ],
+        [
+          0.140240507136071,
+          0.09951950058791603,
+          0.008867102582854999,
+          0.0011056700088553884
+        ]
+      ],
+      "rotation_R": [
+        [
+          -0.3123120322417219,
+          -0.6888875634644475,
+          0.6541369271192854
+        ],
+        [
+          0.11932424523835113,
+          -0.7115735248439734,
+          -0.6924051149720231
+        ],
+        [
+          -0.9424557915442733,
+          0.13819205348043226,
+          -0.3044339621979085
+        ]
+      ],
+      "rotation_anchor_weight": 0.0,
+      "rotation_anchor_distance": null,
+      "determinant_sign_constraint": -1,
+      "rotation_determinant": -0.9999999999999984,
+      "rotation_orthogonality_error": 1.8860867003566985e-15,
+      "transport_objective": 1.0077165218288702,
+      "guided_transport_objective": 1.0077165218288702,
+      "representative_guidance_weight": 0.0,
+      "representative_rotation_weight": 0.0,
+      "representative_rotation_cross_norm": 0.16928659789517528,
+      "component_conditioning_weight": 0.0,
+      "component_conditioning_cost_mean": 0.0,
+      "component_conditioning_cost_max": 0.0,
+      "representative_cost_mean": 0.0,
+      "representative_cost_max": 0.0,
+      "local_global_consensus_mean": 2.613856641221873,
+      "local_global_consensus_max": 2.809815515064778,
+      "local_global_consensus_weighted_rms": 2.4726502280327995,
+      "roca": {
+        "selected_determinant_sign": -1,
+        "source_volume": -6.025188536632605,
+        "target_volume": 4.446332357400182,
+        "volume_product_margin": 26.789990749866206,
+        "source_condition_number": 2.333518391196254,
+        "target_condition_number": 3.9271557680821108,
+        "warning": true,
+        "warning_reasons": [
+          "high_assignment_entropy"
+        ],
+        "target_order": [
+          2,
+          0,
+          3,
+          1
+        ]
+      }
+    }
+  ],
+  "roca": [
+    {
+      "seed": 0,
+      "selected_determinant_sign": -1,
+      "source_volume": -6.025188536632605,
+      "target_volume": 4.446332357400182,
+      "volume_product_margin": 26.789990749866206,
+      "source_condition_number": 2.333518391196254,
+      "target_condition_number": 3.9271557680821108,
+      "warning": true,
+      "warning_reasons": [
+        "high_assignment_entropy"
+      ],
+      "target_order": [
+        2,
+        0,
+        3,
+        1
+      ],
+      "candidate_determinants": [
+        -0.9999999999999984,
+        0.9999999999999998
+      ]
+    }
+  ]
+}
