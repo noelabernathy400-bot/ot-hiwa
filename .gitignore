@@ -33,6 +33,7 @@ tmp/
 # Large data
 *.h5ad
 *.h5
+data/pbmc/
 
 # Archives
 *.7z

@@ -91,10 +91,12 @@ def _run_soft_chain(
     initial_rotation: np.ndarray | None,
     initial_transport: np.ndarray | None,
     method: str,
-) -> tuple[dict, list[dict]]:
+    capture_final_couplings: bool = False,
+) -> tuple[dict, list[dict], dict[str, object]]:
     rotation = np.asarray(hard["rotation_R"]) if initial_rotation is None else np.asarray(initial_rotation)
     transport = np.asarray(hard["transport_P"]) if initial_transport is None else np.asarray(initial_transport)
     records: list[dict] = []
+    capture: dict[str, object] = {}
     for stage, (source, target) in enumerate(zip(source_stages, target_stages)):
         result, _ = run_soft(
             neural,
@@ -113,13 +115,79 @@ def _run_soft_chain(
             initial_transport=transport,
             warm_start_local=True,
             support_mode="full",
+            capture_couplings=capture_final_couplings and stage == len(source_stages) - 1,
         )
+        if capture_couplings and stage == len(source_stages) - 1:
+            capture = {
+                "local_couplings": result.pop("_local_couplings"),
+                "global_sample_coupling": result.pop("_global_sample_coupling"),
+            }
         result["stage"] = stage
         result["temperature"] = float([0.25, 0.35, 0.50][stage]) if len(source_stages) == 3 else None
         records.append(result)
         rotation = np.asarray(result["rotation_R"])
         transport = np.asarray(result["transport_P"])
-    return records[-1], records
+    return records[-1], records, capture
+
+
+def _assignment_change(new: np.ndarray, old: np.ndarray) -> dict[str, float]:
+    return {
+        "frobenius": float(np.linalg.norm(new - old, "fro")),
+        "argmax_change_fraction": float(np.mean(np.argmax(new, axis=1) != np.argmax(old, axis=1))),
+    }
+
+
+def _mechanism_snapshot(
+    result: dict,
+    source_assignment: np.ndarray,
+    target_assignment: np.ndarray,
+    capture: dict[str, object],
+) -> dict[str, object]:
+    return {
+        "source_assignment": np.asarray(source_assignment),
+        "target_assignment": np.asarray(target_assignment),
+        "group_transport": np.asarray(result["transport_P"]),
+        "rotation": np.asarray(result["rotation_R"]),
+        "local_couplings": capture["local_couplings"],
+        "global_sample_coupling": np.asarray(capture["global_sample_coupling"]),
+        "local_entropy": np.asarray(result["local_coupling_entropy"]),
+        "local_frobenius": np.asarray(result["local_coupling_frobenius_norm"]),
+        "transport_objective": float(result["transport_objective"]),
+    }
+
+
+def _mechanism_delta(current: dict[str, object], previous: dict[str, object] | None) -> dict[str, object]:
+    """Summarize an outer-loop state without serializing dense local couplings."""
+    output: dict[str, object] = {
+        "transport_objective": float(current["transport_objective"]),
+        "local_coupling_entropy": np.asarray(current["local_entropy"]).tolist(),
+        "local_coupling_frobenius_norm": np.asarray(current["local_frobenius"]).tolist(),
+    }
+    if previous is None:
+        output["change_from_previous"] = None
+        return output
+    local_current = current["local_couplings"]
+    local_previous = previous["local_couplings"]
+    local_delta = np.asarray(
+        [
+            [float(np.linalg.norm(local_current[i][j] - local_previous[i][j], "fro")) for j in range(len(local_current[i]))]
+            for i in range(len(local_current))
+        ]
+    )
+    output["change_from_previous"] = {
+        "source_assignment": _assignment_change(current["source_assignment"], previous["source_assignment"]),
+        "target_assignment": _assignment_change(current["target_assignment"], previous["target_assignment"]),
+        "group_transport_frobenius": float(np.linalg.norm(current["group_transport"] - previous["group_transport"], "fro")),
+        "rotation_frobenius": float(np.linalg.norm(current["rotation"] - previous["rotation"], "fro")),
+        "global_sample_coupling_frobenius": float(
+            np.linalg.norm(current["global_sample_coupling"] - previous["global_sample_coupling"], "fro")
+        ),
+        "local_coupling_frobenius_delta": local_delta.tolist(),
+        "local_coupling_frobenius_delta_mean": float(local_delta.mean()),
+        "local_coupling_frobenius_delta_max": float(local_delta.max()),
+        "transport_objective_delta": float(current["transport_objective"] - previous["transport_objective"]),
+    }
+    return output
 
 
 def _plot(records: list[dict], path: Path) -> None:
@@ -163,6 +231,7 @@ def main() -> None:
     neural, movement, target_transform, oracle_rotation, evaluation = _problem(args.max_samples)
     records: list[dict] = []
     joint_diagnostics: list[dict] = []
+    mechanism_diagnostics: list[dict] = []
     stage_records: list[dict] = []
     for seed in args.seeds:
         source_proto, source_stages = _initial_path(neural, args, seed)
@@ -171,7 +240,7 @@ def main() -> None:
             "hard_hiwa", neural, np.argmax(source_stages[-1], axis=1), movement, np.argmax(target_stages[-1], axis=1), target_transform, oracle_rotation, seed, args.profile, evaluation
         )
         records.append(hard)
-        fixed, fixed_stages = _run_soft_chain(
+        fixed, fixed_stages, _ = _run_soft_chain(
             neural=neural, movement=movement, source_stages=source_stages, target_stages=target_stages, hard=hard,
             target_transform=target_transform, oracle_rotation=oracle_rotation, evaluation=evaluation, seed=seed, profile=args.profile,
             initial_rotation=None, initial_transport=None, method="fixed_soft_gcot"
@@ -180,17 +249,28 @@ def main() -> None:
         stage_records.extend(fixed_stages)
         prior_rotation = None
         prior_transport = None
+        previous_snapshot: dict[str, object] | None = None
         latest = None
         for outer in range(args.joint_outer_iterations):
-            latest, soft_stages = _run_soft_chain(
+            latest, soft_stages, capture = _run_soft_chain(
                 neural=neural, movement=movement, source_stages=source_stages, target_stages=target_stages, hard=hard,
                 target_transform=target_transform, oracle_rotation=oracle_rotation, evaluation=evaluation, seed=seed, profile=args.profile,
-                initial_rotation=prior_rotation, initial_transport=prior_transport, method="joint_soft_gcot"
+                initial_rotation=prior_rotation, initial_transport=prior_transport, method="joint_soft_gcot",
+                capture_final_couplings=True,
             )
             latest["joint_outer_iteration"] = outer
             stage_records.extend(soft_stages)
             prior_rotation = np.asarray(latest["rotation_R"])
             prior_transport = np.asarray(latest["transport_P"])
+            snapshot = _mechanism_snapshot(latest, source_stages[-1], target_stages[-1], capture)
+            mechanism_diagnostics.append(
+                {
+                    "seed": seed,
+                    "outer_iteration": outer,
+                    **_mechanism_delta(snapshot, previous_snapshot),
+                }
+            )
+            previous_snapshot = snapshot
             if outer == args.joint_outer_iterations - 1:
                 break
             target_entropy = float(0.5 * (assignment_entropy(source_stages[-1]).mean() + assignment_entropy(target_stages[-1]).mean()))
@@ -221,6 +301,7 @@ def main() -> None:
         "results": records,
         "stage_results": stage_records,
         "prototype_updates": joint_diagnostics,
+        "mechanism_diagnostics": mechanism_diagnostics,
         "summary": _summary(records),
     }
     write_json(json_path, payload)

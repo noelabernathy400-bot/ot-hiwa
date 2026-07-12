@@ -279,6 +279,9 @@ class SoftHiWA:
         transport_objectives: list[float] = []
         component_cost_means: list[float] = []
         component_cost_maxima: list[float] = []
+        local_couplings: list[list[np.ndarray | None]] = [
+            [None for _ in range(n_groups_y)] for _ in range(n_groups_x)
+        ]
 
         for _ in range(self.maxiter):
             iteration_error = 0.0
@@ -303,7 +306,7 @@ class SoftHiWA:
                     consensus = (self.mu / high_dim) * (
                         global_rotation - multipliers[:, :, i, j]
                     )
-                    local_rotations[:, :, i, j], group_cost[i, j], marginal_error = (
+                    local_rotations[:, :, i, j], group_cost[i, j], marginal_error, local_coupling = (
                         self._weighted_subspace_alignment(
                             x_i,
                             y_j,
@@ -316,6 +319,7 @@ class SoftHiWA:
                             component_cost,
                         )
                     )
+                    local_couplings[i][j] = local_coupling
                     iteration_error = max(iteration_error, marginal_error)
 
             if self.representative_guidance_weight > 0:
@@ -406,6 +410,21 @@ class SoftHiWA:
         )
         self.Rg = global_rotation
         self.P = group_transport
+        self.local_couplings = tuple(
+            tuple(coupling for coupling in row) for row in local_couplings
+        )
+        local_entropy = np.asarray(
+            [
+                [
+                    float(-np.sum(coupling * np.log(np.maximum(coupling, EPS))))
+                    for coupling in row
+                ]
+                for row in self.local_couplings
+            ]
+        )
+        local_frobenius = np.asarray(
+            [[float(np.linalg.norm(coupling, "fro")) for coupling in row] for row in self.local_couplings]
+        )
         self.diagnostics = {
             "Rg_norm": np.asarray(residuals),
             "admm_primal_residual": np.asarray(admm_primal_residuals),
@@ -467,6 +486,8 @@ class SoftHiWA:
             "local_global_consensus_weighted_rms": float(
                 np.sqrt(np.sum(group_transport * local_global_distances**2))
             ),
+            "local_coupling_entropy": local_entropy,
+            "local_coupling_frobenius_norm": local_frobenius,
         }
         return self
 
@@ -481,7 +502,7 @@ class SoftHiWA:
         rng: np.random.RandomState,
         initial_rotation: np.ndarray | None,
         component_cost: np.ndarray | None = None,
-    ) -> tuple[np.ndarray, float, float]:
+    ) -> tuple[np.ndarray, float, float, np.ndarray]:
         high_dim = source.shape[1]
         if initial_rotation is None:
             if self.determinant_sign is None:
@@ -516,7 +537,7 @@ class SoftHiWA:
             )
             if np.linalg.norm(previous - rotation, 2) <= self.sa_tol:
                 break
-        return rotation, float(distance), float(marginal_error)
+        return rotation, float(distance), float(marginal_error), coupling
 
     def transform(self, source: np.ndarray) -> np.ndarray:
         # Deliberately matches the legacy HiWA demo for a controlled comparison.

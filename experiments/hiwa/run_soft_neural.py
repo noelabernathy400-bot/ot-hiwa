@@ -171,6 +171,7 @@ def run_soft(
     representative_rotation_weight: float = 0.0,
     component_conditioning_weight: float = 0.0,
     support_mode: str = "full",
+    capture_couplings: bool = False,
 ) -> tuple[dict, np.ndarray]:
     model = SoftHiWA(
         dim_red_method=Isomap(n_components=2, n_neighbors=12),
@@ -270,7 +271,16 @@ def run_soft(
         "local_global_consensus_weighted_rms": model.diagnostics[
             "local_global_consensus_weighted_rms"
         ],
+        "local_coupling_entropy": model.diagnostics["local_coupling_entropy"],
+        "local_coupling_frobenius_norm": model.diagnostics["local_coupling_frobenius_norm"],
     }
+    if capture_couplings:
+        result["_local_couplings"] = model.local_couplings
+        result["_global_sample_coupling"] = sum(
+            model.P[i, j] * model.local_couplings[i][j]
+            for i in range(model.P.shape[0])
+            for j in range(model.P.shape[1])
+        )
     return result, aligned
 
 
