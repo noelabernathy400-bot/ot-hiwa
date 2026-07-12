@@ -1,0 +1,100 @@
+{
+  "experiment": "paired_pbmc_fixed_soft_gcot",
+  "input": "data\\pbmc\\processed\\pbmc_multiome_1000.npz",
+  "n_cells": 96,
+  "label_usage": "cell type is final evaluation only",
+  "parameters": {
+    "input": "data\\pbmc\\processed\\pbmc_multiome_1000.npz",
+    "seeds": [
+      100,
+      101,
+      102
+    ],
+    "groups": 4,
+    "temperature_path": [
+      0.25,
+      0.35,
+      0.5
+    ],
+    "entropy_weight": 0.05,
+    "max_cells": 96,
+    "tag": "pbmc_paired_96_seeds_100_102"
+  },
+  "results": [
+    {
+      "method": "paired_hard_hiwa",
+      "seed": 100,
+      "iterations": 32,
+      "converged": true,
+      "elapsed_seconds": 6.518294599998626,
+      "global_residual": 0.0004065678167689834,
+      "primal_residual": 0.09371800014722734,
+      "paired_recall_at_1": 0.0,
+      "paired_recall_at_5": 0.020833333333333332,
+      "cell_type_transfer_accuracy": 0.010416666666666666
+    },
+    {
+      "method": "fixed_soft_gcot",
+      "seed": 100,
+      "iterations": 63,
+      "converged": true,
+      "elapsed_seconds": 35.55507040000521,
+      "global_residual": 0.08966793690361433,
+      "primal_residual": 0.09544718039804188,
+      "support_mode": "full",
+      "paired_recall_at_1": 0.020833333333333332,
+      "paired_recall_at_5": 0.0625,
+      "cell_type_transfer_accuracy": 0.125
+    },
+    {
+      "method": "paired_hard_hiwa",
+      "seed": 101,
+      "iterations": 80,
+      "converged": false,
+      "elapsed_seconds": 15.06485419999808,
+      "global_residual": 0.20959857075330626,
+      "primal_residual": 0.3776433360455764,
+      "paired_recall_at_1": 0.0,
+      "paired_recall_at_5": 0.0625,
+      "cell_type_transfer_accuracy": 0.052083333333333336
+    },
+    {
+      "method": "fixed_soft_gcot",
+      "seed": 101,
+      "iterations": 80,
+      "converged": false,
+      "elapsed_seconds": 56.17493850000028,
+      "global_residual": 0.2554683185473113,
+      "primal_residual": 0.27282836029554036,
+      "support_mode": "full",
+      "paired_recall_at_1": 0.0,
+      "paired_recall_at_5": 0.020833333333333332,
+      "cell_type_transfer_accuracy": 0.052083333333333336
+    },
+    {
+      "method": "paired_hard_hiwa",
+      "seed": 102,
+      "iterations": 67,
+      "converged": true,
+      "elapsed_seconds": 13.443189400000847,
+      "global_residual": 0.09800471947467256,
+      "primal_residual": 0.0957062376387422,
+      "paired_recall_at_1": 0.020833333333333332,
+      "paired_recall_at_5": 0.03125,
+      "cell_type_transfer_accuracy": 0.052083333333333336
+    },
+    {
+      "method": "fixed_soft_gcot",
+      "seed": 102,
+      "iterations": 40,
+      "converged": true,
+      "elapsed_seconds": 28.65976640000008,
+      "global_residual": 0.06721461625472078,
+      "primal_residual": 0.07351960862005835,
+      "support_mode": "full",
+      "paired_recall_at_1": 0.010416666666666666,
+      "paired_recall_at_5": 0.03125,
+      "cell_type_transfer_accuracy": 0.052083333333333336
+    }
+  ]
+}
