@@ -66,6 +66,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-support-factor", type=float, default=1.5)
     parser.add_argument("--max-samples", type=int, default=96, help="Deterministic per-domain neural smoke subset; 0 uses all samples.")
     parser.add_argument(
+        "--include-sparse",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="run the sparse-support diagnostic alongside the full-support reference",
+    )
+    parser.add_argument(
         "--warm-start-hard",
         action="store_true",
         help="initialize the first soft stage from the Hard HiWA rotation and transport",
@@ -221,13 +227,22 @@ def _roca_selector(source: np.ndarray, a: np.ndarray, target: np.ndarray, b: np.
 
 
 def _plot(records: list[dict], path: Path) -> None:
-    names = ["hard_hiwa", "soft_gcot_full", "soft_gcot_sparse", "soft_gcot_roca"]
-    labels = ["Hard\nHiWA", "Soft-GCOT\nHiWA", "Sparse\napproximation", "Soft-GCOT HiWA\n+ ROCA"]
-    means = {name: [] for name in names}
+    definitions = [
+        ("hard_hiwa", "Hard\nHiWA", "#666666"),
+        ("soft_gcot_full", "Soft-GCOT\nHiWA", "#377eb8"),
+        ("soft_gcot_sparse", "Sparse\napproximation", "#4daf4a"),
+        ("soft_gcot_roca", "Soft-GCOT HiWA\n+ ROCA", "#984ea3"),
+    ]
+    means = {name: [] for name, _, _ in definitions}
     for row in records:
         means[row["method"]].append(row["after_direction_accuracy"])
+    definitions = [item for item in definitions if means[item[0]]]
     fig, ax = plt.subplots(figsize=(7, 4), constrained_layout=True)
-    ax.bar(labels, [float(np.mean(means[name])) for name in names], color=["#666666", "#377eb8", "#4daf4a", "#984ea3"])
+    ax.bar(
+        [label for _, label, _ in definitions],
+        [float(np.mean(means[name])) for name, _, _ in definitions],
+        color=[color for _, _, color in definitions],
+    )
     ax.set(ylabel="direction accuracy", title="Frozen TACO-faithful Soft-GCOT HiWA baseline")
     ax.set_ylim(0, 1)
     ax.grid(axis="y", alpha=0.2)
@@ -285,11 +300,15 @@ def main() -> None:
         records.append(hard)
         hard["display_name"] = "Hard HiWA"
         full, full_stages = _run_soft_stages(neural=neural, movement=movement, source_stages=source_stages, target_stages=target_stages, hard=hard, target_transform=target_transform, oracle_rotation=oracle_rotation, evaluation=evaluation, args=args, seed=seed, method="soft_gcot_full", support_mode="full")
-        sparse, sparse_stages = _run_soft_stages(neural=neural, movement=movement, source_stages=source_stages, target_stages=target_stages, hard=hard, target_transform=target_transform, oracle_rotation=oracle_rotation, evaluation=evaluation, args=args, seed=seed, method="soft_gcot_sparse", support_mode="sparse")
-        stage_records.extend(full_stages + sparse_stages)
-        records.extend([full, sparse])
+        stage_records.extend(full_stages)
+        records.append(full)
         full["display_name"] = "Soft-GCOT HiWA"
-        sparse["display_name"] = "Soft-GCOT HiWA (sparse approximation)"
+        sparse = None
+        if args.include_sparse:
+            sparse, sparse_stages = _run_soft_stages(neural=neural, movement=movement, source_stages=source_stages, target_stages=target_stages, hard=hard, target_transform=target_transform, oracle_rotation=oracle_rotation, evaluation=evaluation, args=args, seed=seed, method="soft_gcot_sparse", support_mode="sparse")
+            stage_records.extend(sparse_stages)
+            records.append(sparse)
+            sparse["display_name"] = "Soft-GCOT HiWA (sparse approximation)"
         candidates = []
         for sign in (-1, 1):
             candidate, candidate_stages = _run_soft_stages(neural=neural, movement=movement, source_stages=source_stages, target_stages=target_stages, hard=hard, target_transform=target_transform, oracle_rotation=oracle_rotation, evaluation=evaluation, args=args, seed=seed, method=f"soft_gcot_roca_candidate_det_{sign:+d}", support_mode=args.roca_support_mode, determinant_sign=sign)
@@ -302,7 +321,8 @@ def main() -> None:
         chosen["roca"] = selection
         records.append(chosen)
         roca.append({"seed": seed, **selection, "candidate_determinants": [row["rotation_determinant"] for row in candidates]})
-        print(f"seed={seed} hard={hard['after_direction_accuracy']:.3f} full={full['after_direction_accuracy']:.3f} sparse={sparse['after_direction_accuracy']:.3f} roca={chosen['after_direction_accuracy']:.3f}")
+        sparse_text = "" if sparse is None else f" sparse={sparse['after_direction_accuracy']:.3f}"
+        print(f"seed={seed} hard={hard['after_direction_accuracy']:.3f} full={full['after_direction_accuracy']:.3f}{sparse_text} roca={chosen['after_direction_accuracy']:.3f}")
     suffix = f"_{args.tag}" if args.tag else ""
     json_path = RESULTS_DIR / f"taco_faithful_baseline{suffix}.json"
     figure_path = FIGURES_DIR / f"taco_faithful_baseline{suffix}.png"
