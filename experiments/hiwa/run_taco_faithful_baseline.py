@@ -133,8 +133,9 @@ def _assignment_stages(values: np.ndarray, args: argparse.Namespace, seed: int) 
         assignments_from_prototypes(standardized, learned.prototypes_standardized, temperature)
         for temperature in path
     ]
-    hard = learn_soft_groups(values, args.groups, path[-1], args.entropy_weight, seed=seed)
-    return np.argmax(hard.assignments, axis=1), stages
+    # The paired Hard HiWA control must differ only in membership hardening,
+    # not in a separately learned prototype set.
+    return np.argmax(stages[-1], axis=1), stages
 
 
 def _run_soft_stages(

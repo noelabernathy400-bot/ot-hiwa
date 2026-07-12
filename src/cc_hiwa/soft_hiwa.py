@@ -125,7 +125,7 @@ class SoftHiWA:
         sa_shorn_gamma: float = 1e-1,
         retain_mass: float = 0.90,
         max_support_factor: float = 1.5,
-        support_mode: str = "sparse",
+        support_mode: str = "full",
         random_state: int = 0,
         warm_start_local: bool = False,
         rotation_anchor_weight: float = 0.0,

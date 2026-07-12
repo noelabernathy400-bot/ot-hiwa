@@ -170,7 +170,7 @@ def run_soft(
     representative_guidance_weight: float = 0.0,
     representative_rotation_weight: float = 0.0,
     component_conditioning_weight: float = 0.0,
-    support_mode: str = "sparse",
+    support_mode: str = "full",
 ) -> tuple[dict, np.ndarray]:
     model = SoftHiWA(
         dim_red_method=Isomap(n_components=2, n_neighbors=12),
