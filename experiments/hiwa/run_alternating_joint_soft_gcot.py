@@ -117,7 +117,7 @@ def _run_soft_chain(
             support_mode="full",
             capture_couplings=capture_final_couplings and stage == len(source_stages) - 1,
         )
-        if capture_couplings and stage == len(source_stages) - 1:
+        if capture_final_couplings and stage == len(source_stages) - 1:
             capture = {
                 "local_couplings": result.pop("_local_couplings"),
                 "global_sample_coupling": result.pop("_global_sample_coupling"),
