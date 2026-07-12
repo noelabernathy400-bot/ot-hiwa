@@ -1,0 +1,69 @@
+{
+  "inputs": [
+    "experiments\\results\\taco_faithful_baseline_full_support_roca_seeds_80_84.json",
+    "experiments\\results\\taco_faithful_baseline_full_support_roca_seeds_85_89.json"
+  ],
+  "seeds": [
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89
+  ],
+  "comparisons_vs_hard": {
+    "soft_gcot_full": {
+      "after_direction_accuracy": {
+        "mean": 0.008333333333333314,
+        "median": 0.01041666666666663,
+        "sample_std": 0.008216777476527234,
+        "positive_count": 6,
+        "n": 10,
+        "bootstrap_95_ci": [
+          0.004166666666666652,
+          0.013541666666666641
+        ]
+      },
+      "after_velocity_r2": {
+        "mean": 0.0038699450776628285,
+        "median": 0.005154337423804889,
+        "sample_std": 0.0022260901056507226,
+        "positive_count": 10,
+        "n": 10,
+        "bootstrap_95_ci": [
+          0.0024590808951319653,
+          0.005154963251655264
+        ]
+      }
+    },
+    "soft_gcot_roca": {
+      "after_direction_accuracy": {
+        "mean": 0.06041666666666664,
+        "median": 0.01041666666666663,
+        "sample_std": 0.09756882660935266,
+        "positive_count": 7,
+        "n": 10,
+        "bootstrap_95_ci": [
+          0.008333333333333304,
+          0.1270833333333333
+        ]
+      },
+      "after_velocity_r2": {
+        "mean": 0.14560620795500373,
+        "median": 0.0051605116695634945,
+        "sample_std": 0.4471474534011306,
+        "positive_count": 10,
+        "n": 10,
+        "bootstrap_95_ci": [
+          0.0033222918997198956,
+          0.4287446237299795
+        ]
+      }
+    }
+  },
+  "label_usage": "labels appear only in stored final metrics; this script performs no model, branch, or hyperparameter selection"
+}
