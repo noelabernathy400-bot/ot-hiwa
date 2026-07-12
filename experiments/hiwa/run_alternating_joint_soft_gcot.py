@@ -23,6 +23,7 @@ import sklearn
 
 from common import FIGURES_DIR, RESULTS_DIR, ensure_output_dirs, write_json
 from joint_soft_gcot import JointSoftGCOTConfig, update_prototypes_from_soft_gcot
+from transport_consistent_joint import TransportConsistentConfig, update_transport_consistent_prototypes
 from run_neural import least_squares_rotation
 from run_soft_neural import PROFILES, run_hard, run_soft
 from run_taco_faithful_baseline import _problem
@@ -44,6 +45,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lambda-cross", type=float, default=0.10)
     parser.add_argument("--lambda-entropy", type=float, default=0.05)
     parser.add_argument("--lambda-l2", type=float, default=1e-4)
+    parser.add_argument("--joint-objective", choices=("prototype_cross", "transport_consistent"), default="prototype_cross")
     parser.add_argument("--joint-maxiter", type=int, default=80)
     parser.add_argument("--max-samples", type=int, default=96)
     parser.add_argument("--tag", default="joint_soft_gcot_seeds_100_102")
@@ -274,12 +276,20 @@ def main() -> None:
             if outer == args.joint_outer_iterations - 1:
                 break
             target_entropy = float(0.5 * (assignment_entropy(source_stages[-1]).mean() + assignment_entropy(target_stages[-1]).mean()))
-            update = update_prototypes_from_soft_gcot(
-                neural, movement, rotation=prior_rotation, group_transport=prior_transport,
-                initial_source_prototypes_standardized=source_proto, initial_target_prototypes_standardized=target_proto,
-                target_entropy=target_entropy,
-                config=JointSoftGCOTConfig(n_groups=args.groups, temperature=args.temperature_path[-1], lambda_cross=args.lambda_cross, lambda_entropy=args.lambda_entropy, lambda_l2=args.lambda_l2, maxiter=args.joint_maxiter),
-            )
+            if args.joint_objective == "prototype_cross":
+                update = update_prototypes_from_soft_gcot(
+                    neural, movement, rotation=prior_rotation, group_transport=prior_transport,
+                    initial_source_prototypes_standardized=source_proto, initial_target_prototypes_standardized=target_proto,
+                    target_entropy=target_entropy,
+                    config=JointSoftGCOTConfig(n_groups=args.groups, temperature=args.temperature_path[-1], lambda_cross=args.lambda_cross, lambda_entropy=args.lambda_entropy, lambda_l2=args.lambda_l2, maxiter=args.joint_maxiter),
+                )
+            else:
+                update = update_transport_consistent_prototypes(
+                    neural, movement, local_couplings=snapshot["local_couplings"], group_transport=prior_transport,
+                    initial_source_prototypes_standardized=source_proto, initial_target_prototypes_standardized=target_proto,
+                    target_entropy=target_entropy,
+                    config=TransportConsistentConfig(n_groups=args.groups, temperature=args.temperature_path[-1], lambda_tc=args.lambda_cross, lambda_entropy=args.lambda_entropy, lambda_l2=args.lambda_l2, maxiter=args.joint_maxiter),
+                )
             joint_diagnostics.append({"seed": seed, "outer_iteration": outer, "initial_loss": update.initial_loss, "final_loss": update.final_loss, "diagnostics": update.diagnostics})
             source_proto = update.source_prototypes_standardized
             target_proto = update.target_prototypes_standardized
