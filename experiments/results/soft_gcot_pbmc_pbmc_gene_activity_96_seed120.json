@@ -1,0 +1,48 @@
+{
+  "experiment": "paired_pbmc_fixed_soft_gcot",
+  "input": "data\\pbmc\\processed\\pbmc_gene_activity_96_seed120.npz",
+  "n_cells": 96,
+  "label_usage": "cell type is final evaluation only",
+  "parameters": {
+    "input": "data\\pbmc\\processed\\pbmc_gene_activity_96_seed120.npz",
+    "seeds": [
+      120
+    ],
+    "groups": 4,
+    "temperature_path": [
+      0.25,
+      0.35,
+      0.5
+    ],
+    "entropy_weight": 0.05,
+    "max_cells": 96,
+    "tag": "pbmc_gene_activity_96_seed120"
+  },
+  "results": [
+    {
+      "method": "paired_hard_hiwa",
+      "seed": 120,
+      "iterations": 52,
+      "converged": true,
+      "elapsed_seconds": 5.402776599992649,
+      "global_residual": 0.004571986670596288,
+      "primal_residual": 0.07614705541940181,
+      "paired_recall_at_1": 0.010416666666666666,
+      "paired_recall_at_5": 0.052083333333333336,
+      "cell_type_transfer_accuracy": 0.020833333333333332
+    },
+    {
+      "method": "fixed_soft_gcot",
+      "seed": 120,
+      "iterations": 52,
+      "converged": true,
+      "elapsed_seconds": 20.77162510000926,
+      "global_residual": 0.054543778595596885,
+      "primal_residual": 0.09777738400648042,
+      "support_mode": "full",
+      "paired_recall_at_1": 0.010416666666666666,
+      "paired_recall_at_5": 0.052083333333333336,
+      "cell_type_transfer_accuracy": 0.03125
+    }
+  ]
+}
