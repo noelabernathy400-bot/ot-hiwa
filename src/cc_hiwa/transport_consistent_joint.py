@@ -45,7 +45,7 @@ class TransportConsistentUpdate:
 
 
 def global_coupling(local_couplings: tuple[tuple[np.ndarray, ...], ...], group_transport: np.ndarray) -> np.ndarray:
-    """Return \(\Pi=\sum_{kl}P_{kl}Q_{kl}\) for full-support local couplings."""
+    r"""Return \(\Pi=\sum_{kl}P_{kl}Q_{kl}\) for full-support local couplings."""
     transport = np.asarray(group_transport, dtype=float)
     if transport.ndim != 2 or len(local_couplings) != transport.shape[0]:
         raise ValueError("local coupling and group transport shapes are incompatible")
@@ -79,7 +79,7 @@ def _unpack(flat: np.ndarray, n_groups: int, dimension: int) -> tuple[np.ndarray
 
 
 def transport_consistency_loss(source_assignments: np.ndarray, target_assignments: np.ndarray, coupling: np.ndarray, group_map: np.ndarray) -> float:
-    """Efficiently compute \(\sum_{ij}\Pi_{ij}\|S_i-T_jM^\top\|^2\)."""
+    r"""Efficiently compute \(\sum_{ij}\Pi_{ij}\|S_i-T_jM^\top\|^2\)."""
     source = np.asarray(source_assignments, dtype=float)
     target = np.asarray(target_assignments, dtype=float)
     pi = np.asarray(coupling, dtype=float)
