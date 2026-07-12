@@ -1,0 +1,60 @@
+{
+  "experiment": "paderborn_cross_condition_fault_transfer",
+  "input": "data\\bearing\\processed\\paderborn_speed_shift_96.npz",
+  "label_usage": "labels are used only for final source classifier training and target evaluation",
+  "parameters": {
+    "input": "data\\bearing\\processed\\paderborn_speed_shift_96.npz",
+    "seed": 130,
+    "groups": 4,
+    "temperature_path": [
+      0.25,
+      0.35,
+      0.5
+    ],
+    "entropy_weight": 0.05,
+    "tag": "speed_shift_96_seed130"
+  },
+  "results": [
+    {
+      "method": "unaligned",
+      "target_accuracy": 0.9375,
+      "target_macro_f1": 0.9369458128078817,
+      "target_recall_by_class": [
+        1.0,
+        0.8125,
+        1.0
+      ]
+    },
+    {
+      "method": "paired_hard_hiwa",
+      "iterations": 59,
+      "converged": true,
+      "elapsed_seconds": 7.807188999999198,
+      "global_residual": 0.007087791520985742,
+      "primal_residual": 0.08840992066361585,
+      "target_accuracy": 0.3333333333333333,
+      "target_macro_f1": 0.16666666666666666,
+      "target_recall_by_class": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "method": "fixed_soft_gcot",
+      "iterations": 80,
+      "converged": false,
+      "elapsed_seconds": 34.542287899996154,
+      "global_residual": 1.9999999999999998,
+      "primal_residual": 2.819804805355378,
+      "support_mode": "full",
+      "target_accuracy": 0.3229166666666667,
+      "target_macro_f1": 0.328042328042328,
+      "target_recall_by_class": [
+        0.96875,
+        0.0,
+        0.0
+      ]
+    }
+  ]
+}
