@@ -1,0 +1,38 @@
+{
+  "experiment": "pamap2_differentiable_task_aware_ot_paired_summary",
+  "scope": "three frozen-confirmation seeds under one temporal split; seed 501 is development and seeds 502-503 are confirmation",
+  "rows": [
+    {
+      "seed": 501,
+      "task_only_target_accuracy": 0.5,
+      "task_aware_ot_target_accuracy": 0.3888888888888889,
+      "paired_delta": -0.1111111111111111,
+      "task_only_source_validation_accuracy": 0.75,
+      "task_aware_ot_source_validation_accuracy": 0.75
+    },
+    {
+      "seed": 502,
+      "task_only_target_accuracy": 0.5555555555555556,
+      "task_aware_ot_target_accuracy": 0.2222222222222222,
+      "paired_delta": -0.33333333333333337,
+      "task_only_source_validation_accuracy": 0.75,
+      "task_aware_ot_source_validation_accuracy": 0.75
+    },
+    {
+      "seed": 503,
+      "task_only_target_accuracy": 0.5,
+      "task_aware_ot_target_accuracy": 0.3333333333333333,
+      "paired_delta": -0.16666666666666669,
+      "task_only_source_validation_accuracy": 0.75,
+      "task_aware_ot_source_validation_accuracy": 0.75
+    }
+  ],
+  "summary": {
+    "task_only_target_accuracy_mean": 0.5185185185185185,
+    "task_aware_ot_target_accuracy_mean": 0.3148148148148148,
+    "paired_delta_mean": -0.20370370370370372,
+    "paired_delta_median": -0.16666666666666669,
+    "task_aware_ot_better_seed_count": 0,
+    "seed_count": 3
+  }
+}

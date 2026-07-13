@@ -1,0 +1,194 @@
+{
+  "experiment": "pamap2_fully_differentiable_task_aware_hierarchical_ot_mvp",
+  "scope": "single fixed-protocol feasibility run; no target labels, pair IDs, or target-test data in fit",
+  "label_usage": {
+    "source_activity_labels": "source task loss and source semantic groups only",
+    "target_adaptation": "features only; group probabilities come from task-head outputs",
+    "target_test_labels": "opened after fit only for classification metrics",
+    "pair_ids": "not supplied to fit; held-out order used only for retrieval metrics"
+  },
+  "parameters": {
+    "raw_directory": "D:\\ai\\ot-hiwa\\data\\raw\\pamap2\\PAMAP2_Dataset",
+    "subject": 101,
+    "window_samples": 200,
+    "source_train_windows": 8,
+    "source_validation_windows": 2,
+    "target_adaptation_windows": 3,
+    "target_test_windows": 3,
+    "latent_dimension": 16,
+    "hidden_dimension": 32,
+    "source_warmup_epochs": 100,
+    "epochs": 200,
+    "seed": 502,
+    "tag": "pamap2_differentiable_task_aware_ot_normalized_subject101_seed502_20260713"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "torch": "2.13.0+cpu"
+  },
+  "data": {
+    "subject": 101,
+    "source_view": "wrist",
+    "target_view": "chest",
+    "samples": {
+      "source_train": 48,
+      "source_validation": 12,
+      "target_adaptation": 18,
+      "target_test": 18
+    }
+  },
+  "evaluation": {
+    "best_source_validation_accuracy": 0.75,
+    "target_test_accuracy": 0.2222222222222222,
+    "target_test_macro_f1": 0.15,
+    "paired_retrieval": {
+      "recall_at_1": 0.1111111111111111,
+      "recall_at_5": 0.6666666666666666
+    }
+  },
+  "transport_diagnostics": {
+    "best_epoch": 0,
+    "group_transport": [
+      [
+        0.16463178396224976,
+        0.0010053380392491817,
+        0.0002940155391115695,
+        0.0008415557094849646,
+        0.0002907858870457858,
+        0.00025822786847129464
+      ],
+      [
+        0.0010864108335226774,
+        0.1641656458377838,
+        0.0006734345806762576,
+        0.0011321345809847116,
+        0.00022956071188673377,
+        0.00019495593733154237
+      ],
+      [
+        0.00017880849190987647,
+        8.39864369481802e-05,
+        0.16551542282104492,
+        0.00019073787552770227,
+        3.590585720303352e-06,
+        2.6278182758687763e-06
+      ],
+      [
+        0.0006065673078410327,
+        0.0009587039239704609,
+        0.00017231320089194924,
+        0.16428205370903015,
+        0.0007944172248244286,
+        0.0006703659310005605
+      ],
+      [
+        9.845535532804206e-05,
+        0.00024160946486517787,
+        9.363856406707782e-06,
+        0.0001347502548014745,
+        0.16435110569000244,
+        0.0011400851653888822
+      ],
+      [
+        6.46230619167909e-05,
+        0.0002113602531608194,
+        2.118605152645614e-06,
+        8.542650903109461e-05,
+        0.0009972038678824902,
+        0.1644003838300705
+      ]
+    ],
+    "sample_transport_row_error": 1.4901161193847656e-08,
+    "sample_transport_column_error": 2.60770320892334e-08,
+    "history": [
+      {
+        "epoch": -100.0,
+        "loss": 1.9248837232589722,
+        "task_loss": 1.768062710762024,
+        "transport_loss": 0.0,
+        "group_loss": 0.0,
+        "source_validation_accuracy": 0.25
+      },
+      {
+        "epoch": -1.0,
+        "loss": 0.29642418026924133,
+        "task_loss": 0.2504027187824249,
+        "transport_loss": 0.0,
+        "group_loss": 0.0,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 0.0,
+        "loss": 3.236525774002075,
+        "task_loss": 0.24492840468883514,
+        "transport_loss": 2.276672840118408,
+        "group_loss": 2.046025037765503,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 24.0,
+        "loss": 0.8620104789733887,
+        "task_loss": 0.18609614670276642,
+        "transport_loss": 0.4805983603000641,
+        "group_loss": 0.21412715315818787,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 49.0,
+        "loss": 0.49834781885147095,
+        "task_loss": 0.1129518523812294,
+        "transport_loss": 0.2844146490097046,
+        "group_loss": 0.04462694376707077,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 74.0,
+        "loss": 0.31039267778396606,
+        "task_loss": 0.06574201583862305,
+        "transport_loss": 0.1690250039100647,
+        "group_loss": 0.014492528513073921,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 99.0,
+        "loss": 0.19482655823230743,
+        "task_loss": 0.03858865424990654,
+        "transport_loss": 0.09504304081201553,
+        "group_loss": 0.004487852565944195,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 124.0,
+        "loss": 0.14683829247951508,
+        "task_loss": 0.025778405368328094,
+        "transport_loss": 0.07008848339319229,
+        "group_loss": 0.0021373659837991,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 149.0,
+        "loss": 0.12049349397420883,
+        "task_loss": 0.01908992789685726,
+        "transport_loss": 0.05739767104387283,
+        "group_loss": 0.001280290074646473,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 174.0,
+        "loss": 0.1036790981888771,
+        "task_loss": 0.014950290322303772,
+        "transport_loss": 0.04948945716023445,
+        "group_loss": 0.0010086966212838888,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 199.0,
+        "loss": 0.09144756942987442,
+        "task_loss": 0.012146075256168842,
+        "transport_loss": 0.043861594051122665,
+        "group_loss": 0.000892879324965179,
+        "source_validation_accuracy": 0.75
+      }
+    ]
+  }
+}
