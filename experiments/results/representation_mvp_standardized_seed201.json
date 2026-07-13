@@ -1,0 +1,151 @@
+{
+  "experiment": "mihi_alternating_representation_soft_gcot_mvp",
+  "scope": "exploratory mechanism check; this is not a replacement for the frozen Soft-GCOT baseline",
+  "label_usage": "direction labels are used only after fitting for evaluation; no labels or pair IDs enter encoders, prototypes, or OT",
+  "parameters": {
+    "seed": 201,
+    "max_samples": 96,
+    "groups": 4,
+    "temperature": 0.5,
+    "hidden_dimension": 16,
+    "outer_steps": 3,
+    "encoder_steps": 25,
+    "learning_rate": 0.001,
+    "normalize_input": true,
+    "tag": "representation_mvp_standardized_seed201"
+  },
+  "solver_kwargs": {
+    "normalize": true,
+    "maxiter": 80,
+    "tol": 0.1,
+    "mu": 0.005,
+    "shorn_maxiter": 120,
+    "sa_maxiter": 12,
+    "sa_tol": 0.01,
+    "sa_shorn_maxiter": 40,
+    "sa_shorn_gamma": 0.1,
+    "shorn_gamma": 0.2,
+    "support_mode": "full",
+    "random_state": 201,
+    "warm_start_local": true
+  },
+  "environment": {
+    "python": "3.13.7",
+    "torch": "2.13.0+cpu"
+  },
+  "data": {
+    "source_samples": 96,
+    "target_samples": 96,
+    "input_dimension": 3,
+    "encoder_input_standardized": true,
+    "source_scaler": {
+      "mean": [
+        0.0335269067676848,
+        0.03932885100130416,
+        0.03745536131938291
+      ],
+      "scale": [
+        1.0055551875628965,
+        0.9355392531552484,
+        0.9346361951179134
+      ]
+    },
+    "target_scaler": {
+      "mean": [
+        -1.2474097616033968,
+        -5.011215338463104,
+        10.13482280776917
+      ],
+      "scale": [
+        7.65238363357017,
+        9.14018458887103,
+        8.127461259881912
+      ]
+    }
+  },
+  "evaluation": {
+    "unaligned_direction_accuracy": 0.2708333333333333,
+    "fixed_soft_gcot_direction_accuracy": 0.3854166666666667,
+    "learned_representation_direction_accuracy": 0.4375
+  },
+  "fixed_solver": {
+    "admm_converged": false,
+    "final_primal_residual": 0.10731695117010394,
+    "rotation_orthogonality_error": 8.778482409951043e-16
+  },
+  "learned_solver": {
+    "admm_converged": true,
+    "final_primal_residual": 0.08854489635134667,
+    "rotation_orthogonality_error": 7.565336391519912e-16,
+    "group_transport": [
+      [
+        0.005173114309967531,
+        0.0013678060671272333,
+        0.24131416472156136,
+        0.00214503774613184
+      ],
+      [
+        0.006267005673200016,
+        0.0016572161147485151,
+        0.0018588730863336404,
+        0.24021683486566536
+      ],
+      [
+        0.23514728005694419,
+        0.00433401622042316,
+        0.004782013565431786,
+        0.005736686110273006
+      ],
+      [
+        0.003412599959888213,
+        0.2426409615977011,
+        0.002044948626673237,
+        0.0019014412779298215
+      ]
+    ]
+  },
+  "outer_history": [
+    {
+      "outer_step": 0.0,
+      "loss": 2.214519500732422,
+      "alignment": 0.11208125948905945,
+      "reconstruction": 1.9847928285598755,
+      "variance_penalty": 0.11757509410381317,
+      "covariance_penalty": 0.0002938333200290799,
+      "balance_penalty": 0.0011111926287412643,
+      "source_effective_rank": 2.8707950115203857,
+      "target_effective_rank": 2.491957664489746,
+      "source_assignment_entropy": 1.3363151550292969,
+      "target_assignment_entropy": 1.3491920232772827,
+      "solver_primal_residual": 0.07517078731419662
+    },
+    {
+      "outer_step": 1.0,
+      "loss": 2.0335521697998047,
+      "alignment": 0.14882808923721313,
+      "reconstruction": 1.8615574836730957,
+      "variance_penalty": 0.023067403584718704,
+      "covariance_penalty": 0.0010321297449991107,
+      "balance_penalty": 0.0009558471501804888,
+      "source_effective_rank": 2.8832077980041504,
+      "target_effective_rank": 2.5837562084198,
+      "source_assignment_entropy": 1.3269850015640259,
+      "target_assignment_entropy": 1.3247075080871582,
+      "solver_primal_residual": 0.08546813711102161
+    },
+    {
+      "outer_step": 2.0,
+      "loss": 1.9618204832077026,
+      "alignment": 0.21425902843475342,
+      "reconstruction": 1.7448170185089111,
+      "variance_penalty": 0.0026359756011515856,
+      "covariance_penalty": 0.001132053672336042,
+      "balance_penalty": 0.0010376321151852608,
+      "source_effective_rank": 2.8966224193573,
+      "target_effective_rank": 2.7307848930358887,
+      "source_assignment_entropy": 1.3252359628677368,
+      "target_assignment_entropy": 1.324256181716919,
+      "solver_primal_residual": 0.07547004833683828
+    }
+  ]
+}
