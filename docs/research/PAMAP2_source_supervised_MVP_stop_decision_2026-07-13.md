@@ -69,12 +69,26 @@ flowchart LR
 
 同时，learned model 的 paired Recall@1 / Recall@5 为 `0.0% / 4.2%`，低于 fixed Soft-GCOT 的 `2.1% / 13.5%`。因此，当前训练器并未恢复数据资格诊断已经证明存在的共享几何。
 
+## 🛑 语义保留改动也未通过
+
+随后实施了唯一预先定义的结构性改动：同一个 source task head 同时约束对齐前的 `z_x` 与对齐后的 `z_x R^T`。使用全新 Seed 305，结果为：
+
+| 指标 | Fixed Soft-GCOT | Dual-task representation |
+|---|---:|---:|
+| 目标 Accuracy | **29.2%** | 6.3% |
+| 源原生 latent 训练 Accuracy | — | 80.2% |
+| 源对齐 latent 训练 Accuracy | — | 49.0% |
+| Paired Recall@5 | **13.5%** | 5.2% |
+
+这排除了一个直接解释：不是 source head 完全没有学到活动语义，而是当前无标签 `P,Q,R,Pi` 轮次不能保持该语义跨越对齐坐标系。把 source 分类约束加在两个坐标系中仍无法让 detached transport 产生正确跨视图对应。
+
 ## 🛑 当前停止条件
 
 停止继续调以下版本：
 
 - 当前 source-supervised alternating trainer 的损失权重；
 - source warm-up 步数；
+- dual-task semantic-preservation 版本的更多种子；
 - 当前 96 窗口、Subject 101 协议上的更多初始化种子。
 
 理由是问题已定位为模型机制，而不是数据是否可用：当前对齐更新会破坏源任务表征，且没有把已知存在的配对几何恢复出来。继续在同一套损失上做参数扫描会产生选择偏差，不能构成研究进展。
@@ -83,9 +97,9 @@ flowchart LR
 
 PAMAP2 可以保留为第二个主候选数据集，但下一版必须先解决一个明确的机制问题：
 
-> 在不使用目标标签或 pair ID 的前提下，如何让 `P,Q,R,Pi` 对齐步骤保留 source activity discrimination，而不是在每个 outer round 覆盖它？
+> 在不使用目标标签或 pair ID 的前提下，什么额外的跨视图识别信号能够让 `P,Q,R,Pi` 恢复语义正确的对应，而不只是降低无标签几何代价？
 
-下一轮应只比较一个预先定义的结构性改动与当前 frozen baseline：任务头同时约束 `z_x` 和 `z_x R^T`，并将 source task loss 作为每个外循环的显式保留项。开始前需要先固定多受试者、跨时间窗口的训练/评价划分；不应立即加入 ROCA、更多数据集或大规模搜索。
+下一轮不能再增加一个普通正则项。它应先形成单独的、预注册的模型假设，例如 class-conditional transport 的无标签目标近似、跨视图自监督锚点，或允许使用同步配对的弱监督任务；三者的科学问题与泄漏边界不同，必须先选择其一。开始前需要固定多受试者、跨时间窗口的训练/评价划分；不应立即加入 ROCA、更多数据集或大规模搜索。
 
 [^1]: UCI Machine Learning Repository. *PAMAP2 Physical Activity Monitoring*. https://archive.ics.uci.edu/dataset/231/pamap2%2Bphysical%2Bactivity%2Bmonitoring
 [^2]: J. W. Lockhart et al. *Activity Classification Using Unsupervised Domain Transfer from Body Worn Sensors*. arXiv:2304.10643, 2023. https://arxiv.org/abs/2304.10643

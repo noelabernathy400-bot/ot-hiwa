@@ -53,6 +53,7 @@ class SourceSupervisedRepresentationResult:
     solution: DetachedSoftGCOTSolution
     source_latent: np.ndarray
     target_latent: np.ndarray
+    source_native_logits: np.ndarray
     source_logits: np.ndarray
     target_logits: np.ndarray
     history: list[dict[str, float]]
@@ -200,7 +201,13 @@ class SourceSupervisedAlternatingSoftGCOT:
                     F.mse_loss(self.source_decoder(source_latent), source_tensor)
                     + F.mse_loss(self.target_decoder(target_latent), target_tensor)
                 )
-                task = F.cross_entropy(self.task_head(aligned_source), labels)
+                # The same source labels constrain both coordinate systems.
+                # This prevents a detached rotation update from improving the
+                # transport objective by erasing activity discrimination in
+                # the source encoder's native latent space.
+                task_native = F.cross_entropy(self.task_head(source_latent), labels)
+                task_aligned = F.cross_entropy(self.task_head(aligned_source), labels)
+                task = 0.5 * (task_native + task_aligned)
                 variance = (
                     variance_floor_penalty(source_latent, self.config.minimum_std)
                     + variance_floor_penalty(target_latent, self.config.minimum_std)
@@ -227,6 +234,8 @@ class SourceSupervisedAlternatingSoftGCOT:
                         "alignment": float(alignment.detach().cpu()),
                         "reconstruction": float(reconstruction.detach().cpu()),
                         "source_task_loss": float(task.detach().cpu()),
+                        "source_native_task_loss": float(task_native.detach().cpu()),
+                        "source_aligned_task_loss": float(task_aligned.detach().cpu()),
                         "variance_penalty": float(variance.detach().cpu()),
                         "covariance_penalty": float(covariance.detach().cpu()),
                         "balance_penalty": float(balance.detach().cpu()),
@@ -250,12 +259,14 @@ class SourceSupervisedAlternatingSoftGCOT:
                 },
             )
             fixed_rotation = torch.as_tensor(solution.rotation, dtype=source_tensor.dtype, device=self.device)
+            source_native_logits = self.task_head(final_source_tensor)
             source_logits = self.task_head(final_source_tensor @ fixed_rotation.T)
             target_logits = self.task_head(final_target_tensor)
         return SourceSupervisedRepresentationResult(
             solution=solution,
             source_latent=final_source_tensor.detach().cpu().numpy(),
             target_latent=final_target_tensor.detach().cpu().numpy(),
+            source_native_logits=source_native_logits.detach().cpu().numpy(),
             source_logits=source_logits.detach().cpu().numpy(),
             target_logits=target_logits.detach().cpu().numpy(),
             history=list(self.history),

@@ -1,0 +1,127 @@
+{
+  "experiment": "pamap2_wrist_to_chest_source_supervised_representation_mvp",
+  "scope": "small protocol check; not a final benchmark or a claim of end-to-end differentiation through OT",
+  "label_usage": {
+    "source_activity_labels": "used only by the source task-head cross-entropy loss",
+    "target_activity_labels": "opened only after fitting for accuracy and macro-F1",
+    "pair_ids": "opened only after fitting for retrieval evaluation; never supplied to the trainer or solver"
+  },
+  "parameters": {
+    "raw_directory": "D:\\ai\\ot-hiwa\\data\\raw\\pamap2\\PAMAP2_Dataset",
+    "subject": 101,
+    "windows_per_activity": 16,
+    "window_samples": 200,
+    "groups": 4,
+    "latent_dimension": 16,
+    "hidden_dimension": 32,
+    "outer_steps": 3,
+    "encoder_steps": 25,
+    "source_warmup_steps": 100,
+    "seed": 305,
+    "tag": "pamap2_wrist_chest_dual_task_seed305"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "torch": "2.13.0+cpu"
+  },
+  "data": {
+    "subject": 101,
+    "source_view": "wrist",
+    "target_view": "chest",
+    "samples": 96,
+    "input_dimension": 48,
+    "window_samples": 200,
+    "activity_counts": {
+      "lying": 16,
+      "sitting": 16,
+      "standing": 16,
+      "walking": 16,
+      "running": 16,
+      "cycling": 16
+    }
+  },
+  "evaluation": {
+    "source_only": {
+      "source_train_accuracy": 0.9583333333333334,
+      "target_accuracy": 0.19791666666666666,
+      "target_macro_f1": 0.15841609371021134
+    },
+    "fixed_soft_gcot": {
+      "source_train_accuracy": 0.9583333333333334,
+      "target_accuracy": 0.2916666666666667,
+      "target_macro_f1": 0.2446759259259259
+    },
+    "learned_source_supervised_soft_gcot": {
+      "source_native_train_accuracy": 0.8020833333333334,
+      "source_train_accuracy": 0.4895833333333333,
+      "target_accuracy": 0.0625,
+      "target_macro_f1": 0.053893030566458555
+    },
+    "fixed_paired_retrieval": {
+      "recall_at_1": 0.03125,
+      "recall_at_5": 0.13541666666666666
+    },
+    "learned_paired_retrieval": {
+      "recall_at_1": 0.020833333333333332,
+      "recall_at_5": 0.052083333333333336
+    }
+  },
+  "fixed_solver": {
+    "admm_converged": true,
+    "final_primal_residual": 0.02298283693066608
+  },
+  "learned_solver": {
+    "admm_converged": true,
+    "final_primal_residual": 0.09278729173320871
+  },
+  "outer_history": [
+    {
+      "outer_step": -1.0,
+      "loss": 1.0689440965652466,
+      "source_task_loss": 0.7215701937675476,
+      "source_warmup_accuracy": 0.7916666865348816
+    },
+    {
+      "outer_step": 0.0,
+      "loss": 4.677806377410889,
+      "alignment": 1.0882694721221924,
+      "reconstruction": 1.8311476707458496,
+      "source_task_loss": 1.544746994972229,
+      "source_native_task_loss": 1.3774510622024536,
+      "source_aligned_task_loss": 1.7120429277420044,
+      "variance_penalty": 0.20353205502033234,
+      "covariance_penalty": 0.0007845282088965178,
+      "balance_penalty": 0.0032792934216558933,
+      "identity_penalty": 0.09906725585460663,
+      "solver_primal_residual": 0.09044884944010219
+    },
+    {
+      "outer_step": 1.0,
+      "loss": 4.0716328620910645,
+      "alignment": 0.49234023690223694,
+      "reconstruction": 1.6929221153259277,
+      "source_task_loss": 1.5991668701171875,
+      "source_native_task_loss": 1.4993466138839722,
+      "source_aligned_task_loss": 1.6989871263504028,
+      "variance_penalty": 0.2795410752296448,
+      "covariance_penalty": 0.00011931236804230139,
+      "balance_penalty": 0.0013493017759174109,
+      "identity_penalty": 0.07589098811149597,
+      "solver_primal_residual": 0.034175318435995215
+    },
+    {
+      "outer_step": 2.0,
+      "loss": 3.7805352210998535,
+      "alignment": 0.5314278602600098,
+      "reconstruction": 1.425986647605896,
+      "source_task_loss": 1.552086353302002,
+      "source_native_task_loss": 1.4611154794692993,
+      "source_aligned_task_loss": 1.6430573463439941,
+      "variance_penalty": 0.26346519589424133,
+      "covariance_penalty": 0.00022042925411369652,
+      "balance_penalty": 0.0004715287941507995,
+      "identity_penalty": 0.07534407079219818,
+      "solver_primal_residual": 0.09095550207203675
+    }
+  ]
+}

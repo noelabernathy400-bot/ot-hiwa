@@ -56,6 +56,7 @@ def test_source_supervised_trainer_accepts_only_source_labels_and_returns_target
 
     assert len(result.history) == 3
     assert result.target_logits.shape == (16, 2)
+    assert result.source_native_logits.shape == (16, 2)
     assert result.solution.sample_coupling.shape == (16, 16)
     assert np.isfinite(result.target_logits).all()
     assert result.history[-1]["source_task_loss"] >= 0.0

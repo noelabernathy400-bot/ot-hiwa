@@ -152,6 +152,7 @@ def main() -> None:
     learned = trainer.fit(source, target, source_labels)
     predicted_target = learned.target_logits.argmax(axis=1)
     learned_metrics = {
+        "source_native_train_accuracy": float(accuracy_score(source_labels, learned.source_native_logits.argmax(axis=1))),
         "source_train_accuracy": float(accuracy_score(source_labels, learned.source_logits.argmax(axis=1))),
         "target_accuracy": float(accuracy_score(target_labels, predicted_target)),
         "target_macro_f1": float(f1_score(target_labels, predicted_target, average="macro")),
