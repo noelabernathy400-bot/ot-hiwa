@@ -80,3 +80,18 @@ def test_detached_adapter_rejects_sparse_support() -> None:
         assert "support_mode='full'" in str(error)
     else:
         raise AssertionError("sparse support must be rejected by the detached adapter")
+
+
+def test_detached_adapter_honors_a_valid_fixed_group_transport() -> None:
+    source, source_assignments, target, target_assignments, settings = _fixture()
+    fixed_transport = np.eye(2) / 2.0
+    solution = solve_soft_gcot_detached(
+        source,
+        source_assignments,
+        target,
+        target_assignments,
+        solver_kwargs=settings,
+        fit_kwargs={"fixed_group_transport": fixed_transport},
+    )
+    np.testing.assert_allclose(solution.group_transport, fixed_transport, atol=1e-12)
+    assert solution.diagnostics["fixed_group_transport"]

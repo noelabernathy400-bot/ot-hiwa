@@ -1,0 +1,110 @@
+{
+  "experiment": "pamap2_class_conditional_soft_gcot_feasibility",
+  "scope": "single pre-registered fixed-representation smoke test; not a final benchmark",
+  "label_usage": {
+    "source_activity_labels": "anchor source semantic groups and train the source task classifier",
+    "target_adaptation": "features only; class memberships come from source-task logits",
+    "target_test_labels": "opened after fitting only for evaluation",
+    "pair_ids": "not read by this experiment"
+  },
+  "parameters": {
+    "raw_directory": "D:\\ai\\ot-hiwa\\data\\raw\\pamap2\\PAMAP2_Dataset",
+    "subject": 101,
+    "window_samples": 200,
+    "source_train_windows": 8,
+    "source_validation_windows": 2,
+    "target_adaptation_windows": 3,
+    "target_test_windows": 3,
+    "source_smoothing": 0.02,
+    "target_temperature": 1.0,
+    "seed": 401,
+    "tag": "pamap2_class_conditional_smoke_subject101_seed401_20260713"
+  },
+  "environment": {
+    "python": "3.13.7"
+  },
+  "data": {
+    "subject": 101,
+    "source_view": "wrist",
+    "target_view": "chest",
+    "samples": {
+      "source_train": 48,
+      "source_validation": 12,
+      "target_adaptation": 18,
+      "target_test": 18
+    }
+  },
+  "evaluation": {
+    "source_validation": {
+      "accuracy": 0.75,
+      "macro_f1": 0.6833333333333332
+    },
+    "class_conditional_target_test": {
+      "accuracy": 0.0,
+      "macro_f1": 0.0
+    }
+  },
+  "conditional_diagnostics": {
+    "target_prediction_entropy": 1.05603509707407,
+    "target_predicted_group_mass": [
+      0.27796111349533353,
+      0.2594534063920162,
+      0.10726779250480632,
+      0.09445533951098459,
+      0.21005966939089848,
+      0.05080267870596089
+    ],
+    "admm_converged": true,
+    "final_primal_residual": 0.07302847482640276,
+    "group_transport": [
+      [
+        0.028607350247551715,
+        0.028620421742274072,
+        0.029174892777696936,
+        0.025811962311564293,
+        0.025800594142003773,
+        0.028651445445575876
+      ],
+      [
+        0.02714634438748329,
+        0.027111440847350322,
+        0.026642920343483055,
+        0.029289954112711604,
+        0.02959890295993025,
+        0.026877104015708135
+      ],
+      [
+        0.027477003210723393,
+        0.02719919804245846,
+        0.027378941592776575,
+        0.02850992459337017,
+        0.02822591718163668,
+        0.027875682045701393
+      ],
+      [
+        0.027789644112937776,
+        0.02775916903478826,
+        0.027743542748196938,
+        0.027809285348854358,
+        0.027827875870601898,
+        0.027737149551287428
+      ],
+      [
+        0.02785650196848294,
+        0.02821840289239107,
+        0.028020608738651854,
+        0.027437022882891966,
+        0.027173511798689293,
+        0.027960618385559556
+      ],
+      [
+        0.027789822739487546,
+        0.02775803410740449,
+        0.0277057604658613,
+        0.027808517417274293,
+        0.028039864713804784,
+        0.027564667222834283
+      ]
+    ]
+  }
+}

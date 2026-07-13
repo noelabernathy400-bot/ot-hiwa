@@ -1,0 +1,110 @@
+{
+  "experiment": "pamap2_class_conditional_soft_gcot_feasibility",
+  "scope": "single pre-registered fixed-representation smoke test; not a final benchmark",
+  "label_usage": {
+    "source_activity_labels": "anchor source semantic groups and train the source task classifier",
+    "target_adaptation": "features only; class memberships come from source-task logits",
+    "target_test_labels": "opened after fitting only for evaluation",
+    "pair_ids": "not read by this experiment"
+  },
+  "parameters": {
+    "raw_directory": "D:\\ai\\ot-hiwa\\data\\raw\\pamap2\\PAMAP2_Dataset",
+    "subject": 101,
+    "window_samples": 200,
+    "source_train_windows": 8,
+    "source_validation_windows": 2,
+    "target_adaptation_windows": 3,
+    "target_test_windows": 3,
+    "source_smoothing": 0.02,
+    "target_temperature": 1.0,
+    "seed": 401,
+    "tag": "pamap2_class_conditional_locked_subject101_seed401_20260713"
+  },
+  "environment": {
+    "python": "3.13.7"
+  },
+  "data": {
+    "subject": 101,
+    "source_view": "wrist",
+    "target_view": "chest",
+    "samples": {
+      "source_train": 48,
+      "source_validation": 12,
+      "target_adaptation": 18,
+      "target_test": 18
+    }
+  },
+  "evaluation": {
+    "source_validation": {
+      "accuracy": 0.75,
+      "macro_f1": 0.6833333333333332
+    },
+    "class_conditional_target_test": {
+      "accuracy": 0.0,
+      "macro_f1": 0.0
+    }
+  },
+  "conditional_diagnostics": {
+    "target_prediction_entropy": 1.05603509707407,
+    "target_predicted_group_mass": [
+      0.27796111349533353,
+      0.2594534063920162,
+      0.10726779250480632,
+      0.09445533951098459,
+      0.21005966939089848,
+      0.05080267870596089
+    ],
+    "admm_converged": false,
+    "final_primal_residual": 0.2580144142735208,
+    "group_transport": [
+      [
+        0.16666666666666666,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.16666666666666666,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.16666666666666666,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.16666666666666666,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.16666666666666666,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.16666666666666666
+      ]
+    ]
+  }
+}

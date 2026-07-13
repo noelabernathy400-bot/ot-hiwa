@@ -252,7 +252,22 @@ class SoftHiWA:
             if rotation_anchor.shape != (high_dim, high_dim):
                 raise ValueError("rotation_anchor shape must match the rotation dimension")
         initial_transport = kwargs.get("initial_transport")
-        if initial_transport is None:
+        fixed_group_transport = kwargs.get("fixed_group_transport")
+        if fixed_group_transport is not None:
+            fixed_group_transport = np.asarray(fixed_group_transport, dtype=float).copy()
+            if fixed_group_transport.shape != (n_groups_x, n_groups_y):
+                raise ValueError("fixed_group_transport shape does not match soft group counts")
+            if np.any(fixed_group_transport < 0):
+                raise ValueError("fixed_group_transport must be non-negative")
+            required_row = np.full(n_groups_x, 1.0 / n_groups_x)
+            required_column = np.full(n_groups_y, 1.0 / n_groups_y)
+            if (
+                not np.allclose(fixed_group_transport.sum(axis=1), required_row, atol=1e-8)
+                or not np.allclose(fixed_group_transport.sum(axis=0), required_column, atol=1e-8)
+            ):
+                raise ValueError("fixed_group_transport must have uniform group marginals")
+            group_transport = fixed_group_transport
+        elif initial_transport is None:
             group_transport = np.full(
                 (n_groups_x, n_groups_y),
                 1.0 / (n_groups_x * n_groups_y),
@@ -344,11 +359,12 @@ class SoftHiWA:
                 representative_cost = np.zeros_like(group_cost)
                 mixed_group_cost = group_cost
 
-            group_transport = sinkhorn_groups(
-                mixed_group_cost,
-                self.shorn_gamma,
-                self.shorn_maxiter,
-            )
+            if fixed_group_transport is None:
+                group_transport = sinkhorn_groups(
+                    mixed_group_cost,
+                    self.shorn_gamma,
+                    self.shorn_maxiter,
+                )
             previous = global_rotation.copy()
             consensus_mean = np.mean(
                 np.reshape(
@@ -448,6 +464,7 @@ class SoftHiWA:
             "group_transport_column_marginal_error": float(
                 np.max(np.abs(group_transport.sum(axis=0) - 1.0 / n_groups_y))
             ),
+            "fixed_group_transport": fixed_group_transport is not None,
             "rotation_anchor_weight": self.rotation_anchor_weight,
             "rotation_anchor_distance": (
                 float(np.linalg.norm(global_rotation - rotation_anchor, "fro"))
