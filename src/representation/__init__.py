@@ -1,4 +1,4 @@
-"""Learnable representation components for the alternating Soft-GCOT MVP."""
+"""Learnable representation components for alternating Soft-GCOT MVPs."""
 
 from .decoders import MLPDecoder, ResidualMLPDecoder
 from .encoders import MLPEncoder, ResidualMLPEncoder

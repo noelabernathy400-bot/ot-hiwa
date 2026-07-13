@@ -1,0 +1,43 @@
+{
+  "experiment": "pamap2_paired_wrist_chest_eligibility_upper_bound",
+  "warning": "uses true pairs to fit upper-bound mappings; it is not an unsupervised Soft-GCOT result",
+  "protocol": {
+    "subject": 101,
+    "source_view": "wrist",
+    "target_view": "chest",
+    "samples": 96,
+    "train_pairs": 48,
+    "held_out_pairs": 48,
+    "window_samples": 200,
+    "activities": [
+      "lying",
+      "sitting",
+      "standing",
+      "walking",
+      "running",
+      "cycling"
+    ],
+    "split": "even-indexed synchronous pairs fit mapping; odd-indexed pairs evaluate it"
+  },
+  "held_out_evaluation": {
+    "random_recall_at_1": 0.020833333333333332,
+    "random_recall_at_5": 0.10416666666666667,
+    "unaligned": {
+      "recall_at_1": 0.0625,
+      "recall_at_5": 0.375,
+      "mean_squared_alignment_error": 0.7805670499801636
+    },
+    "orthogonal_procrustes": {
+      "recall_at_1": 0.3333333333333333,
+      "recall_at_5": 0.8125,
+      "mean_squared_alignment_error": 0.4594777822494507
+    },
+    "ridge_linear_alpha_1": {
+      "recall_at_1": 0.3125,
+      "recall_at_5": 0.8125,
+      "mean_squared_alignment_error": 0.24672619998455048
+    },
+    "paired_distance_correlation": 0.7885785169679093,
+    "orthogonal_general_linear_mse_gap": 0.2127515822649002
+  }
+}

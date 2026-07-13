@@ -1,0 +1,110 @@
+{
+  "experiment": "pamap2_wrist_to_chest_source_supervised_representation_mvp",
+  "scope": "small protocol check; not a final benchmark or a claim of end-to-end differentiation through OT",
+  "label_usage": {
+    "source_activity_labels": "used only by the source task-head cross-entropy loss",
+    "target_activity_labels": "opened only after fitting for accuracy and macro-F1",
+    "pair_ids": "opened only after fitting for retrieval evaluation; never supplied to the trainer or solver"
+  },
+  "parameters": {
+    "raw_directory": "D:\\ai\\ot-hiwa\\data\\raw\\pamap2\\PAMAP2_Dataset",
+    "subject": 101,
+    "windows_per_activity": 16,
+    "window_samples": 200,
+    "groups": 4,
+    "latent_dimension": 16,
+    "hidden_dimension": 32,
+    "outer_steps": 3,
+    "encoder_steps": 25,
+    "seed": 303,
+    "tag": "pamap2_wrist_chest_source_supervised_seed303"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "torch": "2.13.0+cpu"
+  },
+  "data": {
+    "subject": 101,
+    "source_view": "wrist",
+    "target_view": "chest",
+    "samples": 96,
+    "input_dimension": 48,
+    "window_samples": 200,
+    "activity_counts": {
+      "lying": 16,
+      "sitting": 16,
+      "standing": 16,
+      "walking": 16,
+      "running": 16,
+      "cycling": 16
+    }
+  },
+  "evaluation": {
+    "source_only": {
+      "target_accuracy": 0.19791666666666666,
+      "target_macro_f1": 0.15841609371021134
+    },
+    "fixed_soft_gcot": {
+      "target_accuracy": 0.09375,
+      "target_macro_f1": 0.08071432398237784
+    },
+    "learned_source_supervised_soft_gcot": {
+      "target_accuracy": 0.010416666666666666,
+      "target_macro_f1": 0.003968253968253968
+    },
+    "fixed_paired_retrieval": {
+      "recall_at_1": 0.03125,
+      "recall_at_5": 0.10416666666666667
+    },
+    "learned_paired_retrieval": {
+      "recall_at_1": 0.010416666666666666,
+      "recall_at_5": 0.020833333333333332
+    }
+  },
+  "fixed_solver": {
+    "admm_converged": true,
+    "final_primal_residual": 0.02479954000297768
+  },
+  "learned_solver": {
+    "admm_converged": true,
+    "final_primal_residual": 0.03727817126344547
+  },
+  "outer_history": [
+    {
+      "outer_step": 0.0,
+      "loss": 4.280118942260742,
+      "alignment": 0.20786353945732117,
+      "reconstruction": 1.9979021549224854,
+      "source_task_loss": 1.7253766059875488,
+      "variance_penalty": 0.3412308096885681,
+      "covariance_penalty": 7.69216421758756e-06,
+      "balance_penalty": 0.0010184329003095627,
+      "identity_penalty": 0.07694251835346222,
+      "solver_primal_residual": 0.03926990075681597
+    },
+    {
+      "outer_step": 1.0,
+      "loss": 4.154824256896973,
+      "alignment": 0.19818364083766937,
+      "reconstruction": 1.932866096496582,
+      "source_task_loss": 1.6677680015563965,
+      "variance_penalty": 0.3485313057899475,
+      "covariance_penalty": 1.773784970282577e-05,
+      "balance_penalty": 0.00045978528214618564,
+      "identity_penalty": 0.07451409846544266,
+      "solver_primal_residual": 2.0327980402613542e-08
+    },
+    {
+      "outer_step": 2.0,
+      "loss": 3.9685089588165283,
+      "alignment": 0.3190612494945526,
+      "reconstruction": 1.7072774171829224,
+      "source_task_loss": 1.624139428138733,
+      "variance_penalty": 0.3101705312728882,
+      "covariance_penalty": 8.679041638970375e-05,
+      "balance_penalty": 0.000406029837904498,
+      "identity_penalty": 0.07835792750120163,
+      "solver_primal_residual": 0.05299203609941021
+    }
+  ]
+}

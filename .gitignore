@@ -35,6 +35,7 @@ tmp/
 *.h5
 data/pbmc/
 data/bearing/
+data/raw/pamap2/
 
 # Archives
 *.7z
