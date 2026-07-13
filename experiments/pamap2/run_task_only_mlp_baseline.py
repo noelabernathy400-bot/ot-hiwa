@@ -80,7 +80,10 @@ def main() -> None:
         optimizer.step()
         with torch.no_grad():
             validation_accuracy = float((head(encoder(source_validation)).argmax(dim=1) == validation_labels).float().mean())
-        if validation_accuracy > best_accuracy:
+        # Source validation is the sole selection signal. Keep the last tied
+        # best epoch so this baseline follows the same source-only checkpoint
+        # convention as the paired representation branch.
+        if validation_accuracy >= best_accuracy:
             best_accuracy, best_epoch = validation_accuracy, epoch
             best_state = {"encoder": deepcopy(encoder.state_dict()), "head": deepcopy(head.state_dict())}
         if epoch == 0 or epoch == args.epochs - 1 or (epoch + 1) % 25 == 0:

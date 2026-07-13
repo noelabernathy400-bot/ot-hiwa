@@ -1,0 +1,207 @@
+{
+  "experiment": "pamap2_fully_differentiable_task_aware_hierarchical_ot_mvp",
+  "scope": "fixed-protocol run; target labels and target-test data are absent from fit",
+  "label_usage": {
+    "source_activity_labels": "source task loss and source semantic groups only",
+    "target_adaptation": "features only; group probabilities come from task-head outputs",
+    "source_training_pairs": "synchronous wrist--chest feature pairs enter the pair loss only when --weak-pairs is set",
+    "target_test_labels": "opened after fit only for classification metrics",
+    "target_test_pair_ids": "not supplied to fit; held-out order used only for retrieval metrics"
+  },
+  "parameters": {
+    "raw_directory": "D:\\ai\\ot-hiwa\\data\\raw\\pamap2\\PAMAP2_Dataset",
+    "subject": 101,
+    "window_samples": 200,
+    "source_train_windows": 8,
+    "source_validation_windows": 2,
+    "target_adaptation_windows": 3,
+    "target_test_windows": 3,
+    "latent_dimension": 16,
+    "hidden_dimension": 32,
+    "source_warmup_epochs": 100,
+    "epochs": 200,
+    "weak_pairs": true,
+    "lambda_pair": 1.0,
+    "disable_transport": false,
+    "seed": 601,
+    "tag": "pamap2_weak_pair_task_aware_ot_revised_subject101_seed601_20260713"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "torch": "2.13.0+cpu"
+  },
+  "data": {
+    "subject": 101,
+    "source_view": "wrist",
+    "target_view": "chest",
+    "samples": {
+      "source_train": 48,
+      "source_validation": 12,
+      "target_adaptation": 18,
+      "target_test": 18
+    }
+  },
+  "evaluation": {
+    "best_source_validation_accuracy": 0.75,
+    "target_test_accuracy": 0.05555555555555555,
+    "target_test_macro_f1": 0.08333333333333333,
+    "paired_retrieval": {
+      "recall_at_1": 0.16666666666666666,
+      "recall_at_5": 0.5
+    }
+  },
+  "transport_diagnostics": {
+    "best_epoch": 125,
+    "group_transport": [
+      [
+        0.16661737859249115,
+        1.8292465028935112e-05,
+        2.39962428167928e-05,
+        1.1969506982789646e-11,
+        2.8480374680839304e-07,
+        4.973696832166752e-07
+      ],
+      [
+        1.777386751200538e-05,
+        0.16655191779136658,
+        6.567660602740943e-05,
+        1.1430635327158711e-09,
+        2.407813553872984e-06,
+        6.007247321804243e-08
+      ],
+      [
+        3.048998405574821e-05,
+        9.422841685591266e-05,
+        0.16657684743404388,
+        4.9014594466489925e-11,
+        1.0592490440330948e-07,
+        8.134310447438509e-10
+      ],
+      [
+        1.5328634195288515e-11,
+        5.062242847131415e-10,
+        2.722505727803526e-11,
+        0.16666629910469055,
+        1.2660008508191822e-07,
+        6.392330414994873e-11
+      ],
+      [
+        7.395198053927743e-07,
+        2.1918228867434664e-06,
+        1.3785388830456213e-07,
+        3.4843307616938546e-07,
+        0.16665877401828766,
+        4.278508640709333e-06
+      ],
+      [
+        2.7913299049942e-07,
+        3.315340890708285e-08,
+        2.5884616672300353e-10,
+        8.652848576540251e-11,
+        4.992366029910045e-06,
+        0.1666618287563324
+      ]
+    ],
+    "sample_transport_row_error": 2.6790425181388855e-05,
+    "sample_transport_column_error": 1.862645149230957e-08,
+    "history": [
+      {
+        "epoch": -100.0,
+        "loss": 1.9781639575958252,
+        "task_loss": 1.8201441764831543,
+        "transport_loss": 0.0,
+        "group_loss": 0.0,
+        "source_validation_accuracy": 0.1666666716337204
+      },
+      {
+        "epoch": -1.0,
+        "loss": 0.3781919777393341,
+        "task_loss": 0.32820650935173035,
+        "transport_loss": 0.0,
+        "group_loss": 0.0,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 0.0,
+        "loss": 3.4793834686279297,
+        "task_loss": 0.3221701383590698,
+        "transport_loss": 2.1242592334747314,
+        "group_loss": 1.9458656311035156,
+        "pair_loss": 0.1256827712059021,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 24.0,
+        "loss": 1.158956527709961,
+        "task_loss": 0.2498382329940796,
+        "transport_loss": 0.5084053874015808,
+        "group_loss": 0.10595015436410904,
+        "pair_loss": 0.04040326550602913,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 49.0,
+        "loss": 0.7484601736068726,
+        "task_loss": 0.15204472839832306,
+        "transport_loss": 0.32042205333709717,
+        "group_loss": 0.0469963364303112,
+        "pair_loss": 0.037342336028814316,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 74.0,
+        "loss": 0.5040799975395203,
+        "task_loss": 0.08522901684045792,
+        "transport_loss": 0.18916794657707214,
+        "group_loss": 0.01503332145512104,
+        "pair_loss": 0.037546686828136444,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 99.0,
+        "loss": 0.333190381526947,
+        "task_loss": 0.047557905316352844,
+        "transport_loss": 0.10885679721832275,
+        "group_loss": 0.003822298953309655,
+        "pair_loss": 0.036040015518665314,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 124.0,
+        "loss": 0.23248016834259033,
+        "task_loss": 0.028898129239678383,
+        "transport_loss": 0.07546640932559967,
+        "group_loss": 0.00241886917501688,
+        "pair_loss": 0.03358570858836174,
+        "source_validation_accuracy": 0.75
+      },
+      {
+        "epoch": 149.0,
+        "loss": 0.1838883012533188,
+        "task_loss": 0.020230377092957497,
+        "transport_loss": 0.05840243399143219,
+        "group_loss": 0.0018250891007483006,
+        "pair_loss": 0.029848625883460045,
+        "source_validation_accuracy": 0.6666666865348816
+      },
+      {
+        "epoch": 174.0,
+        "loss": 0.15236730873584747,
+        "task_loss": 0.015413597226142883,
+        "transport_loss": 0.04810120165348053,
+        "group_loss": 0.0014111342607066035,
+        "pair_loss": 0.02620607614517212,
+        "source_validation_accuracy": 0.6666666865348816
+      },
+      {
+        "epoch": 199.0,
+        "loss": 0.129087895154953,
+        "task_loss": 0.012386556714773178,
+        "transport_loss": 0.04100026562809944,
+        "group_loss": 0.0011773286387324333,
+        "pair_loss": 0.023059165105223656,
+        "source_validation_accuracy": 0.6666666865348816
+      }
+    ]
+  }
+}

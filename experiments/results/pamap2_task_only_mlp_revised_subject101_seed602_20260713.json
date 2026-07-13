@@ -1,0 +1,75 @@
+{
+  "experiment": "pamap2_source_only_mlp_task_baseline",
+  "scope": "source-only neural task control; no target adaptation, labels, or pair IDs in fit",
+  "parameters": {
+    "raw_directory": "D:\\ai\\ot-hiwa\\data\\raw\\pamap2\\PAMAP2_Dataset",
+    "subject": 101,
+    "window_samples": 200,
+    "source_train_windows": 8,
+    "source_validation_windows": 2,
+    "target_adaptation_windows": 3,
+    "target_test_windows": 3,
+    "latent_dimension": 16,
+    "hidden_dimension": 32,
+    "epochs": 200,
+    "seed": 602,
+    "tag": "pamap2_task_only_mlp_revised_subject101_seed602_20260713"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "torch": "2.13.0+cpu"
+  },
+  "evaluation": {
+    "best_source_validation_accuracy": 0.75,
+    "target_test_accuracy": 0.5,
+    "target_test_macro_f1": 0.42063492063492064
+  },
+  "best_epoch": 199,
+  "history": [
+    {
+      "epoch": 0.0,
+      "loss": 1.8056758642196655,
+      "source_validation_accuracy": 0.3333333432674408
+    },
+    {
+      "epoch": 24.0,
+      "loss": 1.11639404296875,
+      "source_validation_accuracy": 0.5
+    },
+    {
+      "epoch": 49.0,
+      "loss": 0.7093814015388489,
+      "source_validation_accuracy": 0.5
+    },
+    {
+      "epoch": 74.0,
+      "loss": 0.44148173928260803,
+      "source_validation_accuracy": 0.6666666865348816
+    },
+    {
+      "epoch": 99.0,
+      "loss": 0.27186837792396545,
+      "source_validation_accuracy": 0.75
+    },
+    {
+      "epoch": 124.0,
+      "loss": 0.14962391555309296,
+      "source_validation_accuracy": 0.75
+    },
+    {
+      "epoch": 149.0,
+      "loss": 0.07216634601354599,
+      "source_validation_accuracy": 0.75
+    },
+    {
+      "epoch": 174.0,
+      "loss": 0.03392454609274864,
+      "source_validation_accuracy": 0.75
+    },
+    {
+      "epoch": 199.0,
+      "loss": 0.018119510263204575,
+      "source_validation_accuracy": 0.75
+    }
+  ]
+}

@@ -42,6 +42,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hidden-dimension", type=int, default=32)
     parser.add_argument("--source-warmup-epochs", type=int, default=100)
     parser.add_argument("--epochs", type=int, default=200)
+    parser.add_argument("--weak-pairs", action="store_true", help="Allow source-training wrist--chest synchronized feature pairs in the pair loss.")
+    parser.add_argument("--lambda-pair", type=float, default=1.0)
+    parser.add_argument("--disable-transport", action="store_true", help="Ablation: retain weak pairs but set group and sample OT loss weights to zero.")
     parser.add_argument("--seed", type=int, default=501)
     parser.add_argument("--tag", default="pamap2_differentiable_task_aware_ot_subject101_seed501")
     return parser.parse_args()
@@ -68,6 +71,7 @@ def main() -> None:
     source_train = source_scaler.transform(split.source_train_features).astype(np.float32)
     source_validation = source_scaler.transform(split.source_validation_features).astype(np.float32)
     target_adaptation = target_scaler.transform(split.target_adaptation_features).astype(np.float32)
+    paired_target = target_scaler.transform(split.source_train_paired_target_features).astype(np.float32) if args.weak_pairs else None
     source_evaluation = source_scaler.transform(split.evaluation_source_features).astype(np.float32)
     target_test = target_scaler.transform(split.evaluation_target_features).astype(np.float32)
     label_offset = int(split.source_train_labels.min())
@@ -80,9 +84,22 @@ def main() -> None:
         MLPDecoder(args.latent_dimension, target_adaptation.shape[1], args.hidden_dimension),
         nn.Linear(args.latent_dimension, len(ACTIVITY_NAMES)),
         n_classes=len(ACTIVITY_NAMES),
-        config=TaskAwareTransportConfig(source_warmup_epochs=args.source_warmup_epochs, epochs=args.epochs),
+        config=TaskAwareTransportConfig(
+            source_warmup_epochs=args.source_warmup_epochs,
+            epochs=args.epochs,
+            lambda_pair=args.lambda_pair,
+            lambda_transport=0.0 if args.disable_transport else 1.0,
+            lambda_group=0.0 if args.disable_transport else 0.25,
+        ),
     )
-    result = model.fit(source_train, source_labels, target_adaptation, source_validation, source_validation_labels)
+    result = model.fit(
+        source_train,
+        source_labels,
+        target_adaptation,
+        source_validation,
+        source_validation_labels,
+        paired_target=paired_target,
+    )
     target_prediction = model.predict_target(target_test)
     source_evaluation_latent = model.encode_source(source_evaluation)
     target_test_latent = model.encode_target(target_test)
@@ -90,8 +107,14 @@ def main() -> None:
     target_test_labels = split.evaluation_target_labels - label_offset
     payload = {
         "experiment": "pamap2_fully_differentiable_task_aware_hierarchical_ot_mvp",
-        "scope": "single fixed-protocol feasibility run; no target labels, pair IDs, or target-test data in fit",
-        "label_usage": {"source_activity_labels": "source task loss and source semantic groups only", "target_adaptation": "features only; group probabilities come from task-head outputs", "target_test_labels": "opened after fit only for classification metrics", "pair_ids": "not supplied to fit; held-out order used only for retrieval metrics"},
+        "scope": "fixed-protocol run; target labels and target-test data are absent from fit",
+        "label_usage": {
+            "source_activity_labels": "source task loss and source semantic groups only",
+            "target_adaptation": "features only; group probabilities come from task-head outputs",
+            "source_training_pairs": "synchronous wrist--chest feature pairs enter the pair loss only when --weak-pairs is set",
+            "target_test_labels": "opened after fit only for classification metrics",
+            "target_test_pair_ids": "not supplied to fit; held-out order used only for retrieval metrics",
+        },
         "parameters": {key: str(value) if isinstance(value, Path) else value for key, value in vars(args).items()},
         "environment": {"python": platform.python_version(), "torch": torch.__version__},
         "data": {"subject": split.subject, "source_view": split.source_view, "target_view": split.target_view, "samples": {"source_train": int(len(source_train)), "source_validation": int(len(source_validation)), "target_adaptation": int(len(target_adaptation)), "target_test": int(len(target_test))}},

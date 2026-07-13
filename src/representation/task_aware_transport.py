@@ -50,6 +50,7 @@ class TaskAwareTransportConfig:
     lambda_group: float = 0.25
     lambda_variance: float = 0.10
     lambda_covariance: float = 0.01
+    lambda_pair: float = 1.0
     lambda_group_semantic_prior: float = 0.50
     lambda_sample_semantic_cost: float = 0.25
     minimum_std: float = 0.20
@@ -151,17 +152,27 @@ class DifferentiableTaskAwareOT:
         target_adaptation: np.ndarray,
         source_validation: np.ndarray,
         source_validation_labels: np.ndarray,
+        *,
+        paired_target: np.ndarray | None = None,
     ) -> TaskAwareTransportResult:
-        """Fit without target labels, target-test samples, or pair IDs."""
+        """Fit without target labels or target-test samples.
+
+        ``paired_target`` is optional. When supplied, it must contain target
+        features synchronized row-for-row with source training data. It is an
+        explicit weak-supervision contract, not target-label access.
+        """
         source_tensor = torch.as_tensor(np.asarray(source, dtype=np.float32), device=self.device)
         target_tensor = torch.as_tensor(np.asarray(target_adaptation, dtype=np.float32), device=self.device)
         validation_tensor = torch.as_tensor(np.asarray(source_validation, dtype=np.float32), device=self.device)
+        paired_target_tensor = None if paired_target is None else torch.as_tensor(np.asarray(paired_target, dtype=np.float32), device=self.device)
         source_label_tensor = torch.as_tensor(np.asarray(source_labels, dtype=np.int64), device=self.device)
         validation_label_tensor = torch.as_tensor(np.asarray(source_validation_labels, dtype=np.int64), device=self.device)
         if source_tensor.ndim != 2 or target_tensor.ndim != 2 or validation_tensor.ndim != 2:
             raise ValueError("all feature arrays must be two-dimensional")
         if source_tensor.shape[1] != target_tensor.shape[1] or source_tensor.shape[1] != validation_tensor.shape[1]:
             raise ValueError("feature dimensions must match")
+        if paired_target_tensor is not None and paired_target_tensor.shape != source_tensor.shape:
+            raise ValueError("paired_target must match source training shape row-for-row")
         for labels, rows, name in ((source_label_tensor, source_tensor.shape[0], "source_labels"), (validation_label_tensor, validation_tensor.shape[0], "source_validation_labels")):
             if labels.ndim != 1 or labels.shape[0] != rows or labels.min() < 0 or labels.max() >= self.n_classes:
                 raise ValueError(f"{name} must be zero-based class indices matching its rows")
@@ -190,27 +201,36 @@ class DifferentiableTaskAwareOT:
         for epoch in range(self.config.epochs):
             source_latent = self.source_encoder(source_tensor)
             target_latent = self.target_encoder(target_tensor)
+            paired_target_latent = None if paired_target_tensor is None else self.target_encoder(paired_target_tensor)
             source_logits = self.task_head(source_latent)
             target_logits = self.task_head(target_latent)
             group_plan, sample_plan, group_geometry, sample_cost = self._plans(source_latent, source_label_tensor, target_latent, target_logits)
             task = F.cross_entropy(source_logits, source_label_tensor)
             reconstruction = F.mse_loss(self.source_decoder(source_latent), source_tensor) + F.mse_loss(self.target_decoder(target_latent), target_tensor)
+            pair = torch.zeros((), dtype=source_latent.dtype, device=self.device)
+            if paired_target_latent is not None:
+                pair = F.mse_loss(F.normalize(source_latent, dim=1), F.normalize(paired_target_latent, dim=1))
+                reconstruction = reconstruction + F.mse_loss(self.target_decoder(paired_target_latent), paired_target_tensor)
             transport = torch.sum(sample_plan * sample_cost)
             group = torch.sum(group_plan * group_geometry)
             variance = variance_floor_penalty(source_latent, self.config.minimum_std) + variance_floor_penalty(target_latent, self.config.minimum_std)
             covariance = covariance_penalty(source_latent) + covariance_penalty(target_latent)
-            loss = self.config.lambda_task * task + self.config.lambda_reconstruction * reconstruction + self.config.lambda_transport * transport + self.config.lambda_group * group + self.config.lambda_variance * variance + self.config.lambda_covariance * covariance
+            loss = self.config.lambda_task * task + self.config.lambda_reconstruction * reconstruction + self.config.lambda_transport * transport + self.config.lambda_group * group + self.config.lambda_variance * variance + self.config.lambda_covariance * covariance + self.config.lambda_pair * pair
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             with torch.no_grad():
                 validation_logits = self.task_head(self.source_encoder(validation_tensor))
                 validation_accuracy = float((validation_logits.argmax(dim=1) == validation_label_tensor).float().mean().cpu())
-            if validation_accuracy > best_accuracy:
+            # Source validation remains the sole model-selection signal. When
+            # multiple epochs have the same best accuracy, retain the latest
+            # such epoch so a just-started joint alignment phase is not
+            # systematically discarded before it can update the target encoder.
+            if validation_accuracy >= best_accuracy:
                 best_accuracy, best_epoch = validation_accuracy, epoch
                 best_state = {name: deepcopy(module.state_dict()) for name, module in zip(("source_encoder", "target_encoder", "source_decoder", "target_decoder", "task_head"), self._modules)}
             if epoch == 0 or epoch == self.config.epochs - 1 or (epoch + 1) % 25 == 0:
-                self.history.append({"epoch": float(epoch), "loss": float(loss.detach().cpu()), "task_loss": float(task.detach().cpu()), "transport_loss": float(transport.detach().cpu()), "group_loss": float(group.detach().cpu()), "source_validation_accuracy": validation_accuracy})
+                self.history.append({"epoch": float(epoch), "loss": float(loss.detach().cpu()), "task_loss": float(task.detach().cpu()), "transport_loss": float(transport.detach().cpu()), "group_loss": float(group.detach().cpu()), "pair_loss": float(pair.detach().cpu()), "source_validation_accuracy": validation_accuracy})
         if best_state is None:
             raise RuntimeError("no task-aware checkpoint was produced")
         for name, module in zip(("source_encoder", "target_encoder", "source_decoder", "target_decoder", "task_head"), self._modules):

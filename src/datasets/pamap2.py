@@ -50,14 +50,17 @@ class PAMAP2PairedWindows:
 class PAMAP2DomainAdaptationSplit:
     """Leakage-safe temporal split for wrist-to-chest adaptation.
 
-    The source training and validation views are labelled.  The chest
-    adaptation view is deliberately returned without labels or pair IDs.
+    The source training and validation views are labelled. The synchronous
+    chest view of source-training windows is retained solely for explicitly
+    weakly supervised cross-view experiments; it has no target activity label.
+    The chest adaptation view is deliberately returned without labels or pair IDs.
     Labels and pair IDs for the final paired source/chest holdout live in
     ``evaluation_*`` fields and must not be supplied to a trainer.
     """
 
     source_train_features: np.ndarray
     source_train_labels: np.ndarray
+    source_train_paired_target_features: np.ndarray
     source_validation_features: np.ndarray
     source_validation_labels: np.ndarray
     target_adaptation_features: np.ndarray
@@ -230,7 +233,7 @@ def build_temporal_domain_adaptation_split(
     target_columns = VIEW_COLUMNS[target_view]
     activity_values = values[:, 1].astype(np.int64)
     buckets: dict[str, list[object]] = {
-        "source_train_features": [], "source_train_labels": [],
+        "source_train_features": [], "source_train_labels": [], "source_train_paired_target_features": [],
         "source_validation_features": [], "source_validation_labels": [],
         "target_adaptation_features": [], "evaluation_source_features": [],
         "evaluation_target_features": [], "evaluation_source_labels": [],
@@ -265,6 +268,7 @@ def build_temporal_domain_adaptation_split(
         for source_feature, target_feature, pair_id in candidates[:train_end]:
             buckets["source_train_features"].append(source_feature)
             buckets["source_train_labels"].append(int(activity))
+            buckets["source_train_paired_target_features"].append(target_feature)
         for source_feature, _, _ in candidates[train_end:validation_end]:
             buckets["source_validation_features"].append(source_feature)
             buckets["source_validation_labels"].append(int(activity))
@@ -280,6 +284,7 @@ def build_temporal_domain_adaptation_split(
     return PAMAP2DomainAdaptationSplit(
         source_train_features=np.stack(buckets["source_train_features"]),
         source_train_labels=np.asarray(buckets["source_train_labels"], dtype=np.int64),
+        source_train_paired_target_features=np.stack(buckets["source_train_paired_target_features"]),
         source_validation_features=np.stack(buckets["source_validation_features"]),
         source_validation_labels=np.asarray(buckets["source_validation_labels"], dtype=np.int64),
         target_adaptation_features=np.stack(buckets["target_adaptation_features"]),

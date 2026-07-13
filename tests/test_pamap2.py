@@ -57,6 +57,7 @@ def test_temporal_split_has_disjoint_partitions_and_hides_adaptation_metadata() 
         counts=PAMAP2SplitCounts(source_train=2, source_validation=2, target_adaptation=2, target_test=2),
     )
     assert split.source_train_features.shape == (4, 48)
+    assert split.source_train_paired_target_features.shape == (4, 48)
     assert split.source_validation_features.shape == (4, 48)
     assert split.target_adaptation_features.shape == (4, 48)
     assert split.evaluation_target_features.shape == (4, 48)
