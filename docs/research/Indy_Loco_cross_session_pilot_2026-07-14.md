@@ -106,6 +106,22 @@ convergence qualification.  Therefore it is a negative mechanism test, not a
 model improvement.  It shows that adding a weak unlabelled local-dynamics cue
 alone is insufficient to resolve the disagreement among local rotations.
 
+### Source-supervised state-anchor probe
+
+We also tested a distinct, task-centred mechanism.  The source session already
+has cursor velocity because it is used to train the transferable source
+decoder.  In this probe only, its four source soft groups were learned from
+that source velocity rather than from source neural states.  The target groups
+were still learned from target neural data alone; no target cursor position or
+velocity entered fitting.  This asks whether a meaningful source task-state
+partition can anchor an unlabelled target neural alignment.
+
+The single qualification run (seed 703, 100 iterations, four groups) also
+failed: Soft-GCOT's final primal residual was 3.3020 and its target velocity
+$R^2$ was -0.1123.  The latter is diagnostic only because the solver did not
+converge.  Thus source-side state semantics by itself does not repair the
+current local-rotation consensus failure.
+
 ## What the new data revealed
 
 This is a useful failure mode, not a reason to keep tuning blindly:
@@ -119,7 +135,8 @@ This is a useful failure mode, not a reason to keep tuning blindly:
    failure.
 4. A causal unlabelled temporal-dynamics cue also does not resolve the ADMM
    disagreement.
-5. Therefore the present solver is not yet a transferable cross-session neural
+5. Source-side task-state groups alone also do not resolve it.
+6. Therefore the present solver is not yet a transferable cross-session neural
    alignment method, and no performance conclusion may be drawn from the
    provisional Soft-GCOT scores.
 

@@ -42,6 +42,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-samples", type=int, default=192)
     parser.add_argument("--latent-dimension", type=int, default=8)
     parser.add_argument("--groups", type=int, default=4)
+    parser.add_argument(
+        "--source-grouping",
+        choices=("neural", "velocity"),
+        default="neural",
+        help=(
+            "How source soft groups are defined. 'velocity' is source-supervised "
+            "and is only permitted because source cursor velocity trains the transfer decoder."
+        ),
+    )
     parser.add_argument("--temperature", type=float, default=0.5)
     parser.add_argument("--seed", type=int, default=701)
     parser.add_argument("--maxiter", type=int, default=30)
@@ -159,8 +168,9 @@ def main() -> None:
     )[target_adaptation_indices]
     decoder = _fit_ridge(source_latent, source_train_velocity, args.ridge_alpha)
 
+    source_group_values = source_latent if args.source_grouping == "neural" else source_train_velocity
     source_groups = learn_soft_groups(
-        source_latent,
+        source_group_values,
         n_groups=args.groups,
         temperature=args.temperature,
         seed=args.seed,
@@ -220,6 +230,11 @@ def main() -> None:
             "source_session": args.source_session,
             "target_session": args.target_session,
             "source_velocity": "used to fit the source ridge decoder",
+            "source_grouping": (
+                "source neural latent states"
+                if args.source_grouping == "neural"
+                else "source cursor velocity only; source-supervised state anchor"
+            ),
             "target_adaptation_neural_rates": "used without target cursor position or velocity for Soft-GCOT fitting",
             "target_test_neural_rates": "transformed after fitting only",
             "target_test_velocity": "opened only after all unsupervised fits for final metrics",
