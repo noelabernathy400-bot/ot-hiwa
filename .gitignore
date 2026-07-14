@@ -36,6 +36,7 @@ tmp/
 data/pbmc/
 data/bearing/
 data/raw/pamap2/
+data/raw/indy_loco/
 
 # Archives
 *.7z

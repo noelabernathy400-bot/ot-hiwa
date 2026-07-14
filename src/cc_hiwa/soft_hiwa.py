@@ -102,6 +102,33 @@ def _unit_scale_cost(cost: np.ndarray) -> np.ndarray:
     return (values - np.min(values)) / spread
 
 
+def _consensus_rotation_input(
+    local_rotations: np.ndarray,
+    multipliers: np.ndarray,
+    group_transport: np.ndarray,
+    consensus_weighting: str,
+) -> np.ndarray:
+    """Aggregate local rotations for the global orthogonal update.
+
+    ``uniform`` preserves the frozen HiWA-compatible update.  ``transport``
+    is an explicit experimental variant that downweights low-mass group pairs.
+    """
+    values = np.asarray(local_rotations, dtype=float) + np.asarray(multipliers, dtype=float)
+    if consensus_weighting == "uniform":
+        return np.mean(
+            np.reshape(values, (values.shape[0], values.shape[1], -1), order="F"),
+            axis=2,
+        )
+    if consensus_weighting == "transport":
+        weights = np.asarray(group_transport, dtype=float)
+        if weights.shape != values.shape[2:]:
+            raise ValueError("group_transport shape must match local rotation groups")
+        if np.any(weights < 0) or not np.isfinite(weights).all() or weights.sum() <= EPS:
+            raise ValueError("group_transport must be finite, non-negative, and non-empty")
+        return np.einsum("ij,abij->ab", weights / weights.sum(), values)
+    raise ValueError("consensus_weighting must be 'uniform' or 'transport'")
+
+
 class SoftHiWA:
     """TACO-style soft-group HiWA with an explicit full-support reference mode.
 
@@ -134,6 +161,7 @@ class SoftHiWA:
         representative_rotation_weight: float = 0.0,
         component_conditioning_weight: float = 0.0,
         representative_cost_normalization: str = "minmax",
+        consensus_weighting: str = "uniform",
     ) -> None:
         self.dim_red_method = dim_red_method or PCA(n_components=2)
         self.normalize = normalize
@@ -171,6 +199,9 @@ class SoftHiWA:
         if representative_cost_normalization != "minmax":
             raise ValueError("representative_cost_normalization currently supports only 'minmax'")
         self.representative_cost_normalization = representative_cost_normalization
+        if consensus_weighting not in {"uniform", "transport"}:
+            raise ValueError("consensus_weighting must be 'uniform' or 'transport'")
+        self.consensus_weighting = consensus_weighting
 
     def fit(
         self,
@@ -366,13 +397,11 @@ class SoftHiWA:
                     self.shorn_maxiter,
                 )
             previous = global_rotation.copy()
-            consensus_mean = np.mean(
-                np.reshape(
-                    local_rotations + multipliers,
-                    (high_dim, high_dim, n_groups_x * n_groups_y),
-                    order="F",
-                ),
-                axis=2,
+            consensus_mean = _consensus_rotation_input(
+                local_rotations,
+                multipliers,
+                group_transport,
+                self.consensus_weighting,
             )
             if self.rotation_anchor_weight > 0:
                 consensus_mean = (
@@ -465,6 +494,7 @@ class SoftHiWA:
                 np.max(np.abs(group_transport.sum(axis=0) - 1.0 / n_groups_y))
             ),
             "fixed_group_transport": fixed_group_transport is not None,
+            "consensus_weighting": self.consensus_weighting,
             "rotation_anchor_weight": self.rotation_anchor_weight,
             "rotation_anchor_distance": (
                 float(np.linalg.norm(global_rotation - rotation_anchor, "fro"))

@@ -17,10 +17,19 @@ from soft_groups import (  # noqa: E402
     build_sparse_group_supports,
     learn_soft_groups,
 )
-from soft_hiwa import SoftHiWA, _closed_form_rotation, sinkhorn_weighted  # noqa: E402
+from soft_hiwa import SoftHiWA, _closed_form_rotation, _consensus_rotation_input, sinkhorn_weighted  # noqa: E402
 
 
 class SoftGroupTests(unittest.TestCase):
+    def test_transport_weighted_consensus_downweights_low_mass_group_pairs(self) -> None:
+        local = np.zeros((1, 1, 2, 2))
+        local[0, 0] = np.asarray([[1.0, 3.0], [5.0, 7.0]])
+        transport = np.asarray([[0.7, 0.1], [0.1, 0.1]])
+        uniform = _consensus_rotation_input(local, np.zeros_like(local), transport, "uniform")
+        weighted = _consensus_rotation_input(local, np.zeros_like(local), transport, "transport")
+        np.testing.assert_allclose(uniform, np.asarray([[4.0]]))
+        np.testing.assert_allclose(weighted, np.asarray([[2.2]]))
+
     def test_assignments_and_group_weights_are_normalized(self) -> None:
         rng = np.random.default_rng(3)
         values = np.vstack((rng.normal(-1, 0.2, (30, 2)), rng.normal(1, 0.2, (30, 2))))
