@@ -81,6 +81,31 @@ weights local rotations by the current group transport instead of weighting
 all group pairs equally.  It is retained as a tested negative diagnostic; the
 default `uniform` solver and existing baselines are unchanged.
 
+### Unlabelled temporal-dynamics correspondence probe
+
+The original solver treats each 50 ms neural bin as independent.  To test one
+new, falsifiable cross-session correspondence mechanism, we added an optional
+causal temporal signature to the *local* OT cost.  For each bin the signature
+is the z-scored vector of log neural-latent displacements over the preceding
+1, 2, 4, and 8 bins.  It uses neither cursor coordinates nor velocity, and is
+therefore available in an unlabelled target session.  Local OT is softly
+penalised when source and target bins have dissimilar signatures.
+
+This is a separate experimental option, disabled by default.  Its one fixed
+qualification run used seed 703, 100 iterations and signature weight 0.05;
+the weight was set before opening the target metrics and was not tuned against
+them.
+
+| Variant | Iterations | Final primal residual | $R^2$ | Result |
+| --- | ---: | ---: | ---: | --- |
+| Soft-GCOT + temporal signature | 100 | 3.5239 | 0.0666 | not converged |
+
+The temporal signature changes the coupling and raises the exploratory score
+relative to the uniform-consensus seed-703 probe, but it still fails the same
+convergence qualification.  Therefore it is a negative mechanism test, not a
+model improvement.  It shows that adding a weak unlabelled local-dynamics cue
+alone is insufficient to resolve the disagreement among local rotations.
+
 ## What the new data revealed
 
 This is a useful failure mode, not a reason to keep tuning blindly:
@@ -92,7 +117,9 @@ This is a useful failure mode, not a reason to keep tuning blindly:
    on this task.
 3. Increasing iterations and reweighting the consensus do not resolve that
    failure.
-4. Therefore the present solver is not yet a transferable cross-session neural
+4. A causal unlabelled temporal-dynamics cue also does not resolve the ADMM
+   disagreement.
+5. Therefore the present solver is not yet a transferable cross-session neural
    alignment method, and no performance conclusion may be drawn from the
    provisional Soft-GCOT scores.
 

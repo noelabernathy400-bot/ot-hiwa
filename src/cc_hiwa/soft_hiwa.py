@@ -160,6 +160,7 @@ class SoftHiWA:
         representative_guidance_weight: float = 0.0,
         representative_rotation_weight: float = 0.0,
         component_conditioning_weight: float = 0.0,
+        temporal_signature_weight: float = 0.0,
         representative_cost_normalization: str = "minmax",
         consensus_weighting: str = "uniform",
     ) -> None:
@@ -196,6 +197,9 @@ class SoftHiWA:
         if component_conditioning_weight < 0:
             raise ValueError("component_conditioning_weight must be non-negative")
         self.component_conditioning_weight = float(component_conditioning_weight)
+        if temporal_signature_weight < 0:
+            raise ValueError("temporal_signature_weight must be non-negative")
+        self.temporal_signature_weight = float(temporal_signature_weight)
         if representative_cost_normalization != "minmax":
             raise ValueError("representative_cost_normalization currently supports only 'minmax'")
         self.representative_cost_normalization = representative_cost_normalization
@@ -221,6 +225,28 @@ class SoftHiWA:
             raise ValueError("source assignment rows must sum to one")
         if np.max(np.abs(b.sum(axis=1) - 1.0)) > 1e-6:
             raise ValueError("target assignment rows must sum to one")
+        source_temporal_signatures = kwargs.get("source_temporal_signatures")
+        target_temporal_signatures = kwargs.get("target_temporal_signatures")
+        if self.temporal_signature_weight > 0:
+            if source_temporal_signatures is None or target_temporal_signatures is None:
+                raise ValueError(
+                    "source_temporal_signatures and target_temporal_signatures are required "
+                    "when temporal_signature_weight is positive"
+                )
+        if source_temporal_signatures is not None:
+            source_temporal_signatures = np.asarray(source_temporal_signatures, dtype=float)
+            if source_temporal_signatures.ndim != 2 or source_temporal_signatures.shape[0] != x_original.shape[0]:
+                raise ValueError("source_temporal_signatures must have one row per source sample")
+        if target_temporal_signatures is not None:
+            target_temporal_signatures = np.asarray(target_temporal_signatures, dtype=float)
+            if target_temporal_signatures.ndim != 2 or target_temporal_signatures.shape[0] != y_original.shape[0]:
+                raise ValueError("target_temporal_signatures must have one row per target sample")
+        if (
+            source_temporal_signatures is not None
+            and target_temporal_signatures is not None
+            and source_temporal_signatures.shape[1] != target_temporal_signatures.shape[1]
+        ):
+            raise ValueError("source and target temporal signatures must have the same dimension")
 
         x_fit = _normal(x_original) if self.normalize else x_original.copy()
         y_fit = _normal(y_original) if self.normalize else y_original.copy()
@@ -325,6 +351,8 @@ class SoftHiWA:
         transport_objectives: list[float] = []
         component_cost_means: list[float] = []
         component_cost_maxima: list[float] = []
+        temporal_cost_means: list[float] = []
+        temporal_cost_maxima: list[float] = []
         local_couplings: list[list[np.ndarray | None]] = [
             [None for _ in range(n_groups_y)] for _ in range(n_groups_x)
         ]
@@ -349,6 +377,25 @@ class SoftHiWA:
                         )
                         iteration_component_cost_means.append(float(np.mean(component_cost)))
                         iteration_component_cost_maxima.append(float(np.max(component_cost)))
+                    temporal_cost = None
+                    if self.temporal_signature_weight > 0:
+                        source_signature = source_temporal_signatures[x_indices[i], :]
+                        target_signature = target_temporal_signatures[y_indices[j], :]
+                        temporal_cost = _unit_scale_cost(
+                            np.sum(
+                                (source_signature[:, None, :] - target_signature[None, :, :]) ** 2,
+                                axis=2,
+                            )
+                        )
+                        temporal_cost_means.append(float(np.mean(temporal_cost)))
+                        temporal_cost_maxima.append(float(np.max(temporal_cost)))
+                    extra_cost = None
+                    if component_cost is not None or temporal_cost is not None:
+                        extra_cost = np.zeros((x_i.shape[0], y_j.shape[0]))
+                        if component_cost is not None:
+                            extra_cost += self.component_conditioning_weight * component_cost
+                        if temporal_cost is not None:
+                            extra_cost += self.temporal_signature_weight * temporal_cost
                     consensus = (self.mu / high_dim) * (
                         global_rotation - multipliers[:, :, i, j]
                     )
@@ -362,7 +409,8 @@ class SoftHiWA:
                             consensus,
                             rng,
                             local_rotations[:, :, i, j] if self.warm_start_local else None,
-                            component_cost,
+                            extra_cost,
+                            1.0 if extra_cost is not None else 0.0,
                         )
                     )
                     local_couplings[i][j] = local_coupling
@@ -533,6 +581,13 @@ class SoftHiWA:
             "local_global_consensus_weighted_rms": float(
                 np.sqrt(np.sum(group_transport * local_global_distances**2))
             ),
+            "temporal_signature_weight": self.temporal_signature_weight,
+            "temporal_signature_cost_mean": (
+                float(np.mean(temporal_cost_means)) if temporal_cost_means else 0.0
+            ),
+            "temporal_signature_cost_max": (
+                float(np.max(temporal_cost_maxima)) if temporal_cost_maxima else 0.0
+            ),
             "local_coupling_entropy": local_entropy,
             "local_coupling_frobenius_norm": local_frobenius,
         }
@@ -548,7 +603,8 @@ class SoftHiWA:
         consensus: np.ndarray,
         rng: np.random.RandomState,
         initial_rotation: np.ndarray | None,
-        component_cost: np.ndarray | None = None,
+        extra_cost: np.ndarray | None = None,
+        extra_cost_weight: float = 0.0,
     ) -> tuple[np.ndarray, float, float, np.ndarray]:
         high_dim = source.shape[1]
         if initial_rotation is None:
@@ -579,8 +635,8 @@ class SoftHiWA:
                 target.T,
                 self.sa_shorn_gamma / max(group_weight, 1e-8),
                 self.sa_shorn_maxiter,
-                extra_cost=component_cost,
-                extra_cost_weight=self.component_conditioning_weight,
+                extra_cost=extra_cost,
+                extra_cost_weight=extra_cost_weight,
             )
             if np.linalg.norm(previous - rotation, 2) <= self.sa_tol:
                 break

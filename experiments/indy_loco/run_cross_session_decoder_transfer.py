@@ -46,16 +46,24 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=701)
     parser.add_argument("--maxiter", type=int, default=30)
     parser.add_argument("--consensus-weighting", choices=("uniform", "transport"), default="uniform")
+    parser.add_argument(
+        "--temporal-signature-weight",
+        type=float,
+        default=0.0,
+        help=(
+            "Optional unlabelled temporal-dynamics regulariser for local OT. "
+            "Zero preserves the frozen baseline."
+        ),
+    )
     parser.add_argument("--ridge-alpha", type=float, default=1.0)
     parser.add_argument("--tag", default="indy_loco_cross_session_pilot_20160915_to_20160921_seed701")
     return parser.parse_args()
 
 
-def _evenly_spaced(values: np.ndarray, maximum: int) -> np.ndarray:
-    if maximum <= 0 or values.shape[0] <= maximum:
-        return values
-    indices = np.linspace(0, values.shape[0] - 1, maximum, dtype=int)
-    return values[indices]
+def _evenly_spaced_indices(n_samples: int, maximum: int) -> np.ndarray:
+    if maximum <= 0 or n_samples <= maximum:
+        return np.arange(n_samples)
+    return np.linspace(0, n_samples - 1, maximum, dtype=int)
 
 
 def _velocity_direction(velocity: np.ndarray, n_bins: int = 8) -> np.ndarray:
@@ -70,23 +78,32 @@ def _metrics(prediction: np.ndarray, truth: np.ndarray) -> dict[str, float]:
     }
 
 
-def _prepare_domain(
-    train_rates: np.ndarray,
-    evaluation_rates: np.ndarray,
-    *,
-    latent_dimension: int,
-) -> tuple[np.ndarray, np.ndarray, dict[str, int]]:
+def _fit_domain_transform(train_rates: np.ndarray, *, latent_dimension: int):
     scaler = StandardScaler().fit(train_rates)
     train_scaled = scaler.transform(train_rates)
-    evaluation_scaled = scaler.transform(evaluation_rates)
     pca = PCA(n_components=latent_dimension, random_state=0).fit(train_scaled)
     latent_scaler = StandardScaler().fit(pca.transform(train_scaled))
-    train_latent = latent_scaler.transform(pca.transform(train_scaled))
-    evaluation_latent = latent_scaler.transform(pca.transform(evaluation_scaled))
-    return train_latent, evaluation_latent, {
+    def transform(rates: np.ndarray) -> np.ndarray:
+        return latent_scaler.transform(pca.transform(scaler.transform(rates)))
+    return transform, {
         "input_dimension": int(train_rates.shape[1]),
         "latent_dimension": int(latent_dimension),
     }
+
+
+def _temporal_signatures(latent: np.ndarray, lags: tuple[int, ...] = (1, 2, 4, 8)) -> np.ndarray:
+    """Causal, unlabelled local dynamics signatures for matching neural states.
+
+    Each feature records the log displacement over a past lag.  The signature
+    deliberately uses neural latents only: cursor coordinates and velocities
+    never enter the OT solve.
+    """
+    values = np.asarray(latent, dtype=float)
+    features = []
+    for lag in lags:
+        previous = np.vstack((np.repeat(values[:1], lag, axis=0), values[:-lag]))
+        features.append(np.log1p(np.linalg.norm(values - previous, axis=1)))
+    return StandardScaler().fit_transform(np.column_stack(features))
 
 
 def _fit_ridge(features: np.ndarray, velocity: np.ndarray, alpha: float) -> Ridge:
@@ -114,20 +131,32 @@ def main() -> None:
 
     source_cut = int(source.neural_rates.shape[0] * args.adaptation_fraction)
     target_cut = int(target.neural_rates.shape[0] * args.adaptation_fraction)
-    source_train_rates = _evenly_spaced(source.neural_rates[:source_cut], args.max_samples)
-    source_train_velocity = _evenly_spaced(source.cursor_velocity[:source_cut], args.max_samples)
-    target_adaptation_rates = _evenly_spaced(target.neural_rates[:target_cut], args.max_samples)
-    target_test_rates = _evenly_spaced(target.neural_rates[target_cut:], args.max_samples)
+    source_indices = _evenly_spaced_indices(source_cut, args.max_samples)
+    target_adaptation_indices = _evenly_spaced_indices(target_cut, args.max_samples)
+    target_test_indices = _evenly_spaced_indices(target.neural_rates.shape[0] - target_cut, args.max_samples)
+    source_train_rates = source.neural_rates[:source_cut][source_indices]
+    source_train_velocity = source.cursor_velocity[:source_cut][source_indices]
+    target_adaptation_rates = target.neural_rates[:target_cut][target_adaptation_indices]
+    target_test_rates = target.neural_rates[target_cut:][target_test_indices]
 
     # Target-session velocity is deliberately withheld until after all fitting.
-    target_test_velocity = _evenly_spaced(target.cursor_velocity[target_cut:], args.max_samples)
+    target_test_velocity = target.cursor_velocity[target_cut:][target_test_indices]
 
-    source_latent, _, source_meta = _prepare_domain(
-        source_train_rates, source_train_rates, latent_dimension=args.latent_dimension
+    source_transform, source_meta = _fit_domain_transform(
+        source_train_rates, latent_dimension=args.latent_dimension
     )
-    target_adaptation_latent, target_test_latent, target_meta = _prepare_domain(
-        target_adaptation_rates, target_test_rates, latent_dimension=args.latent_dimension
+    target_transform, target_meta = _fit_domain_transform(
+        target_adaptation_rates, latent_dimension=args.latent_dimension
     )
+    source_latent = source_transform(source_train_rates)
+    target_adaptation_latent = target_transform(target_adaptation_rates)
+    target_test_latent = target_transform(target_test_rates)
+    source_temporal_signatures = _temporal_signatures(
+        source_transform(source.neural_rates[:source_cut])
+    )[source_indices]
+    target_temporal_signatures = _temporal_signatures(
+        target_transform(target.neural_rates[:target_cut])
+    )[target_adaptation_indices]
     decoder = _fit_ridge(source_latent, source_train_velocity, args.ridge_alpha)
 
     source_groups = learn_soft_groups(
@@ -149,11 +178,14 @@ def main() -> None:
         support_mode="full",
         random_state=args.seed,
         consensus_weighting=args.consensus_weighting,
+        temporal_signature_weight=args.temporal_signature_weight,
     ).fit(
         target_adaptation_latent,
         target_groups.assignments,
         source_latent,
         source_groups.assignments,
+        source_temporal_signatures=target_temporal_signatures,
+        target_temporal_signatures=source_temporal_signatures,
     )
     hard_model = SoftHiWA(
         dim_red_method=PCA(n_components=args.latent_dimension, random_state=args.seed),
@@ -162,11 +194,14 @@ def main() -> None:
         support_mode="full",
         random_state=args.seed,
         consensus_weighting=args.consensus_weighting,
+        temporal_signature_weight=args.temporal_signature_weight,
     ).fit(
         target_adaptation_latent,
         np.eye(args.groups)[np.argmax(target_groups.assignments, axis=1)],
         source_latent,
         np.eye(args.groups)[np.argmax(source_groups.assignments, axis=1)],
+        source_temporal_signatures=target_temporal_signatures,
+        target_temporal_signatures=source_temporal_signatures,
     )
 
     no_alignment = decoder.predict(target_test_latent)
@@ -175,7 +210,7 @@ def main() -> None:
 
     # Explicit oracle: target adaptation velocity trains a target-only decoder.
     # It is an upper-bound diagnostic and is never compared as an unsupervised method.
-    target_oracle_velocity = _evenly_spaced(target.cursor_velocity[:target_cut], args.max_samples)
+    target_oracle_velocity = target.cursor_velocity[:target_cut][target_adaptation_indices]
     oracle_prediction = _fit_ridge(target_adaptation_latent, target_oracle_velocity, args.ridge_alpha).predict(target_test_latent)
 
     payload = {
@@ -189,6 +224,11 @@ def main() -> None:
             "target_test_neural_rates": "transformed after fitting only",
             "target_test_velocity": "opened only after all unsupervised fits for final metrics",
             "target_supervised_oracle": "separate labelled upper bound; not an alignment baseline",
+            "temporal_signature": (
+                "causal neural-latent displacement signature, used without target behaviour"
+                if args.temporal_signature_weight > 0
+                else "disabled"
+            ),
         },
         "parameters": {key: str(value) if isinstance(value, Path) else value for key, value in vars(args).items()},
         "environment": {"python": platform.python_version()},

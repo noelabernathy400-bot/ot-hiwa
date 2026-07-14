@@ -152,6 +152,24 @@ class WeightedTransportTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "component_conditioning_weight"):
             SoftHiWA(component_conditioning_weight=-0.1)
 
+    def test_negative_temporal_signature_weight_is_rejected(self) -> None:
+        with self.assertRaisesRegex(ValueError, "temporal_signature_weight"):
+            SoftHiWA(temporal_signature_weight=-0.1)
+
+    def test_positive_temporal_signature_weight_requires_signatures(self) -> None:
+        values = np.asarray([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
+        assignments = np.asarray([[1.0], [1.0], [1.0]])
+        model = SoftHiWA(
+            normalize=False,
+            maxiter=1,
+            sa_maxiter=1,
+            shorn_maxiter=2,
+            sa_shorn_maxiter=2,
+            temporal_signature_weight=0.1,
+        )
+        with self.assertRaisesRegex(ValueError, "temporal_signatures"):
+            model.fit(values, assignments, values, assignments)
+
     def test_positive_anchor_weight_requires_anchor(self) -> None:
         model = SoftHiWA(
             normalize=False,
@@ -421,6 +439,39 @@ class WeightedTransportTests(unittest.TestCase):
         self.assertEqual(model.diagnostics["component_conditioning_weight"], 0.05)
         self.assertGreaterEqual(model.diagnostics["component_conditioning_cost_mean"], 0.0)
         self.assertGreater(model.diagnostics["component_conditioning_cost_max"], 0.0)
+
+    def test_positive_temporal_signature_reports_diagnostics(self) -> None:
+        rng = np.random.default_rng(53)
+        source = rng.normal(size=(18, 2))
+        target = source @ np.asarray([[0.0, -1.0], [1.0, 0.0]]).T
+        assignments = np.zeros((18, 3))
+        assignments[:6, 0] = 1.0
+        assignments[6:12, 1] = 1.0
+        assignments[12:, 2] = 1.0
+        signatures = np.column_stack((np.arange(18), np.arange(18) ** 2)).astype(float)
+        model = SoftHiWA(
+            normalize=False,
+            maxiter=3,
+            sa_maxiter=2,
+            shorn_maxiter=20,
+            sa_shorn_maxiter=10,
+            retain_mass=1.0,
+            max_support_factor=2.0,
+            random_state=59,
+            warm_start_local=True,
+            temporal_signature_weight=0.05,
+        ).fit(
+            source,
+            assignments,
+            target,
+            assignments,
+            initial_rotation=np.eye(2),
+            source_temporal_signatures=signatures,
+            target_temporal_signatures=signatures,
+        )
+        self.assertEqual(model.diagnostics["temporal_signature_weight"], 0.05)
+        self.assertGreaterEqual(model.diagnostics["temporal_signature_cost_mean"], 0.0)
+        self.assertGreater(model.diagnostics["temporal_signature_cost_max"], 0.0)
 
 
 if __name__ == "__main__":
