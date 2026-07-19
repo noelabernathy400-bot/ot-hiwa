@@ -27,6 +27,7 @@ for path in (ROOT / "src",):
 
 from cc_hiwa.soft_groups import learn_soft_groups
 from cc_hiwa.soft_hiwa import SoftHiWA
+from cc_hiwa.global_soft_gcot import GlobalSoftGCOT
 from cc_hiwa.common import RESULTS_DIR, ensure_output_dirs, write_json
 from datasets.indy_loco import bin_indy_loco_session, load_indy_loco_session
 
@@ -54,6 +55,21 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--temperature", type=float, default=0.5)
     parser.add_argument("--seed", type=int, default=701)
     parser.add_argument("--maxiter", type=int, default=30)
+    parser.add_argument(
+        "--global-sinkhorn-maxiter",
+        type=int,
+        default=100,
+        help="Inner log-Sinkhorn iterations when alignment-solver=global_rotation.",
+    )
+    parser.add_argument(
+        "--alignment-solver",
+        choices=("local_admm", "global_rotation"),
+        default="local_admm",
+        help=(
+            "'global_rotation' keeps hierarchical OT but replaces local rotations plus ADMM "
+            "with one shared orthogonal map."
+        ),
+    )
     parser.add_argument("--consensus-weighting", choices=("uniform", "transport"), default="uniform")
     parser.add_argument(
         "--temporal-signature-weight",
@@ -181,38 +197,51 @@ def main() -> None:
         temperature=args.temperature,
         seed=args.seed,
     )
-    soft_model = SoftHiWA(
-        dim_red_method=PCA(n_components=args.latent_dimension, random_state=args.seed),
-        normalize=False,
-        maxiter=args.maxiter,
-        support_mode="full",
-        random_state=args.seed,
-        consensus_weighting=args.consensus_weighting,
-        temporal_signature_weight=args.temporal_signature_weight,
-    ).fit(
-        target_adaptation_latent,
-        target_groups.assignments,
-        source_latent,
-        source_groups.assignments,
-        source_temporal_signatures=target_temporal_signatures,
-        target_temporal_signatures=source_temporal_signatures,
-    )
-    hard_model = SoftHiWA(
-        dim_red_method=PCA(n_components=args.latent_dimension, random_state=args.seed),
-        normalize=False,
-        maxiter=args.maxiter,
-        support_mode="full",
-        random_state=args.seed,
-        consensus_weighting=args.consensus_weighting,
-        temporal_signature_weight=args.temporal_signature_weight,
-    ).fit(
-        target_adaptation_latent,
-        np.eye(args.groups)[np.argmax(target_groups.assignments, axis=1)],
-        source_latent,
-        np.eye(args.groups)[np.argmax(source_groups.assignments, axis=1)],
-        source_temporal_signatures=target_temporal_signatures,
-        target_temporal_signatures=source_temporal_signatures,
-    )
+    if args.alignment_solver == "global_rotation":
+        if args.temporal_signature_weight != 0:
+            raise ValueError("temporal signatures are currently implemented only for local_admm")
+        solver_settings = dict(
+            maxiter=args.maxiter,
+            sinkhorn_maxiter=args.global_sinkhorn_maxiter,
+        )
+        soft_model = GlobalSoftGCOT(**solver_settings).fit(
+            target_adaptation_latent,
+            target_groups.assignments,
+            source_latent,
+            source_groups.assignments,
+        )
+        hard_model = GlobalSoftGCOT(**solver_settings).fit(
+            target_adaptation_latent,
+            np.eye(args.groups)[np.argmax(target_groups.assignments, axis=1)],
+            source_latent,
+            np.eye(args.groups)[np.argmax(source_groups.assignments, axis=1)],
+        )
+    else:
+        solver_settings = dict(
+            dim_red_method=PCA(n_components=args.latent_dimension, random_state=args.seed),
+            normalize=False,
+            maxiter=args.maxiter,
+            support_mode="full",
+            random_state=args.seed,
+            consensus_weighting=args.consensus_weighting,
+            temporal_signature_weight=args.temporal_signature_weight,
+        )
+        soft_model = SoftHiWA(**solver_settings).fit(
+            target_adaptation_latent,
+            target_groups.assignments,
+            source_latent,
+            source_groups.assignments,
+            source_temporal_signatures=target_temporal_signatures,
+            target_temporal_signatures=source_temporal_signatures,
+        )
+        hard_model = SoftHiWA(**solver_settings).fit(
+            target_adaptation_latent,
+            np.eye(args.groups)[np.argmax(target_groups.assignments, axis=1)],
+            source_latent,
+            np.eye(args.groups)[np.argmax(source_groups.assignments, axis=1)],
+            source_temporal_signatures=target_temporal_signatures,
+            target_temporal_signatures=source_temporal_signatures,
+        )
 
     no_alignment = decoder.predict(target_test_latent)
     soft_prediction = decoder.predict(soft_model.transform(target_test_latent))

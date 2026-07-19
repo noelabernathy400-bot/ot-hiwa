@@ -122,6 +122,22 @@ $R^2$ was -0.1123.  The latter is diagnostic only because the solver did not
 converge.  Thus source-side state semantics by itself does not repair the
 current local-rotation consensus failure.
 
+### Globally constrained hierarchical OT probe
+
+The preceding failures point at the local-rotation ADMM structure rather than
+at a missing feature.  We therefore implemented a separate `GlobalSoftGCOT`
+solver: it retains soft groups, group transport and local sample couplings,
+but fits one orthogonal map for all group pairs.  Its rotation update is a
+direct weighted Procrustes step, so it has no ADMM consensus variable.  Local
+plans use log-domain Sinkhorn to avoid underflow from direct scaling.
+
+On the fixed session pair, a 30-outer-iteration seed-703 smoke run was not
+qualified: the soft model had rotation residual 0.000269, but local OT
+marginal error 0.01497 and $R^2=-0.0947$.  The solver is numerically better
+posed than the ADMM version, but this is **not** a good transfer result and
+does not justify a performance claim.  Removing the ADMM disagreement alone
+does not identify a useful source-to-target decoder map.
+
 ## What the new data revealed
 
 This is a useful failure mode, not a reason to keep tuning blindly:
@@ -136,18 +152,20 @@ This is a useful failure mode, not a reason to keep tuning blindly:
 4. A causal unlabelled temporal-dynamics cue also does not resolve the ADMM
    disagreement.
 5. Source-side task-state groups alone also do not resolve it.
-6. Therefore the present solver is not yet a transferable cross-session neural
+6. A globally constrained rotation removes the ADMM inconsistency but has not
+   produced a qualified transfer result.
+7. Therefore the present solver is not yet a transferable cross-session neural
    alignment method, and no performance conclusion may be drawn from the
    provisional Soft-GCOT scores.
 
 ## Next boundary
 
-Do not add more sessions or tune temperatures, group counts, or ADMM weights
-against this session pair.  A future method revision must state a new,
-falsifiable mechanism for cross-session correspondence--for example a
-behaviourally meaningful *source-only* state representation coupled to an
-unlabelled target-domain consistency objective--and must first demonstrate
-ADMM convergence on this fixed pair before any cross-session performance
-claim.  If it cannot beat the source-only decoder with converged solutions,
-the appropriate conclusion is that the current hierarchical OT assumption is
-too weak for unconstrained cross-session neural drift.
+Do not add more sessions or tune temperatures, group counts, or rotation
+penalties against this session pair.  A future method revision must state a
+new, falsifiable mechanism for cross-session correspondence--for example a
+source-trained predictive neural state representation with a target-domain
+self-supervision objective--and must first demonstrate both valid OT marginals
+and stable outer iterations on this fixed pair before any transfer claim.  If
+it cannot beat the source-only decoder with qualified solutions, the
+appropriate conclusion is that the current hierarchical OT assumption is too
+weak for unconstrained cross-session neural drift.
