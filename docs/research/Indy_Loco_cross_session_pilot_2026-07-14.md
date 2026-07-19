@@ -138,6 +138,36 @@ posed than the ADMM version, but this is **not** a good transfer result and
 does not justify a performance claim.  Removing the ADMM disagreement alone
 does not identify a useful source-to-target decoder map.
 
+### Within-session neural-to-behaviour applicability check
+
+Indy--Loco also permits a separate external test that matches the original
+HiWA problem more closely: neural rates and cursor velocity from the same
+recording session are treated as two distributions, with timestamps withheld
+from OT fitting and opened only for held-out evaluation.  This is not a
+cross-session decoder-transfer experiment.
+
+The first fixed smoke test also rejects the present geometry.  On 96 held-out
+bins, no alignment had velocity $R^2=-0.8030$, hard global hierarchical OT had
+$R^2=-0.6772$, soft global OT had $R^2=-0.6837$, and even an explicit paired
+Procrustes oracle fitted on the adaptation block had $R^2=-0.2818$.  Because
+the paired linear-orthogonal oracle itself fails, this dataset does not support
+the current assumption that neural PCA coordinates and instantaneous velocity
+are related by an approximately global orthogonal map.  It is evidence about
+the method's applicability boundary, not an unsuccessful attempt that should
+be fixed by tuning OT.
+
+### Task-aware representation checks
+
+To avoid requiring OT to invent task relevance, we also connected the existing
+differentiable task-aware representation framework to this protocol.  One
+version used source velocity direction as supervision; a second used continuous
+source velocity regression while target velocity remained unavailable.  Both
+passed their leakage and unit checks.  Neither qualified as a transfer result:
+the full continuous-regression run had source-only target $R^2=0.0511$ and
+task-aware OT $R^2=-0.0740$.  Freezing the source task representation after
+warm-up did not change that conclusion ($R^2=-0.0695$).  These are controlled
+negative results, not evidence that target labels should be introduced.
+
 ## What the new data revealed
 
 This is a useful failure mode, not a reason to keep tuning blindly:
@@ -154,7 +184,11 @@ This is a useful failure mode, not a reason to keep tuning blindly:
 5. Source-side task-state groups alone also do not resolve it.
 6. A globally constrained rotation removes the ADMM inconsistency but has not
    produced a qualified transfer result.
-7. Therefore the present solver is not yet a transferable cross-session neural
+7. The simple neural-PCA to instantaneous-velocity geometry is not a valid
+   external HiWA task on this Indy--Loco session.
+8. Source-task supervision alone does not make the unpaired target neural
+   representation identifiable in this protocol.
+9. Therefore the present solver is not yet a transferable cross-session neural
    alignment method, and no performance conclusion may be drawn from the
    provisional Soft-GCOT scores.
 

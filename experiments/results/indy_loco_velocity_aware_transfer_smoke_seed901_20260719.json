@@ -1,0 +1,69 @@
+{
+  "experiment": "indy_loco_continuous_velocity_source_supervised_target_unlabelled_ot",
+  "scope": "fixed-seed qualification; target cursor position/velocity are absent from fitting",
+  "label_usage": {
+    "source_velocity": "source regression and source-only direction groups",
+    "target_adaptation_velocity": "not passed to the model",
+    "target_test_velocity": "opened only after fitting for final metrics"
+  },
+  "parameters": {
+    "raw_directory": "D:\\ai\\ot-hiwa\\data\\raw\\indy_loco",
+    "source_session": "indy_20160915_01.mat",
+    "target_session": "indy_20160921_01.mat",
+    "adaptation_fraction": 0.6,
+    "source_validation_fraction": 0.15,
+    "max_samples": 96,
+    "input_dimension": 8,
+    "latent_dimension": 8,
+    "hidden_dimension": 24,
+    "directions": 8,
+    "warmup_epochs": 10,
+    "epochs": 20,
+    "sinkhorn_iterations": 10,
+    "seed": 901,
+    "tag": "indy_loco_velocity_aware_transfer_smoke_seed901_20260719"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "torch": "2.13.0+cpu"
+  },
+  "evaluation": {
+    "source_only_velocity_r2": 0.05108250677878745,
+    "velocity_aware_ot_r2": -0.028538449360592022,
+    "velocity_aware_ot_direction_accuracy": 0.03125,
+    "source_validation_velocity_mse": 1.2821317911148071
+  },
+  "training": {
+    "best_epoch": 29,
+    "history": [
+      {
+        "epoch": 0.0,
+        "loss": 1.1250371932983398,
+        "velocity_loss": 0.9661895632743835,
+        "transport_loss": 0.0,
+        "source_validation_mse": 1.3428325653076172
+      },
+      {
+        "epoch": 9.0,
+        "loss": 1.0483896732330322,
+        "velocity_loss": 0.8958733677864075,
+        "transport_loss": 0.0,
+        "source_validation_mse": 1.3150475025177002
+      },
+      {
+        "epoch": 10.0,
+        "loss": 4.504374980926514,
+        "velocity_loss": 0.8882206082344055,
+        "transport_loss": 2.647434711456299,
+        "source_validation_mse": 1.3125420808792114
+      },
+      {
+        "epoch": 29.0,
+        "loss": 2.297879219055176,
+        "velocity_loss": 0.816805362701416,
+        "transport_loss": 1.0737407207489014,
+        "source_validation_mse": 1.2821317911148071
+      }
+    ]
+  }
+}

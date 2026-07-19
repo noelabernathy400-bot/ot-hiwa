@@ -1,0 +1,77 @@
+{
+  "experiment": "indy_loco_task_aware_source_supervised_target_unlabelled_transfer",
+  "scope": "single fixed-seed qualification run; source velocity creates source direction supervision, target behaviour is evaluation-only",
+  "label_usage": {
+    "source_velocity": "source direction labels and source ridge decoder only",
+    "source_validation_velocity": "source-only checkpoint selection through direction accuracy",
+    "target_adaptation_velocity": "not loaded into model fitting",
+    "target_test_velocity": "opened after fitting only for R2 and direction accuracy"
+  },
+  "parameters": {
+    "raw_directory": "D:\\ai\\ot-hiwa\\data\\raw\\indy_loco",
+    "source_session": "indy_20160915_01.mat",
+    "target_session": "indy_20160921_01.mat",
+    "bin_width": 0.05,
+    "adaptation_fraction": 0.6,
+    "source_validation_fraction": 0.15,
+    "max_samples": 96,
+    "input_dimension": 8,
+    "latent_dimension": 8,
+    "hidden_dimension": 24,
+    "directions": 8,
+    "warmup_epochs": 20,
+    "epochs": 20,
+    "sinkhorn_iterations": 10,
+    "seed": 801,
+    "tag": "indy_loco_task_aware_transfer_smoke_seed801_20260719"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "torch": "2.13.0+cpu"
+  },
+  "evaluation": {
+    "source_only_velocity_r2": 0.05108250677878745,
+    "task_aware_velocity_r2": -0.11831761509675631,
+    "task_aware_target_direction_accuracy": 0.14583333333333334,
+    "source_validation_direction_accuracy": 0.2604166567325592
+  },
+  "training": {
+    "best_epoch": 9,
+    "history": [
+      {
+        "epoch": -20.0,
+        "loss": 2.300889492034912,
+        "task_loss": 2.140911817550659,
+        "transport_loss": 0.0,
+        "group_loss": 0.0,
+        "source_validation_accuracy": 0.1666666716337204
+      },
+      {
+        "epoch": -1.0,
+        "loss": 2.159877300262451,
+        "task_loss": 2.010462760925293,
+        "transport_loss": 0.0,
+        "group_loss": 0.0,
+        "source_validation_accuracy": 0.2708333432674408
+      },
+      {
+        "epoch": 0.0,
+        "loss": 5.183049201965332,
+        "task_loss": 2.003160238265991,
+        "transport_loss": 2.3702797889709473,
+        "group_loss": 2.0200860500335693,
+        "pair_loss": 0.0,
+        "source_validation_accuracy": 0.25
+      },
+      {
+        "epoch": 19.0,
+        "loss": 3.2136006355285645,
+        "task_loss": 1.923224925994873,
+        "transport_loss": 0.933763325214386,
+        "group_loss": 0.2981022894382477,
+        "pair_loss": 0.0,
+        "source_validation_accuracy": 0.2291666716337204
+      }
+    ]
+  }
+}

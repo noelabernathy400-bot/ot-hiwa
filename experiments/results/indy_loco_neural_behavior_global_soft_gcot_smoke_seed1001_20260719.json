@@ -1,0 +1,144 @@
+{
+  "experiment": "indy_loco_heldout_neural_to_behavior_distribution_alignment",
+  "scope": "external HiWA-style evaluation; timestamps are withheld from group/OT fitting and used only for held-out metrics plus the explicit paired oracle",
+  "data_contract": {
+    "neural_rates": "source distribution",
+    "cursor_velocity": "target distribution",
+    "adaptation_pairs": "not provided to OT",
+    "test_pairs": "opened only for final evaluation",
+    "paired_oracle": "evaluation-only upper-bound diagnostic"
+  },
+  "parameters": {
+    "raw_directory": "D:\\ai\\ot-hiwa\\data\\raw\\indy_loco",
+    "session": "indy_20160915_01.mat",
+    "adaptation_fraction": 0.6,
+    "max_samples": 96,
+    "dimension": 2,
+    "groups": 4,
+    "temperature": 0.5,
+    "maxiter": 30,
+    "sinkhorn_maxiter": 80,
+    "seed": 1001,
+    "tag": "indy_loco_neural_behavior_global_soft_gcot_smoke_seed1001_20260719"
+  },
+  "environment": {
+    "python": "3.13.7"
+  },
+  "evaluation": {
+    "no_alignment": {
+      "velocity_r2": -0.8029646781752019,
+      "direction_accuracy": 0.08333333333333333
+    },
+    "hard_global_hiwa": {
+      "velocity_r2": -0.6772024056345349,
+      "direction_accuracy": 0.10416666666666667
+    },
+    "soft_global_gcot": {
+      "velocity_r2": -0.6836966008514141,
+      "direction_accuracy": 0.11458333333333333
+    },
+    "paired_procrustes_oracle": {
+      "velocity_r2": -0.28182282841807604,
+      "direction_accuracy": 0.28125
+    }
+  },
+  "diagnostics": {
+    "hard": {
+      "solver": "global_soft_gcot",
+      "rotation_residual": [
+        0.5085035792666031,
+        0.16035802591537773,
+        0.0702339846999895,
+        0.030098041222353038,
+        0.012318141596899984,
+        0.0049201540018415455,
+        0.0019446729566043744,
+        0.0007653515398853364,
+        0.0003007036125473245,
+        0.0001180662556993893,
+        4.634455242108304e-05
+      ],
+      "transport_objective_history": [
+        1.446623323328555,
+        1.1641201936893102,
+        1.1323482333017385,
+        1.1248819440359212,
+        1.1230290314787639,
+        1.1225240947924409,
+        1.1223650797582718,
+        1.1223090453786866,
+        1.1222880574386993,
+        1.1222799763579312,
+        1.1222768289278497
+      ],
+      "max_sinkhorn_marginal_error": [
+        1.3489077911821301e-05,
+        1.5110662859862956e-08,
+        7.392214978890754e-07,
+        8.842143154330628e-07,
+        8.079848180519988e-07,
+        7.681307535173376e-07,
+        7.518281948393213e-07,
+        7.453785067501606e-07,
+        7.428422454658357e-07,
+        7.418462613095755e-07,
+        7.414552931905849e-07
+      ],
+      "group_transport_row_marginal_error": 0.00011566355516312576,
+      "group_transport_column_marginal_error": 0.0,
+      "rotation_determinant": 1.0000000000000004,
+      "rotation_orthogonality_error": 8.027630352539686e-16,
+      "converged": true
+    },
+    "soft": {
+      "solver": "global_soft_gcot",
+      "rotation_residual": [
+        0.3252508929524178,
+        0.22167985202104473,
+        0.10199768837546819,
+        0.048951493263248824,
+        0.022398337182382218,
+        0.010041186876463234,
+        0.004480353267919351,
+        0.0019968009478182483,
+        0.0008896265529748716,
+        0.00039630397224694504,
+        0.0001765341049599313,
+        7.863578649892261e-05
+      ],
+      "transport_objective_history": [
+        1.4733050648813322,
+        1.3034198267797656,
+        1.2497299810300984,
+        1.2366682610147124,
+        1.233092779373124,
+        1.2321643364315742,
+        1.2318982124234488,
+        1.2318095813753316,
+        1.2317760660222445,
+        1.2317623220351517,
+        1.2317564351854013,
+        1.231753859649488
+      ],
+      "max_sinkhorn_marginal_error": [
+        1.6655269097221037e-07,
+        1.0761745051351967e-07,
+        1.223190276705699e-07,
+        1.8169824082120423e-07,
+        1.7138140355477116e-07,
+        1.36803495920379e-07,
+        1.1848616081333585e-07,
+        1.1017638038707256e-07,
+        1.064794981908701e-07,
+        1.0483647347458991e-07,
+        1.04105580378544e-07,
+        1.0378022699542022e-07
+      ],
+      "group_transport_row_marginal_error": 0.0005872390308121478,
+      "group_transport_column_marginal_error": 2.7755575615628914e-17,
+      "rotation_determinant": 0.9999999999999999,
+      "rotation_orthogonality_error": 2.3170726453065027e-16,
+      "converged": true
+    }
+  }
+}
