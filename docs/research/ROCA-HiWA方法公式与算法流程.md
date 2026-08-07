@@ -6,7 +6,7 @@
 
 早期实验说明：
 
-- TACO 式 soft prototypes 可以产生有结构的自动分组；
+- TACO 式 soft prototypes 可以产生有结构的自分组；
 - Soft-Prototype HiWA 可以实现；
 - soft random init 不稳定；
 - soft warm start 更稳定，但最初没有明显提高 direction accuracy；

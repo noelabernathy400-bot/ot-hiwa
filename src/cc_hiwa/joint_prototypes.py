@@ -24,6 +24,8 @@ class JointPrototypeConfig:
     lambda_align: float = 0.10
     lambda_balance: float = 0.05
     lambda_entropy: float = 0.10
+    lambda_separation: float = 0.0
+    separation_margin: float = 0.20
     group_gamma: float = 0.10
     sinkhorn_maxiter: int = 200
     maxiter: int = 80
@@ -79,6 +81,10 @@ def _validate_inputs(
     for name in ("lambda_align", "lambda_balance", "lambda_entropy"):
         if getattr(config, name) < 0:
             raise ValueError(f"{name} must be non-negative")
+    if config.lambda_separation < 0:
+        raise ValueError("lambda_separation must be non-negative")
+    if not -1.0 <= config.separation_margin < 1.0:
+        raise ValueError("separation_margin must be in [-1, 1)")
 
 
 def _unpack(
@@ -90,6 +96,23 @@ def _unpack(
     return flat[:split].reshape(n_groups, dimension), flat[split:].reshape(
         n_groups, dimension
     )
+
+
+def prototype_separation_loss(prototypes: np.ndarray, margin: float) -> float:
+    """Bounded cosine-hinge penalty for overly similar prototype directions.
+
+    Unlike a negative squared-distance objective, this loss cannot be driven to
+    negative infinity by sending prototype norms to infinity.  The prototype
+    directions are normalized only for this penalty, preserving the existing
+    reconstruction parameterization.
+    """
+    values = np.asarray(prototypes, dtype=float)
+    if values.ndim != 2 or values.shape[0] < 2:
+        raise ValueError("prototypes must contain at least two rank-2 rows")
+    directions = values / np.maximum(np.linalg.norm(values, axis=1, keepdims=True), EPS)
+    similarities = directions @ directions.T
+    upper = similarities[np.triu_indices(values.shape[0], k=1)]
+    return float(np.mean(np.maximum(upper - margin, 0.0) ** 2))
 
 
 def _loss_terms(
@@ -146,6 +169,9 @@ def _loss_terms(
     source_entropy = float(np.mean(assignment_entropy(source_assignments)))
     target_entropy_mean = float(np.mean(assignment_entropy(target_assignments)))
     entropy = float((source_entropy - target_entropy) ** 2 + (target_entropy_mean - target_entropy) ** 2)
+    source_separation = prototype_separation_loss(source_proto, config.separation_margin)
+    target_separation = prototype_separation_loss(target_proto, config.separation_margin)
+    separation = source_separation + target_separation
 
     total = (
         proto_source
@@ -153,6 +179,7 @@ def _loss_terms(
         + config.lambda_align * align
         + config.lambda_balance * balance
         + config.lambda_entropy * entropy
+        + config.lambda_separation * separation
     )
     terms = {
         "total": float(total),
@@ -161,6 +188,9 @@ def _loss_terms(
         "align": align,
         "balance": balance,
         "entropy": entropy,
+        "separation": separation,
+        "source_separation": source_separation,
+        "target_separation": target_separation,
         "source_mean_entropy": source_entropy,
         "target_mean_entropy": target_entropy_mean,
         "source_min_mass": float(source_mass.min()),
@@ -278,6 +308,8 @@ def optimize_joint_prototypes(
             "lambda_align": cfg.lambda_align,
             "lambda_balance": cfg.lambda_balance,
             "lambda_entropy": cfg.lambda_entropy,
+            "lambda_separation": cfg.lambda_separation,
+            "separation_margin": cfg.separation_margin,
             "group_gamma": cfg.group_gamma,
             "sinkhorn_maxiter": cfg.sinkhorn_maxiter,
             "maxiter": cfg.maxiter,

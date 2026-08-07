@@ -1,0 +1,277 @@
+% !TEX program = xelatex
+\documentclass[UTF8,a4paper,11pt]{ctexart}
+
+\usepackage[left=2.35cm,right=2.35cm,top=2.2cm,bottom=2.35cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{booktabs,tabularx,array,multirow}
+\usepackage{xcolor,hyperref,enumitem,fancyhdr,caption,microtype}
+\usepackage{cleveref}
+
+\definecolor{navy}{HTML}{153B5B}
+\definecolor{teal}{HTML}{007C83}
+\definecolor{softgray}{HTML}{F2F5F7}
+\definecolor{rulegray}{HTML}{CBD5E1}
+\hypersetup{colorlinks=true,linkcolor=navy,urlcolor=teal,citecolor=navy,
+  pdftitle={GC-HiWA: 带适用性诊断的无监督坐标对齐},pdfauthor={OT-HiWA Project}}
+\setlength{\parskip}{0.42em}
+\setlength{\parindent}{2em}
+\setlength{\headheight}{22pt}
+\renewcommand{\arraystretch}{1.18}
+\setlist[itemize]{leftmargin=1.7em,itemsep=0.2em,topsep=0.2em}
+\setlist[enumerate]{leftmargin=2em,itemsep=0.2em,topsep=0.2em}
+\captionsetup{font=small,labelfont=bf,labelsep=quad}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small\color{navy}GC-HiWA v2}
+\rhead{\small\color{navy}带适用性诊断的无监督坐标对齐}
+\cfoot{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{rulegray}\leaders\hrule height \headrulewidth\hfill}}
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\OO}{\mathrm{O}}
+\newcommand{\SO}{\mathrm{SO}}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert}
+\newcommand{\inner}[2]{\left\langle #1,#2\right\rangle}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\Proj}{\operatorname{Proj}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newtheorem{theorem}{定理}
+\newtheorem{proposition}[theorem]{命题}
+\newtheorem{lemma}[theorem]{引理}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{定义}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{注记}
+
+\title{\textbf{GC-HiWA：带适用性诊断的无监督坐标对齐}\\
+\large 面向无标定跨设备／跨视角三维姿态坐标恢复的数学合同、方法与受控验证}
+\author{OT-HiWA Project}
+\date{2026 年 7 月 25 日\\\small 论文草稿：受控结果已冻结；真实语义动作迁移验证尚待完成}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+无监督最优传输对齐常被用于跨域迁移，但低运输代价或数值收敛并不能证明两个域存在可迁移的共同语义。本文研究一个更窄、可检验的问题：当两个无配对数据域共享群组几何，且坐标系近似仅相差一个预先声明的正交变换时，能否恢复该变换；当这一合同不成立时，能否明确弃权而非输出错误映射。为此，我们提出 GC-HiWA（Group-Conditioned Hierarchical Wasserstein Alignment）：以旋转等变软分组、组层与样本层最优传输、局部旋转的 ADMM 共识为固定主干；对三维姿态采用 $I_J\otimes SO(3)$ 的结构化坐标变换；并以 ROCA 在两个行列式分支之间只做保守选择。方法输出前必须同时通过局部 OT 边际可行性、正交性、单一旋转拟合比、协方差谱必要条件、几何可识别性和多启动稳定性检查。
+
+在独立合成种子批次中，三类可恢复条件的核心门槛和 ROCA 均为 $15/15$ 接受；五类预声明失配条件均为 $25/25$ 弃权。额外的谱伪装非正交反例使源、目标协方差谱在数值上完全一致，但核心门槛与 ROCA 仍 $5/5$ 弃权。在 Panoptic Studio 的受控跨相机三维骨架实验中，拟合阶段不使用相机外参、同步帧或动作标签；结构化模型恢复了物理相机旋转，并在多个相机对和独立窗口中得到配对 Recall@1 为 $1.0$ 的事后评估。本文因此主张的是\emph{带失效诊断的无监督坐标对齐}，而不是任意跨域任务上的普遍迁移提升。真实跨设备语义动作识别的冻结协议已给出，但尚未因为缺少完整外部骨架数据而执行。
+\end{abstract}
+
+\noindent\textbf{关键词：} 无监督坐标对齐；层级最优传输；三维姿态；正交 Procrustes；弃权；适用性诊断
+
+\section{引言}
+跨设备或跨视角的三维姿态系统常面对同一身体运动在不同坐标框架中表示的问题。若目标设备没有标定、没有与源设备配对的帧，且没有可用于训练的目标标签，直接把源端动作模型作用到目标坐标上通常会失效。一个诱人的方案是用最优传输（OT）将两域无标签样本对齐；然而，OT 总能在给定代价下给出某种耦合，数值收敛也只说明求解器到达固定点，并不意味着两域确实共享一个单一坐标变换。
+
+本文不试图让 OT 在所有跨域数据上提升性能。我们的研究目标是建立一个可证伪的合同：仅当两域存在共享群组几何，且目标坐标由源坐标经允许的单一正交变换得到时，输出该变换；否则输出弃权。该定位继承了层级 OT 对多模态分布对齐的思想\cite{lee2019hierarchical,peyre2019computational}，但将部署时的“是否应输出映射”作为与拟合本身同等重要的问题。
+
+本文贡献如下：
+\begin{enumerate}
+  \item 给出无配对正交坐标对齐的数学合同，明确可恢复、不可恢复及仅能保守弃权的情形；证明整体标量标准化的正交等变性，并给出已知正确耦合下的唯一恢复命题。
+  \item 提出固定 GC-HiWA 主干：旋转等变软分组、全支持的组条件 OT、局部旋转与全局结构化旋转的 ADMM 共识。对 $J$ 关节三维姿态，限制允许族为 $I_J\otimes SO(3)$，避免不具物理意义的跨关节混合。
+  \item 提出 ROCA（Representative-Oriented Component-Aware）作为行列式分支的保守资格选择器，而非把 OT 目标误解释为语义正确性。
+  \item 构建数值与几何资格门槛，并在合成失配、谱伪装非正交、跨模态独立目标以及 Panoptic Studio 受控真实骨架上验证恢复与弃权边界。
+\end{enumerate}
+
+\section{问题设定与适用性合同}\label{sec:contract}
+令 $X=\{x_i\}_{i=1}^{n}\subset\RR^d$ 与 $Y=\{y_j\}_{j=1}^{m}\subset\RR^d$ 分别为源域与目标域无标签样本。拟合阶段没有已知样本配对、动作标签、相机外参或目标端监督。理想关系为
+\begin{equation}\label{eq:ideal-model}
+ y_{\pi(i)}=x_iR_\star^\top+\varepsilon_i,\qquad R_\star\in\mathcal R,
+\end{equation}
+其中 $\pi$ 为未知对应，$\varepsilon_i$ 为测量噪声或轻微失配，$\mathcal R$ 为实验前声明的允许变换族。
+
+主应用是一帧包含 $J$ 个三维关节的姿态，故 $d=3J$。真实相机坐标变化应对每个关节施加同一个三维旋转，而不应混合不同关节的坐标。因此使用
+\begin{equation}\label{eq:pose-family}
+ \mathcal R_{\mathrm{pose}}=\{I_J\otimes R_3:R_3\in SO(3)\}.
+\end{equation}
+这只有三个自由度；相反，$O(3J)$ 有 $3J(3J-1)/2$ 个自由度，允许把左臂与右臂坐标任意混合，不代表相机坐标变换。
+
+合同不覆盖以下情形：每个样本拥有不同旋转、显著非正交形变、缺失或不可匹配的群组、跨模态但没有共享几何，或把目标域标签泄露给拟合。它们的正确输出是弃权，而不是一个表面正交的矩阵。
+
+\section{GC-HiWA 方法}\label{sec:method}
+\subsection{旋转等变的预处理与软群组}
+逐坐标 z-score 会按轴缩放，通常破坏未知旋转关系。我们只采用整体标量标准化：
+\begin{equation}\label{eq:global-scale}
+ \mathcal S(X)=\frac{X-\bm 1\bar x^\top}{s_X},\qquad
+ s_X=\sqrt{\frac{1}{nd}\norm{X-\bm1\bar x^\top}_F^2}.
+\end{equation}
+每个域在标准化后独立学习 $K$ 个原型，得到行和为一的软归属 $a_{ik}$ 与 $b_{j\ell}$。实现使用基于到原型距离的 softmax 分配和重构／熵正则的原型学习；关键限制是采用 \texttt{global\_scalar} 缩放，而非逐特征缩放。
+
+\begin{lemma}[整体标量标准化的正交等变性]\label{lem:equivariance}
+若 $Y=XR^\top+\bm1t^\top$，其中 $R\in O(d)$，则 $\mathcal S(Y)=\mathcal S(X)R^\top$。
+\end{lemma}
+\begin{proof}
+有 $\bar y=\bar xR^\top+t$。Frobenius 范数在右乘正交矩阵时不变，故 $s_Y=s_X$。代入\cref{eq:global-scale} 即得结论。
+\end{proof}
+
+\subsection{组条件层级 OT 与旋转共识}
+对每个组对 $(k,\ell)$，局部耦合 $Q_{k\ell}$ 的行、列边际由相应软归属归一化后给出。局部代价为
+\begin{equation}
+ C_{k\ell}(R_{k\ell})=
+ \inner{Q_{k\ell}}{\left[\norm{x_iR_{k\ell}^\top-y_j}_2^2\right]_{ij}}.
+\end{equation}
+外层群组传输 $P$ 以熵正则 Sinkhorn 形式求得：
+\begin{equation}\label{eq:group-ot}
+ P_\gamma=\argmin_{P\in\mathcal U_K}
+ \inner{P}{C}+\gamma\sum_{k,\ell}P_{k\ell}(\log P_{k\ell}-1),
+\end{equation}
+其中 $\mathcal U_K$ 为均匀边际的传输多面体。局部旋转、局部耦合和 $P$ 交替更新；ADMM 使局部旋转与单一全局旋转达成共识：
+\begin{equation}\label{eq:consensus}
+ R_g\leftarrow\Proj_{\mathcal R}\left(\sum_{k,\ell}P_{k\ell}(R_{k\ell}+\Lambda_{k\ell})\right).
+\end{equation}
+对一般向量，$\Proj_{\mathcal R}$ 是正交 Procrustes 投影\cite{umeyama1991least,cuturi2013sinkhorn}。对姿态族\cref{eq:pose-family}，若 $A_{uv}\in\RR^{3\times3}$ 是 $A$ 的第 $(u,v)$ 个关节块，则
+\begin{equation}
+ \Proj_{\mathcal R_{\mathrm{pose}}}(A)=I_J\otimes
+ \Proj_{SO(3)}\left(\sum_{u=1}^J A_{uu}\right).
+\end{equation}
+这正是“所有关节共享一个相机旋转”的 Frobenius 最优投影。
+
+\subsection{ROCA：分支选择而非语义补救}
+正交群 $O(d)$ 有 $\det(R)=+1$ 与 $\det(R)=-1$ 两个分支。ROCA 分别拟合两个 determinant-constrained 候选。对每一候选，仅当 ADMM 收敛、局部边际可靠、单一旋转拟合健康且代表元单纯形非退化时，该候选才有资格参与选择。
+
+令 $r_k^X,r_\ell^Y$ 为软归属加权代表元。候选自己的群组传输决定 Hungarian 一一匹配；在 $d=3,K=4$ 时，四个代表元形成定向四面体。若配对后的源、目标四面体有向体积符号与候选的 determinant 符号一致，则该候选通过方向一致性检查。若仅一支合格，选择它；若两支均合格，只有内部目标差距达到预先固定阈值时才选目标更小者，否则弃权。ROCA 不访问标签、配对或事后旋转误差，也不宣称在失配情形中“修复” OT。
+
+\section{何时可恢复，何时应弃权}\label{sec:theory}
+\begin{theorem}[已知正确耦合下的唯一恢复]\label{thm:recovery}
+设无噪声模型\cref{eq:ideal-model} 成立，正确加权耦合 $Q_\star$ 的源样本加权协方差满秩。则
+\begin{equation}
+ \widehat R=\argmin_{R\in\mathcal R}
+ \sum_{i,j}(Q_\star)_{ij}\norm{x_iR^\top-y_j}_2^2
+\end{equation}
+的唯一最优解是 $R_\star$。对姿态族，只需关节聚合后的三维加权协方差满秩。
+\end{theorem}
+\begin{proof}
+$R_\star$ 使目标为零。若另一 $R$ 同样使目标为零，则耦合支持上的 $x_i(R-R_\star)^\top=0$。满秩条件排除非零零空间，故 $R=R_\star$。
+\end{proof}
+
+\begin{remark}
+该定理的前提是\emph{正确耦合已知}，并不声称熵正则 OT--ADMM 能从任意初始化全局恢复该耦合。因此，数值健康、拟合失配和多启动检查是部署合同的一部分，而不是定理的替代品。
+\end{remark}
+
+定义允许族下的最小配对残差
+\begin{equation}
+ \rho_{\mathcal R}^2=\inf_{R\in\mathcal R,\pi}\frac1n\sum_i\norm{x_iR^\top-y_{\pi(i)}}_2^2.
+\end{equation}
+若 $\rho_{\mathcal R}>0$，则允许族中不存在精确坐标解。混合多个旋转、群组平移、显著非正交缩放和跨模态独立目标均可导致该情形。
+
+正交变换还保持中心化协方差的谱。令
+\begin{equation}
+ \widetilde\Sigma_X=\frac{X_c^\top X_c}{\norm{X_c}_F^2},\qquad
+ \delta_{\mathrm{spec}}=
+ \frac{\norm{\lambda(\widetilde\Sigma_X)-\lambda(\widetilde\Sigma_Y)}_2}
+ {\{\norm{\lambda(\widetilde\Sigma_X)}_2+\norm{\lambda(\widetilde\Sigma_Y)}_2\}/2}.
+\end{equation}
+因此 $\delta_{\mathrm{spec}}$ 是正交合同的必要不变量，但不是充分条件。为避免协方差具有重特征值时输出虚假的唯一旋转，我们定义
+\begin{equation}
+ \kappa_{\mathrm{id}}=\frac{\min_{r<d}(\lambda_{r+1}-\lambda_r)}{\norm{\lambda(\widetilde\Sigma_X)}_2}.
+\end{equation}
+小的 $\kappa_{\mathrm{id}}$ 不证明完整分布不可识别，但在无标签、无配对部署中提供保守的弃权理由。
+
+\section{资格门槛与输出规则}\label{sec:qualification}
+GC-HiWA 的输出不是“一个旋转矩阵”，而是\emph{旋转或弃权及原因}。当前冻结合同要求以下条件取合取：
+\begin{enumerate}
+ \item ADMM 收敛；局部 Sinkhorn 边际误差不超过 $10^{-3}$；旋转正交误差不超过 $10^{-6}$；
+ \item 匹配群组的跨域代价相对域内自耦合代价的拟合比 $\eta\le1.5$；
+ \item $\delta_{\mathrm{spec}}\le0.05$，且物理三维聚合后的 $\kappa_{\mathrm{id}}\ge0.02$；
+ \item 对姿态任务，观察到的旋转结构必须为 \texttt{repeated\_3d\_blocks}；
+ \item 至少三次无标签重启中，至少 $80\%$ 的健康候选在物理三维旋转上与其 medoid 相差不超过 $5^\circ$。
+\end{enumerate}
+任一条件失败即返回 \texttt{abstain}，并记录如 \texttt{covariance\_spectrum\_incompatible}、\texttt{rotation\_geometry\_weakly\_identifiable} 或 \texttt{restart\_rotation\_disagreement} 的机器可读原因。接受仅表示未观察到与单一旋转合同冲突的数值证据；它不证明语义等价。
+
+\section{实验协议}\label{sec:experiments}
+\subsection{共同原则}
+在所有恢复实验中，真实旋转、目标样本配对、群组标签和 determinant 真值仅用于\emph{事后评分}。它们不进入软群组学习、OT、ADMM、ROCA 或重启选择。固定主干采用全支持局部 OT、传输加权共识和固定局部熵温度；学习编码器与联合原型更新未纳入本论文主结果。
+
+\subsection{已知真值的合成边界}
+四个不对称三维群组生成源域，目标端按单一正交变换生成后打乱行顺序。可恢复条件包括理想旋转及两种噪声级别。失配条件包括混合旋转、群组平移、非正交缩放和独立生成的跨模态目标。先在种子 1901--1905 上发现旧的单一拟合门槛会错误接受一个轻度非正交反例；随后冻结谱门槛，并在互不重合的种子 1961--1965 上进行独立确认。
+
+此外，构造谱伪装的非正交映射。令 $S=X_c^\top X_c$，取 $Q\in SO(3)$，并令 $A=S^{1/2}QS^{-1/2}$。则 $ASA^\top=S$，所以 $Y=XA^\top$ 的经验协方差谱与 $X$ 严格相同；当 $Q$ 不与各向异性的 $S$ 交换时，$A\notin O(3)$，故不存在可恢复的单一正交真值。
+
+\subsection{Panoptic Studio 受控跨相机验证}
+Panoptic Studio 提供多相机重建的三维骨架和相机外参\cite{joo2015panoptic}。我们将每帧 19 个三维关节按置信度加权中心化，在两个相机坐标系中表示，并用共同标量缩放。目标帧在拟合前打乱。相机外参、同步帧 ID 与对应关系均仅在事后用于计算旋转误差、配对 MSE 和 Recall；动作标签不进入任一阶段。
+
+最后，我们在两个独立窗口中训练源端定义的四类“姿态状态”分类器，并比较目标原坐标与经 GC-HiWA 映射后的表现。它检验坐标恢复能否使冻结源模型重新可用，但这些状态由源姿态聚类定义，\emph{不是}真实语义动作标签。
+
+\section{结果}\label{sec:results}
+\subsection{合成恢复与弃权}
+\cref{tab:synthetic} 报告冻结门槛在独立结果文件上的审计。可恢复和不可恢复条件均使用事先声明的类别；数量有限，不能解释为未知数据分布上的错误率估计。
+
+\begin{table}[htbp]
+\centering
+\caption{独立合成审计。核心列使用已知 determinant 的评价控制以隔离恢复；ROCA 列为不使用标签的分支选择。}
+\label{tab:synthetic}
+\begin{tabularx}{0.96\linewidth}{lCCC Y}
+\toprule
+条件 & 次数 & 核心门槛 & ROCA & 解释\\
+\midrule
+理想旋转、噪声 0.05、噪声 0.10 & 15 & 15/15 接受 & 15/15 接受 & 三类共享单一旋转的可恢复条件\\
+混合旋转、群组平移、非正交、独立跨模态 & 25 & 25/25 弃权 & 25/25 弃权 & 预声明合同违例的独立确认\\
+谱伪装非正交 & 5 & 5/5 弃权 & 5/5 弃权 & $\delta_{\mathrm{spec}}\le1.16\times10^{-15}$，但拟合比为 4.34--12.36\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+谱伪装结果尤为关键：只检查协方差谱会把该反例误认为兼容；当前系统实际因 ADMM 未收敛和 \texttt{single\_rotation\_fit\_excessive} 而弃权。这证明谱检查是必要条件而非充分条件，也说明资格规则依赖多项诊断的合取。
+
+\subsection{Panoptic：结构化旋转恢复}
+将无结构的 $O(57)$ 旋转用于姿态会在 100 轮内不收敛，旋转 Frobenius 误差为 10.31，因而不能作为成功证据。使用 $I_{19}\otimes SO(3)$ 后，多个相机对和窗口的结果如\cref{tab:panoptic}。所有 Recall 均在拟合后用被隐藏的同步帧计算。
+
+\begin{table}[htbp]
+\centering
+\caption{Panoptic Studio 的受控跨相机坐标恢复。}
+\label{tab:panoptic}
+\begin{tabularx}{0.96\linewidth}{lCCC Y}
+\toprule
+设置 & 有效重启／总数 & 旋转误差 & 配对 Recall@1 & 结论\\
+\midrule
+pose1：00\_00 $\to$ 00\_01，5 次 & 5/5 & 均值 0.0154，最大 0.0254 & 1.0 & 结构化模型稳定恢复\\
+pose1：00\_00 $\to$ 00\_05，3 次 & 3/3 & 最大 0.0308 & 1.0 & 不依赖单一相机对\\
+pose1：00\_00 $\to$ 00\_21，3 次 & 3/3 & 最大 0.0288 & 1.0 & 不依赖单一相机对\\
+pose2 独立窗口，多启动 & 4/5 稳定簇 & 代表解 0.00575 & 1.0 & 一个约 $6.7^\circ$ 坏局部解被重启门槛排除\\
+pose2，主体 2，独立窗口 & 3/3 & 代表解 0.0435 & 1.0 & 主体与时间窗口均改变\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+在加入谱与几何可识别性门槛的受控复查中，101 帧、00\_00 $\to$ 00\_01 的实例通过资格检查：旋转误差为 0.00818，配对 MSE 为 $2.79\times10^{-7}$，Recall@1 为 1.0，且 $\kappa_{\mathrm{id}}=0.133>0.02$。
+
+\subsection{冻结源模型的受控迁移代理}
+\cref{tab:proxy} 给出源定义姿态状态的冻结分类器结果。对齐后性能接近源域留出表现，而原始目标坐标使同一模型明显退化。这是坐标恢复使已有模型重新可用的受控证据，不应被称为真实动作识别迁移。
+
+\begin{table}[htbp]
+\centering
+\caption{Panoptic 源定义姿态状态的冻结迁移代理（普通准确率／平衡准确率）。}
+\label{tab:proxy}
+\begin{tabular}{lccc}
+\toprule
+独立窗口 & 源域留出 & 目标原坐标 & 目标经 GC-HiWA 映射\\
+\midrule
+主体 0，帧 141--339 & 0.888 / 0.864 & 0.838 / 0.333 & 0.888 / 0.864\\
+主体 2，帧 10000--10099 & 0.600 / 0.822 & 0.250 / 0.667 & 0.575 / 0.811\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{讨论、限制与真实语义验证}\label{sec:discussion}
+本文证据支持的结论是：当共享群组几何和结构化单一旋转合同成立时，GC-HiWA 能在无配对、无标定的受控环境中恢复姿态坐标关系；对本文设计的非正交、错配与跨模态边界，它倾向于弃权。本文没有证明以下命题：完整 OT--ADMM 的全局收敛、阈值在未知分布上的误拒绝／错误接受率、任意跨域任务上的迁移改善，或真实跨设备动作识别的提升。
+
+真实语义动作验证的首选候选为 UWA3D Multiview Activity II：官方资料说明其包含 30 个动作、10 名受试者、4 个 Kinect 视角的骨架数据\cite{uwa3dii}. 由于不同视角为独立表演而非同步帧，它适合检验“源视角有标签、目标视角无标签”的语义迁移，但不能报告不存在的帧级真值旋转或 Recall。预注册协议为：按受试者划分，源视角训练动作分类器；用训练受试者的无标签目标视角序列拟合 GC-HiWA；仅在未见受试者的目标视角上打开标签评分；同时报告 source-only、映射后、标定／配对上界、接受率、弃权率及错误接受。该数据尚未完整取得，因此本稿不报告任何 UWA3DII 数值。
+
+\section{可复查性}\label{sec:reproducibility}
+所有主张都可追溯至固定脚本、种子和 JSON：合成边界运行器为 \path{experiments/synthetic/run_gc_hiwa_boundary_benchmark.py}；Panoptic 运行器位于 \path{experiments/panoptic/}；资格门槛和 ROCA 分别实现于 \path{src/cc_hiwa/alignment_qualification.py} 与 \path{src/cc_hiwa/roca_qualification.py}。\path{experiments/synthetic/verify_gc_hiwa_v2_evidence.py} 自动核验本文引用的独立合成、谱伪装和 Panoptic 结果文件。当前回归套件在设置 \texttt{OMP\_NUM\_THREADS=1}、\texttt{MKL\_NUM\_THREADS=1} 时为 114 项通过；该限制用于规避当前 Windows 环境下 Torch 多线程运行时的偶发中止，不改变 GC-HiWA 的算法配置。
+
+\section{结论}
+GC-HiWA 将无监督坐标对齐表述为带合同的恢复问题，而不是万能域迁移。固定 Soft-GCOT／层级 OT 主干在结构化姿态旋转下实现了无标定、无配对的受控坐标恢复；ROCA 只在候选分支具有数值和几何资格时选择，否则弃权；多项诊断共同阻止系统把不兼容数据包装成对齐成功。合成边界与 Panoptic 结果支持这一受限主张。下一步不是扩大结论，而是在冻结协议下完成独立的真实语义动作数据验证。
+
+\bibliographystyle{plain}
+\begingroup
+\small
+\setlength{\parskip}{0pt}
+\bibliography{gc_hiwa_v2_refs}
+\endgroup
+
+\end{document}

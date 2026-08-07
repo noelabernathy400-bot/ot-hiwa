@@ -1,0 +1,159 @@
+{
+  "source_experiment": "gc_hiwa_fixed_core_known_truth_boundary_benchmark",
+  "truth_usage": "scenario truth is used only for this post-fit audit; it was not supplied to fitting, qualification, or ROCA selection",
+  "predeclared_recoverable_scenarios": [
+    "ideal_rotation",
+    "noise_05",
+    "noise_10"
+  ],
+  "per_scenario": [
+    {
+      "scenario": "cross_modal_independent",
+      "expected_single_rotation": false,
+      "core_oracle_component": {
+        "runs": 5,
+        "accepted_count": 0,
+        "abstained_count": 5,
+        "accepted_rotation_frobenius_error_mean": null
+      },
+      "roca_label_free": {
+        "runs": 5,
+        "accepted_count": 0,
+        "abstained_count": 5,
+        "selected_correct_component_count": 0,
+        "accepted_rotation_frobenius_error_mean": null
+      }
+    },
+    {
+      "scenario": "group_shift_1",
+      "expected_single_rotation": false,
+      "core_oracle_component": {
+        "runs": 5,
+        "accepted_count": 0,
+        "abstained_count": 5,
+        "accepted_rotation_frobenius_error_mean": null
+      },
+      "roca_label_free": {
+        "runs": 5,
+        "accepted_count": 0,
+        "abstained_count": 5,
+        "selected_correct_component_count": 0,
+        "accepted_rotation_frobenius_error_mean": null
+      }
+    },
+    {
+      "scenario": "ideal_rotation",
+      "expected_single_rotation": true,
+      "core_oracle_component": {
+        "runs": 5,
+        "accepted_count": 5,
+        "abstained_count": 0,
+        "accepted_rotation_frobenius_error_mean": 0.0013528552946974208
+      },
+      "roca_label_free": {
+        "runs": 5,
+        "accepted_count": 5,
+        "abstained_count": 0,
+        "selected_correct_component_count": 5,
+        "accepted_rotation_frobenius_error_mean": 0.0013528552946974208
+      }
+    },
+    {
+      "scenario": "mixed_transforms_25pct",
+      "expected_single_rotation": false,
+      "core_oracle_component": {
+        "runs": 5,
+        "accepted_count": 0,
+        "abstained_count": 5,
+        "accepted_rotation_frobenius_error_mean": null
+      },
+      "roca_label_free": {
+        "runs": 5,
+        "accepted_count": 0,
+        "abstained_count": 5,
+        "selected_correct_component_count": 0,
+        "accepted_rotation_frobenius_error_mean": null
+      }
+    },
+    {
+      "scenario": "noise_05",
+      "expected_single_rotation": true,
+      "core_oracle_component": {
+        "runs": 5,
+        "accepted_count": 5,
+        "abstained_count": 0,
+        "accepted_rotation_frobenius_error_mean": 0.0069082242145425505
+      },
+      "roca_label_free": {
+        "runs": 5,
+        "accepted_count": 5,
+        "abstained_count": 0,
+        "selected_correct_component_count": 5,
+        "accepted_rotation_frobenius_error_mean": 0.0069082242145425505
+      }
+    },
+    {
+      "scenario": "noise_10",
+      "expected_single_rotation": true,
+      "core_oracle_component": {
+        "runs": 5,
+        "accepted_count": 5,
+        "abstained_count": 0,
+        "accepted_rotation_frobenius_error_mean": 0.013939290885471297
+      },
+      "roca_label_free": {
+        "runs": 5,
+        "accepted_count": 5,
+        "abstained_count": 0,
+        "selected_correct_component_count": 5,
+        "accepted_rotation_frobenius_error_mean": 0.013939290885471297
+      }
+    },
+    {
+      "scenario": "nonorthogonal_10pct",
+      "expected_single_rotation": false,
+      "core_oracle_component": {
+        "runs": 5,
+        "accepted_count": 1,
+        "abstained_count": 4,
+        "accepted_rotation_frobenius_error_mean": 0.023674249468433765
+      },
+      "roca_label_free": {
+        "runs": 5,
+        "accepted_count": 1,
+        "abstained_count": 4,
+        "selected_correct_component_count": 1,
+        "accepted_rotation_frobenius_error_mean": 0.023674249468433765
+      }
+    },
+    {
+      "scenario": "nonorthogonal_30pct",
+      "expected_single_rotation": false,
+      "core_oracle_component": {
+        "runs": 5,
+        "accepted_count": 0,
+        "abstained_count": 5,
+        "accepted_rotation_frobenius_error_mean": null
+      },
+      "roca_label_free": {
+        "runs": 5,
+        "accepted_count": 0,
+        "abstained_count": 5,
+        "selected_correct_component_count": 0,
+        "accepted_rotation_frobenius_error_mean": null
+      }
+    }
+  ],
+  "aggregate": {
+    "recoverable_runs": 15,
+    "recoverable_core_accepted": 15,
+    "recoverable_roca_accepted": 15,
+    "nonrecoverable_runs": 25,
+    "nonrecoverable_core_abstained": 24,
+    "nonrecoverable_roca_abstained": 24,
+    "core_recovery_accept_rate": 1.0,
+    "roca_recovery_accept_rate": 1.0,
+    "core_nonrecovery_abstain_rate": 0.96,
+    "roca_nonrecovery_abstain_rate": 0.96
+  }
+}

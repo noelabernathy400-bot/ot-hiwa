@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 from scipy.linalg import orth, sqrtm
+from scipy.optimize import linear_sum_assignment
 from sklearn.decomposition import PCA
 
 try:
@@ -23,9 +24,34 @@ def _normal(values: np.ndarray) -> np.ndarray:
 def _closed_form_rotation(
     matrix: np.ndarray,
     determinant_sign: int | None = None,
+    rotation_structure: str = "full",
 ) -> np.ndarray:
-    """Return the closest orthogonal matrix, optionally in a fixed O(d) component."""
-    u, _, vh = np.linalg.svd(matrix)
+    """Project a cross-covariance matrix onto an allowed rotation family.
+
+    ``full`` is the historical O(d) update. ``repeated_3d_blocks`` is the
+    physically appropriate family for a flattened J-joint 3-D pose: one
+    common 3-D coordinate rotation acts independently on every joint,
+    ``I_J kron R_3``. It removes unsupported joint-mixing degrees of freedom
+    while retaining the same local-OT/ADMM objective.
+    """
+    values = np.asarray(matrix, dtype=float)
+    if values.ndim != 2 or values.shape[0] != values.shape[1]:
+        raise ValueError("matrix must be a square two-dimensional array")
+    if rotation_structure == "repeated_3d_blocks":
+        if values.shape[0] % 3:
+            raise ValueError("repeated_3d_blocks requires a dimension divisible by three")
+        block_trace = sum(
+            (
+                values[3 * joint : 3 * joint + 3, 3 * joint : 3 * joint + 3]
+                for joint in range(values.shape[0] // 3)
+            ),
+            start=np.zeros((3, 3)),
+        )
+        rotation_3d = _closed_form_rotation(block_trace, determinant_sign, "full")
+        return np.kron(np.eye(values.shape[0] // 3), rotation_3d)
+    if rotation_structure != "full":
+        raise ValueError("rotation_structure must be 'full' or 'repeated_3d_blocks'")
+    u, _, vh = np.linalg.svd(values)
     unconstrained = u @ vh
     if determinant_sign is None:
         return unconstrained
@@ -129,6 +155,28 @@ def _consensus_rotation_input(
     raise ValueError("consensus_weighting must be 'uniform' or 'transport'")
 
 
+def _local_sinkhorn_gamma(
+    base_gamma: float,
+    group_weight: float,
+    inner_entropy_mode: str,
+) -> float:
+    """Return the local OT entropy temperature under an explicit contract.
+
+    ``legacy_inverse_group_mass`` reproduces the historical HiWA code path.
+    ``fixed`` is the GC-HiWA v2 contract: every local OT problem receives the
+    same independently configured inner entropy temperature.
+    """
+    if base_gamma <= 0:
+        raise ValueError("base_gamma must be positive")
+    if inner_entropy_mode == "legacy_inverse_group_mass":
+        return float(base_gamma / max(float(group_weight), 1e-8))
+    if inner_entropy_mode == "fixed":
+        return float(base_gamma)
+    raise ValueError(
+        "inner_entropy_mode must be 'legacy_inverse_group_mass' or 'fixed'"
+    )
+
+
 class SoftHiWA:
     """TACO-style soft-group HiWA with an explicit full-support reference mode.
 
@@ -163,6 +211,8 @@ class SoftHiWA:
         temporal_signature_weight: float = 0.0,
         representative_cost_normalization: str = "minmax",
         consensus_weighting: str = "uniform",
+        inner_entropy_mode: str = "legacy_inverse_group_mass",
+        rotation_structure: str = "full",
     ) -> None:
         self.dim_red_method = dim_red_method or PCA(n_components=2)
         self.normalize = normalize
@@ -206,6 +256,14 @@ class SoftHiWA:
         if consensus_weighting not in {"uniform", "transport"}:
             raise ValueError("consensus_weighting must be 'uniform' or 'transport'")
         self.consensus_weighting = consensus_weighting
+        if inner_entropy_mode not in {"legacy_inverse_group_mass", "fixed"}:
+            raise ValueError(
+                "inner_entropy_mode must be 'legacy_inverse_group_mass' or 'fixed'"
+            )
+        self.inner_entropy_mode = inner_entropy_mode
+        if rotation_structure not in {"full", "repeated_3d_blocks"}:
+            raise ValueError("rotation_structure must be 'full' or 'repeated_3d_blocks'")
+        self.rotation_structure = rotation_structure
 
     def fit(
         self,
@@ -290,13 +348,15 @@ class SoftHiWA:
             global_rotation = _closed_form_rotation(
                 rng.random((high_dim, high_dim)),
                 self.determinant_sign,
+                self.rotation_structure,
             )
         else:
             global_rotation = np.asarray(initial_rotation, dtype=float).copy()
-            if self.determinant_sign is not None:
+            if self.determinant_sign is not None or self.rotation_structure != "full":
                 global_rotation = _closed_form_rotation(
                     global_rotation,
                     self.determinant_sign,
+                    self.rotation_structure,
                 )
         rotation_anchor = kwargs.get("rotation_anchor")
         if rotation_anchor is None:
@@ -467,6 +527,7 @@ class SoftHiWA:
             global_rotation = _closed_form_rotation(
                 consensus_mean,
                 self.determinant_sign,
+                self.rotation_structure,
             )
             multipliers = (
                 multipliers
@@ -500,6 +561,94 @@ class SoftHiWA:
         local_global_distances = np.linalg.norm(
             local_rotations - global_rotation[:, :, None, None],
             axis=(0, 1),
+        )
+        # A single-rotation goodness-of-fit check.  For two independently
+        # sampled domains related by one admissible rotation, the final
+        # cross-domain OT cost should be comparable to within-domain OT cost
+        # at the same entropy scale.  This is deliberately retained as a
+        # diagnostic rather than injected into the optimization objective.
+        global_cross_cost = 0.0
+        for i in range(n_groups_x):
+            for j in range(n_groups_y):
+                _, cost, _ = sinkhorn_weighted(
+                    x_weights[i],
+                    y_weights[j],
+                    global_rotation @ x_mbed[x_indices[i], :].T,
+                    y_mbed[y_indices[j], :].T,
+                    _local_sinkhorn_gamma(
+                        self.sa_shorn_gamma,
+                        group_transport[i, j],
+                        self.inner_entropy_mode,
+                    ),
+                    self.sa_shorn_maxiter,
+                )
+                global_cross_cost += float(group_transport[i, j]) * cost
+        if n_groups_x == n_groups_y:
+            matched_rows, matched_cols = linear_sum_assignment(-group_transport)
+            matched_global_cross_cost = float(
+                np.mean(
+                    [
+                        sinkhorn_weighted(
+                            x_weights[i],
+                            y_weights[j],
+                            global_rotation @ x_mbed[x_indices[i], :].T,
+                            y_mbed[y_indices[j], :].T,
+                            _local_sinkhorn_gamma(
+                                self.sa_shorn_gamma,
+                                group_transport[i, j],
+                                self.inner_entropy_mode,
+                            ),
+                            self.sa_shorn_maxiter,
+                        )[1]
+                        for i, j in zip(matched_rows, matched_cols, strict=True)
+                    ]
+                )
+            )
+            group_matching = matched_cols[np.argsort(matched_rows)].astype(int).tolist()
+        else:
+            matched_global_cross_cost = float("nan")
+            group_matching = None
+        source_self_cost = float(
+            np.mean(
+                [
+                    sinkhorn_weighted(
+                        x_weights[i],
+                        x_weights[i],
+                        x_mbed[x_indices[i], :].T,
+                        x_mbed[x_indices[i], :].T,
+                        _local_sinkhorn_gamma(
+                            self.sa_shorn_gamma,
+                            1.0 / n_groups_x,
+                            self.inner_entropy_mode,
+                        ),
+                        self.sa_shorn_maxiter,
+                    )[1]
+                    for i in range(n_groups_x)
+                ]
+            )
+        )
+        target_self_cost = float(
+            np.mean(
+                [
+                    sinkhorn_weighted(
+                        y_weights[j],
+                        y_weights[j],
+                        y_mbed[y_indices[j], :].T,
+                        y_mbed[y_indices[j], :].T,
+                        _local_sinkhorn_gamma(
+                            self.sa_shorn_gamma,
+                            1.0 / n_groups_y,
+                            self.inner_entropy_mode,
+                        ),
+                        self.sa_shorn_maxiter,
+                    )[1]
+                    for j in range(n_groups_y)
+                ]
+            )
+        )
+        within_domain_self_cost = 0.5 * (source_self_cost + target_self_cost)
+        relative_global_fit_ratio = float(
+            matched_global_cross_cost / max(within_domain_self_cost, EPS)
         )
         self.Rg = global_rotation
         self.P = group_transport
@@ -543,6 +692,8 @@ class SoftHiWA:
             ),
             "fixed_group_transport": fixed_group_transport is not None,
             "consensus_weighting": self.consensus_weighting,
+            "inner_entropy_mode": self.inner_entropy_mode,
+            "rotation_structure": self.rotation_structure,
             "rotation_anchor_weight": self.rotation_anchor_weight,
             "rotation_anchor_distance": (
                 float(np.linalg.norm(global_rotation - rotation_anchor, "fro"))
@@ -570,6 +721,13 @@ class SoftHiWA:
                 np.linalg.norm(global_rotation.T @ global_rotation - np.eye(high_dim), "fro")
             ),
             "transport_objective": float(np.sum(group_transport * group_cost)),
+            "global_cross_cost": float(global_cross_cost),
+            "matched_global_cross_cost": matched_global_cross_cost,
+            "source_self_cost": source_self_cost,
+            "target_self_cost": target_self_cost,
+            "within_domain_self_cost": within_domain_self_cost,
+            "relative_global_fit_ratio": relative_global_fit_ratio,
+            "diagnostic_group_matching": group_matching,
             "guided_transport_objective": float(np.sum(group_transport * mixed_group_cost)),
             "admm_converged": bool(
                 residuals
@@ -614,11 +772,16 @@ class SoftHiWA:
                 rotation = _closed_form_rotation(
                     rng.random((high_dim, high_dim)),
                     self.determinant_sign,
+                    self.rotation_structure,
                 )
         else:
             rotation = np.asarray(initial_rotation, dtype=float).copy()
-            if self.determinant_sign is not None:
-                rotation = _closed_form_rotation(rotation, self.determinant_sign)
+            if self.determinant_sign is not None or self.rotation_structure != "full":
+                rotation = _closed_form_rotation(
+                    rotation,
+                    self.determinant_sign,
+                    self.rotation_structure,
+                )
         coupling = np.outer(source_mass, target_mass)
         distance = np.inf
         marginal_error = np.inf
@@ -627,13 +790,18 @@ class SoftHiWA:
             rotation = _closed_form_rotation(
                 2.0 * group_weight * (target.T @ coupling.T @ source) + consensus,
                 self.determinant_sign,
+                self.rotation_structure,
             )
             coupling, distance, marginal_error = sinkhorn_weighted(
                 source_mass,
                 target_mass,
                 rotation @ source.T,
                 target.T,
-                self.sa_shorn_gamma / max(group_weight, 1e-8),
+                _local_sinkhorn_gamma(
+                    self.sa_shorn_gamma,
+                    group_weight,
+                    self.inner_entropy_mode,
+                ),
                 self.sa_shorn_maxiter,
                 extra_cost=extra_cost,
                 extra_cost_weight=extra_cost_weight,

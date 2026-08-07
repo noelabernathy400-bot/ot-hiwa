@@ -1,0 +1,150 @@
+{
+  "experiment": "panoptic_uncalibrated_cross_view_pose_coordinate_alignment",
+  "scope": "controlled real-data coordinate-frame validation; camera extrinsics and frame pairing are withheld from fitting and used only for final scoring",
+  "truth_usage": "calibration-derived relative rotation and synchronised frame identity are evaluation-only; no action labels, frame IDs, pair IDs, or camera extrinsics enter group learning or OT",
+  "parameters": {
+    "raw_directory": "data\\raw\\panoptic\\171204_pose2",
+    "source_camera": "00_00",
+    "target_camera": "00_21",
+    "person_id": 2,
+    "max_frames": 100,
+    "minimum_frame_id": 10000,
+    "seeds": [
+      1721
+    ],
+    "groups": 4,
+    "temperature": 0.5,
+    "entropy_weight": 0.05,
+    "maxiter": 30,
+    "tol": 0.02,
+    "mu": 0.05,
+    "local_gamma": 0.4,
+    "local_iterations": 12,
+    "local_sinkhorn_iterations": 40,
+    "tag": "panoptic_pose2_person2_window10000_100frames_seed1721",
+    "minimum_restarts": 3,
+    "max_restart_disagreement_degrees": 5.0,
+    "minimum_restart_consensus": 0.8
+  },
+  "fixed_contract": {
+    "support_mode": "full",
+    "consensus_weighting": "transport",
+    "inner_entropy_mode": "fixed",
+    "soft_group_scaling_mode": "global_scalar (rotation-equivariant)",
+    "determinant_component": "+1, because physical camera-coordinate changes are proper rotations",
+    "rotation_structure": "I_19 kron R_3 (one physical camera rotation shared by all joints)"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "scikit_learn": "1.9.0"
+  },
+  "records": [
+    {
+      "seed": 1721,
+      "samples": 100,
+      "feature_dimension": 57,
+      "source_camera": "00_00",
+      "target_camera": "00_21",
+      "source_frame_first": 10000,
+      "source_frame_last": 10099,
+      "common_scale": 30.58094799722134,
+      "rotation_frobenius_error": 0.043458542564634564,
+      "rotation_frobenius_error_per_dimension": 0.005756224581774695,
+      "paired_alignment_mse": 2.1921905541342397e-05,
+      "paired_recall_at_1": 1.0,
+      "paired_recall_at_5": 1.0,
+      "unaligned_recall_at_1": 0.02,
+      "unaligned_recall_at_5": 0.08,
+      "admm_converged": true,
+      "iterations": 17,
+      "final_global_residual": 0.001174728485584389,
+      "final_primal_residual": 0.015915658693767393,
+      "final_local_marginal_error": 3.469446951953614e-17,
+      "rotation_orthogonality_error": 7.402116613071795e-15,
+      "estimated_physical_rotation_3x3": [
+        [
+          0.9202881937946157,
+          -0.04228443198494245,
+          -0.38894944038261997
+        ],
+        [
+          -0.10801326889525799,
+          0.9280457123216733,
+          -0.35646078267309866
+        ],
+        [
+          0.3760356021772448,
+          0.37005835033554935,
+          0.8495022326292783
+        ]
+      ],
+      "transport_objective": 0.085850765071807,
+      "relative_global_fit_ratio": 1.0285539905318914,
+      "applicability_qualification": {
+        "decision": "accepted_numerically_compatible",
+        "accepted": true,
+        "reasons": [],
+        "final_global_residual": 0.001174728485584389,
+        "final_primal_residual": 0.015915658693767393,
+        "final_local_marginal_error": 3.469446951953614e-17,
+        "rotation_orthogonality_error": 7.402116613071795e-15,
+        "relative_global_fit_ratio": 1.0285539905318914,
+        "max_relative_fit_ratio": 1.5,
+        "required_rotation_structure": "repeated_3d_blocks",
+        "observed_rotation_structure": "repeated_3d_blocks",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 44,
+        "initial_loss": 0.3981865244647316,
+        "final_loss": 0.30784727435372244,
+        "mean_entropy": 0.05057192981698152,
+        "normalized_mean_entropy": 0.03647993617757197,
+        "min_group_mass": 0.13948192423684197,
+        "max_group_mass": 0.4343724001842704,
+        "group_mass": [
+          0.4343724001842704,
+          0.20465500250806948,
+          0.13948192423684197,
+          0.2214906730708181
+        ],
+        "min_prototype_distance": 6.929332360116357,
+        "max_row_sum_error": 2.220446049250313e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 48,
+        "initial_loss": 0.4002575818321786,
+        "final_loss": 0.30777738812403294,
+        "mean_entropy": 0.059186446485660654,
+        "normalized_mean_entropy": 0.04269399641635132,
+        "min_group_mass": 0.13004233764858605,
+        "max_group_mass": 0.4217484675737546,
+        "group_mass": [
+          0.4217484675737546,
+          0.21697104258014757,
+          0.13004233764858605,
+          0.23123815219751173
+        ],
+        "min_prototype_distance": 6.901852990681701,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    }
+  ],
+  "restart_stability_qualification": {
+    "decision": "abstain",
+    "accepted": false,
+    "reason": "insufficient_individually_qualified_restarts",
+    "healthy_indices": [
+      0
+    ],
+    "selected_index": null
+  }
+}

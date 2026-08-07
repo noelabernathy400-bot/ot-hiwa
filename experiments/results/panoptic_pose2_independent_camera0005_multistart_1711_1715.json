@@ -1,0 +1,586 @@
+{
+  "experiment": "panoptic_uncalibrated_cross_view_pose_coordinate_alignment",
+  "scope": "controlled real-data coordinate-frame validation; camera extrinsics and frame pairing are withheld from fitting and used only for final scoring",
+  "truth_usage": "calibration-derived relative rotation and synchronised frame identity are evaluation-only; no action labels, frame IDs, pair IDs, or camera extrinsics enter group learning or OT",
+  "parameters": {
+    "raw_directory": "data\\raw\\panoptic\\171204_pose2",
+    "source_camera": "00_00",
+    "target_camera": "00_05",
+    "max_frames": 200,
+    "seeds": [
+      1711,
+      1712,
+      1713,
+      1714,
+      1715
+    ],
+    "groups": 4,
+    "temperature": 0.5,
+    "entropy_weight": 0.05,
+    "maxiter": 30,
+    "tol": 0.02,
+    "mu": 0.05,
+    "local_gamma": 0.4,
+    "local_iterations": 12,
+    "local_sinkhorn_iterations": 40,
+    "tag": "panoptic_pose2_independent_camera0005_multistart_1711_1715",
+    "minimum_restarts": 3,
+    "max_restart_disagreement_degrees": 5.0,
+    "minimum_restart_consensus": 0.8
+  },
+  "fixed_contract": {
+    "support_mode": "full",
+    "consensus_weighting": "transport",
+    "inner_entropy_mode": "fixed",
+    "soft_group_scaling_mode": "global_scalar (rotation-equivariant)",
+    "determinant_component": "+1, because physical camera-coordinate changes are proper rotations",
+    "rotation_structure": "I_19 kron R_3 (one physical camera rotation shared by all joints)"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "scikit_learn": "1.9.0"
+  },
+  "records": [
+    {
+      "seed": 1711,
+      "samples": 199,
+      "feature_dimension": 57,
+      "source_camera": "00_00",
+      "target_camera": "00_05",
+      "source_frame_first": 141,
+      "source_frame_last": 339,
+      "common_scale": 24.44758475197547,
+      "rotation_frobenius_error": 0.7069641041220196,
+      "rotation_frobenius_error_per_dimension": 0.09363968311931156,
+      "paired_alignment_mse": 0.0018152840195374787,
+      "paired_recall_at_1": 0.5376884422110553,
+      "paired_recall_at_5": 0.7537688442211056,
+      "unaligned_recall_at_1": 0.035175879396984924,
+      "unaligned_recall_at_5": 0.1407035175879397,
+      "admm_converged": true,
+      "iterations": 19,
+      "final_global_residual": 0.0003500824941074889,
+      "final_primal_residual": 0.01869256099470084,
+      "final_local_marginal_error": 3.469446951953614e-17,
+      "rotation_orthogonality_error": 6.044249778131178e-15,
+      "estimated_physical_rotation_3x3": [
+        [
+          0.34161611364882605,
+          0.06587716182161475,
+          -0.9375279358215421
+        ],
+        [
+          -0.000878963039920224,
+          0.9975623452607438,
+          0.06977531613586506
+        ],
+        [
+          0.9398391661978381,
+          -0.023012319922472522,
+          0.34084127510079926
+        ]
+      ],
+      "transport_objective": 0.15649998310668822,
+      "relative_global_fit_ratio": 1.497076493710292,
+      "applicability_qualification": {
+        "decision": "accepted_numerically_compatible",
+        "accepted": true,
+        "reasons": [],
+        "final_global_residual": 0.0003500824941074889,
+        "final_primal_residual": 0.01869256099470084,
+        "final_local_marginal_error": 3.469446951953614e-17,
+        "rotation_orthogonality_error": 6.044249778131178e-15,
+        "relative_global_fit_ratio": 1.497076493710292,
+        "max_relative_fit_ratio": 1.5,
+        "required_rotation_structure": "repeated_3d_blocks",
+        "observed_rotation_structure": "repeated_3d_blocks",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 10,
+        "initial_loss": 0.2180134195580565,
+        "final_loss": 0.21418866325019353,
+        "mean_entropy": 0.01138421514206154,
+        "normalized_mean_entropy": 0.008211975364932615,
+        "min_group_mass": 0.08286553485389997,
+        "max_group_mass": 0.4261735058242212,
+        "group_mass": [
+          0.2763819095477213,
+          0.4261735058242212,
+          0.08286553485389997,
+          0.21457904977415748
+        ],
+        "min_prototype_distance": 5.230107251024273,
+        "max_row_sum_error": 2.220446049250313e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": false,
+        "status": 1,
+        "iterations": 56,
+        "initial_loss": 0.2100783590419256,
+        "final_loss": 0.20040255103437385,
+        "mean_entropy": 0.08416004475875229,
+        "normalized_mean_entropy": 0.060708639607222566,
+        "min_group_mass": 0.10335579952181251,
+        "max_group_mass": 0.449966485793956,
+        "group_mass": [
+          0.449966485793956,
+          0.27792785845804624,
+          0.16874985622618532,
+          0.10335579952181251
+        ],
+        "min_prototype_distance": 6.044334905212827,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    },
+    {
+      "seed": 1712,
+      "samples": 199,
+      "feature_dimension": 57,
+      "source_camera": "00_00",
+      "target_camera": "00_05",
+      "source_frame_first": 141,
+      "source_frame_last": 339,
+      "common_scale": 24.44758475197547,
+      "rotation_frobenius_error": 0.00716767459646835,
+      "rotation_frobenius_error_per_dimension": 0.0009493816927935461,
+      "paired_alignment_mse": 1.6082385952702012e-07,
+      "paired_recall_at_1": 1.0,
+      "paired_recall_at_5": 1.0,
+      "unaligned_recall_at_1": 0.035175879396984924,
+      "unaligned_recall_at_5": 0.1407035175879397,
+      "admm_converged": true,
+      "iterations": 18,
+      "final_global_residual": 0.0008229591949049788,
+      "final_primal_residual": 0.019835197940230583,
+      "final_local_marginal_error": 4.85722573273506e-17,
+      "rotation_orthogonality_error": 3.3921047647209254e-15,
+      "estimated_physical_rotation_3x3": [
+        [
+          0.23078596206696578,
+          0.06723608149617859,
+          -0.9706787053695284
+        ],
+        [
+          0.004805253066897203,
+          0.9975187095179469,
+          0.07023769432870763
+        ],
+        [
+          0.9729926768767522,
+          -0.020874230684965057,
+          0.22989022866908232
+        ]
+      ],
+      "transport_objective": 0.13664222621335503,
+      "relative_global_fit_ratio": 1.0000031844881552,
+      "applicability_qualification": {
+        "decision": "accepted_numerically_compatible",
+        "accepted": true,
+        "reasons": [],
+        "final_global_residual": 0.0008229591949049788,
+        "final_primal_residual": 0.019835197940230583,
+        "final_local_marginal_error": 4.85722573273506e-17,
+        "rotation_orthogonality_error": 3.3921047647209254e-15,
+        "relative_global_fit_ratio": 1.0000031844881552,
+        "max_relative_fit_ratio": 1.5,
+        "required_rotation_structure": "repeated_3d_blocks",
+        "observed_rotation_structure": "repeated_3d_blocks",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": false,
+        "status": 1,
+        "iterations": 53,
+        "initial_loss": 0.21152327146775352,
+        "final_loss": 0.20040250959320216,
+        "mean_entropy": 0.08431585173910769,
+        "normalized_mean_entropy": 0.060821030586169875,
+        "min_group_mass": 0.10341562843060177,
+        "max_group_mass": 0.4498946216621181,
+        "group_mass": [
+          0.16876128721719114,
+          0.2779284626900888,
+          0.4498946216621181,
+          0.10341562843060177
+        ],
+        "min_prototype_distance": 6.042566534451923,
+        "max_row_sum_error": 2.220446049250313e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 54,
+        "initial_loss": 0.21054083143265553,
+        "final_loss": 0.20040255430832862,
+        "mean_entropy": 0.08410402001088843,
+        "normalized_mean_entropy": 0.06066822629426744,
+        "min_group_mass": 0.10331901135601745,
+        "max_group_mass": 0.44998928186434617,
+        "group_mass": [
+          0.16876016522067838,
+          0.2779315415589582,
+          0.10331901135601745,
+          0.44998928186434617
+        ],
+        "min_prototype_distance": 6.043584323952589,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    },
+    {
+      "seed": 1713,
+      "samples": 199,
+      "feature_dimension": 57,
+      "source_camera": "00_00",
+      "target_camera": "00_05",
+      "source_frame_first": 141,
+      "source_frame_last": 339,
+      "common_scale": 24.44758475197547,
+      "rotation_frobenius_error": 0.0007754961687802515,
+      "rotation_frobenius_error_per_dimension": 0.00010271697683294175,
+      "paired_alignment_mse": 2.0960660867501976e-09,
+      "paired_recall_at_1": 1.0,
+      "paired_recall_at_5": 1.0,
+      "unaligned_recall_at_1": 0.035175879396984924,
+      "unaligned_recall_at_5": 0.1407035175879397,
+      "admm_converged": true,
+      "iterations": 16,
+      "final_global_residual": 5.5398777758396485e-05,
+      "final_primal_residual": 0.0163831218159928,
+      "final_local_marginal_error": 4.85722573273506e-17,
+      "rotation_orthogonality_error": 4.196337941734362e-15,
+      "estimated_physical_rotation_3x3": [
+        [
+          0.23202437985692043,
+          0.06707364555846346,
+          -0.970394668793841
+        ],
+        [
+          0.004951123461750507,
+          0.9975253801190299,
+          0.07013274837656959
+        ],
+        [
+          0.9726973699607078,
+          -0.021077051261557567,
+          0.23111811781346694
+        ]
+      ],
+      "transport_objective": 0.13662411851407796,
+      "relative_global_fit_ratio": 1.0000003917103268,
+      "applicability_qualification": {
+        "decision": "accepted_numerically_compatible",
+        "accepted": true,
+        "reasons": [],
+        "final_global_residual": 5.5398777758396485e-05,
+        "final_primal_residual": 0.0163831218159928,
+        "final_local_marginal_error": 4.85722573273506e-17,
+        "rotation_orthogonality_error": 4.196337941734362e-15,
+        "relative_global_fit_ratio": 1.0000003917103268,
+        "max_relative_fit_ratio": 1.5,
+        "required_rotation_structure": "repeated_3d_blocks",
+        "observed_rotation_structure": "repeated_3d_blocks",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 53,
+        "initial_loss": 0.21054083142174917,
+        "final_loss": 0.20040254148450154,
+        "mean_entropy": 0.08427550993391675,
+        "normalized_mean_entropy": 0.06079193012502514,
+        "min_group_mass": 0.10340072441542472,
+        "max_group_mass": 0.4499226280122587,
+        "group_mass": [
+          0.27793123836430134,
+          0.4499226280122587,
+          0.10340072441542472,
+          0.16874540920801512
+        ],
+        "min_prototype_distance": 6.043396196143605,
+        "max_row_sum_error": 2.220446049250313e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": false,
+        "status": 1,
+        "iterations": 56,
+        "initial_loss": 0.21152124635897424,
+        "final_loss": 0.20040254983883507,
+        "mean_entropy": 0.0841030174759265,
+        "normalized_mean_entropy": 0.060667503118158495,
+        "min_group_mass": 0.10330812511602792,
+        "max_group_mass": 0.449964987575808,
+        "group_mass": [
+          0.10330812511602792,
+          0.2779322426099814,
+          0.449964987575808,
+          0.16879464469818264
+        ],
+        "min_prototype_distance": 6.043319104939805,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    },
+    {
+      "seed": 1714,
+      "samples": 199,
+      "feature_dimension": 57,
+      "source_camera": "00_00",
+      "target_camera": "00_05",
+      "source_frame_first": 141,
+      "source_frame_last": 339,
+      "common_scale": 24.44758475197547,
+      "rotation_frobenius_error": 0.0015637962195557205,
+      "rotation_frobenius_error_per_dimension": 0.0002071298692657543,
+      "paired_alignment_mse": 7.770376096160046e-09,
+      "paired_recall_at_1": 1.0,
+      "paired_recall_at_5": 1.0,
+      "unaligned_recall_at_1": 0.035175879396984924,
+      "unaligned_recall_at_5": 0.1407035175879397,
+      "admm_converged": true,
+      "iterations": 16,
+      "final_global_residual": 0.00038534683355666294,
+      "final_primal_residual": 0.017673044618125622,
+      "final_local_marginal_error": 3.469446951953614e-17,
+      "rotation_orthogonality_error": 6.5385920889737906e-15,
+      "estimated_physical_rotation_3x3": [
+        [
+          0.23214666421132635,
+          0.06705293891377087,
+          -0.9703668531429643
+        ],
+        [
+          0.004978577777400101,
+          0.99752608952918,
+          0.07012071357265097
+        ],
+        [
+          0.9726680523482142,
+          -0.021109336598992452,
+          0.23123852587638255
+        ]
+      ],
+      "transport_objective": 0.1366252559359627,
+      "relative_global_fit_ratio": 1.0000001076131002,
+      "applicability_qualification": {
+        "decision": "accepted_numerically_compatible",
+        "accepted": true,
+        "reasons": [],
+        "final_global_residual": 0.00038534683355666294,
+        "final_primal_residual": 0.017673044618125622,
+        "final_local_marginal_error": 3.469446951953614e-17,
+        "rotation_orthogonality_error": 6.5385920889737906e-15,
+        "relative_global_fit_ratio": 1.0000001076131002,
+        "max_relative_fit_ratio": 1.5,
+        "required_rotation_structure": "repeated_3d_blocks",
+        "observed_rotation_structure": "repeated_3d_blocks",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": false,
+        "status": 1,
+        "iterations": 59,
+        "initial_loss": 0.21054083142174917,
+        "final_loss": 0.20040248861954083,
+        "mean_entropy": 0.08420486532524818,
+        "normalized_mean_entropy": 0.06074097081172929,
+        "min_group_mass": 0.10336004299783982,
+        "max_group_mass": 0.44993506481295575,
+        "group_mass": [
+          0.44993506481295575,
+          0.27793073614564684,
+          0.16877415604355747,
+          0.10336004299783982
+        ],
+        "min_prototype_distance": 6.042746429992688,
+        "max_row_sum_error": 2.220446049250313e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 55,
+        "initial_loss": 0.2105408314326555,
+        "final_loss": 0.2004025604269371,
+        "mean_entropy": 0.08419864721168581,
+        "normalized_mean_entropy": 0.06073648539092923,
+        "min_group_mass": 0.10335821049004269,
+        "max_group_mass": 0.4499466883790458,
+        "group_mass": [
+          0.16876376643311236,
+          0.2779313346977991,
+          0.4499466883790458,
+          0.10335821049004269
+        ],
+        "min_prototype_distance": 6.044643122566516,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    },
+    {
+      "seed": 1715,
+      "samples": 199,
+      "feature_dimension": 57,
+      "source_camera": "00_00",
+      "target_camera": "00_05",
+      "source_frame_first": 141,
+      "source_frame_last": 339,
+      "common_scale": 24.44758475197547,
+      "rotation_frobenius_error": 0.005769595687914455,
+      "rotation_frobenius_error_per_dimension": 0.0007642016175825646,
+      "paired_alignment_mse": 1.0226198792101536e-07,
+      "paired_recall_at_1": 1.0,
+      "paired_recall_at_5": 1.0,
+      "unaligned_recall_at_1": 0.035175879396984924,
+      "unaligned_recall_at_5": 0.1407035175879397,
+      "admm_converged": true,
+      "iterations": 18,
+      "final_global_residual": 0.0010883361267803979,
+      "final_primal_residual": 0.01817793773725404,
+      "final_local_marginal_error": 4.163336342344337e-17,
+      "rotation_orthogonality_error": 5.56829128133847e-15,
+      "estimated_physical_rotation_3x3": [
+        [
+          0.23280579178927222,
+          0.06696103036999397,
+          -0.9702152769984397
+        ],
+        [
+          0.005036669690395137,
+          0.9975304295163958,
+          0.07005479389210158
+        ],
+        [
+          0.9725102031689955,
+          -0.021195815639501743,
+          0.231893600885355
+        ]
+      ],
+      "transport_objective": 0.13665471855254324,
+      "relative_global_fit_ratio": 1.0000014099950252,
+      "applicability_qualification": {
+        "decision": "accepted_numerically_compatible",
+        "accepted": true,
+        "reasons": [],
+        "final_global_residual": 0.0010883361267803979,
+        "final_primal_residual": 0.01817793773725404,
+        "final_local_marginal_error": 4.163336342344337e-17,
+        "rotation_orthogonality_error": 5.56829128133847e-15,
+        "relative_global_fit_ratio": 1.0000014099950252,
+        "max_relative_fit_ratio": 1.5,
+        "required_rotation_structure": "repeated_3d_blocks",
+        "observed_rotation_structure": "repeated_3d_blocks",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 54,
+        "initial_loss": 0.21054083142174917,
+        "final_loss": 0.2004025546082752,
+        "mean_entropy": 0.08408073485076807,
+        "normalized_mean_entropy": 0.06065142960175147,
+        "min_group_mass": 0.10330552321724527,
+        "max_group_mass": 0.4499981673195552,
+        "group_mass": [
+          0.4499981673195552,
+          0.27793159409610424,
+          0.10330552321724527,
+          0.1687647153670951
+        ],
+        "min_prototype_distance": 6.043832249539252,
+        "max_row_sum_error": 2.220446049250313e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": false,
+        "status": 1,
+        "iterations": 57,
+        "initial_loss": 0.21152124635897415,
+        "final_loss": 0.20040261976332252,
+        "mean_entropy": 0.08408367941379513,
+        "normalized_mean_entropy": 0.06065355365498983,
+        "min_group_mass": 0.10329741332904768,
+        "max_group_mass": 0.44999401012688023,
+        "group_mass": [
+          0.44999401012688023,
+          0.2779293688906988,
+          0.16877920765337323,
+          0.10329741332904768
+        ],
+        "min_prototype_distance": 6.042649557433899,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    }
+  ],
+  "restart_stability_qualification": {
+    "decision": "accepted_stable_multistart",
+    "accepted": true,
+    "reason": null,
+    "healthy_indices": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "selected_index": 3,
+    "consensus_indices": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "required_consensus_count": 4,
+    "max_rotation_disagreement_degrees": 5.0,
+    "min_consensus_fraction": 0.8,
+    "pairwise_angle_degrees": [
+      [
+        0.0,
+        6.639957774397688,
+        6.567488251714296,
+        6.560369559699301,
+        6.5217416206769965
+      ],
+      [
+        6.639957774397688,
+        0.0,
+        0.0736995204745561,
+        0.08107550866444196,
+        0.12023226770544411
+      ],
+      [
+        6.567488251714296,
+        0.0736995204745561,
+        0.0,
+        0.007410338684004513,
+        0.046536717297465766
+      ],
+      [
+        6.560369559699301,
+        0.08107550866444196,
+        0.007410338684004513,
+        0.0,
+        0.03917809974670958
+      ],
+      [
+        6.5217416206769965,
+        0.12023226770544411,
+        0.046536717297465766,
+        0.03917809974670958,
+        0.0
+      ]
+    ]
+  }
+}

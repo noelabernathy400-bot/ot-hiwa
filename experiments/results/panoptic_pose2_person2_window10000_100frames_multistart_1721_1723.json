@@ -1,0 +1,362 @@
+{
+  "experiment": "panoptic_coordinate_alignment_restart_aggregation",
+  "scope": "post-fit aggregation of independently persisted unlabelled restarts; truth-based metrics remain evaluation-only",
+  "input_files": [
+    "experiments\\results\\panoptic_pose2_person2_window10000_100frames_seed1721.json",
+    "experiments\\results\\panoptic_pose2_person2_window10000_100frames_seed1722.json",
+    "experiments\\results\\panoptic_pose2_person2_window10000_100frames_seed1723.json"
+  ],
+  "parameters": {
+    "raw_directory": "data\\raw\\panoptic\\171204_pose2",
+    "source_camera": "00_00",
+    "target_camera": "00_21",
+    "person_id": 2,
+    "minimum_frame_id": 10000,
+    "max_frames": 100,
+    "groups": 4,
+    "temperature": 0.5,
+    "entropy_weight": 0.05,
+    "maxiter": 30,
+    "tol": 0.02,
+    "mu": 0.05,
+    "local_gamma": 0.4,
+    "local_iterations": 12,
+    "local_sinkhorn_iterations": 40
+  },
+  "records": [
+    {
+      "seed": 1721,
+      "samples": 100,
+      "feature_dimension": 57,
+      "source_camera": "00_00",
+      "target_camera": "00_21",
+      "source_frame_first": 10000,
+      "source_frame_last": 10099,
+      "common_scale": 30.58094799722134,
+      "rotation_frobenius_error": 0.043458542564634564,
+      "rotation_frobenius_error_per_dimension": 0.005756224581774695,
+      "paired_alignment_mse": 2.1921905541342397e-05,
+      "paired_recall_at_1": 1.0,
+      "paired_recall_at_5": 1.0,
+      "unaligned_recall_at_1": 0.02,
+      "unaligned_recall_at_5": 0.08,
+      "admm_converged": true,
+      "iterations": 17,
+      "final_global_residual": 0.001174728485584389,
+      "final_primal_residual": 0.015915658693767393,
+      "final_local_marginal_error": 3.469446951953614e-17,
+      "rotation_orthogonality_error": 7.402116613071795e-15,
+      "estimated_physical_rotation_3x3": [
+        [
+          0.9202881937946157,
+          -0.04228443198494245,
+          -0.38894944038261997
+        ],
+        [
+          -0.10801326889525799,
+          0.9280457123216733,
+          -0.35646078267309866
+        ],
+        [
+          0.3760356021772448,
+          0.37005835033554935,
+          0.8495022326292783
+        ]
+      ],
+      "transport_objective": 0.085850765071807,
+      "relative_global_fit_ratio": 1.0285539905318914,
+      "applicability_qualification": {
+        "decision": "accepted_numerically_compatible",
+        "accepted": true,
+        "reasons": [],
+        "final_global_residual": 0.001174728485584389,
+        "final_primal_residual": 0.015915658693767393,
+        "final_local_marginal_error": 3.469446951953614e-17,
+        "rotation_orthogonality_error": 7.402116613071795e-15,
+        "relative_global_fit_ratio": 1.0285539905318914,
+        "max_relative_fit_ratio": 1.5,
+        "required_rotation_structure": "repeated_3d_blocks",
+        "observed_rotation_structure": "repeated_3d_blocks",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 44,
+        "initial_loss": 0.3981865244647316,
+        "final_loss": 0.30784727435372244,
+        "mean_entropy": 0.05057192981698152,
+        "normalized_mean_entropy": 0.03647993617757197,
+        "min_group_mass": 0.13948192423684197,
+        "max_group_mass": 0.4343724001842704,
+        "group_mass": [
+          0.4343724001842704,
+          0.20465500250806948,
+          0.13948192423684197,
+          0.2214906730708181
+        ],
+        "min_prototype_distance": 6.929332360116357,
+        "max_row_sum_error": 2.220446049250313e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 48,
+        "initial_loss": 0.4002575818321786,
+        "final_loss": 0.30777738812403294,
+        "mean_entropy": 0.059186446485660654,
+        "normalized_mean_entropy": 0.04269399641635132,
+        "min_group_mass": 0.13004233764858605,
+        "max_group_mass": 0.4217484675737546,
+        "group_mass": [
+          0.4217484675737546,
+          0.21697104258014757,
+          0.13004233764858605,
+          0.23123815219751173
+        ],
+        "min_prototype_distance": 6.901852990681701,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    },
+    {
+      "seed": 1722,
+      "samples": 100,
+      "feature_dimension": 57,
+      "source_camera": "00_00",
+      "target_camera": "00_21",
+      "source_frame_first": 10000,
+      "source_frame_last": 10099,
+      "common_scale": 30.58094799722134,
+      "rotation_frobenius_error": 0.04492000792408266,
+      "rotation_frobenius_error_per_dimension": 0.005949800397506566,
+      "paired_alignment_mse": 4.162139780120702e-05,
+      "paired_recall_at_1": 0.96,
+      "paired_recall_at_5": 1.0,
+      "unaligned_recall_at_1": 0.02,
+      "unaligned_recall_at_5": 0.08,
+      "admm_converged": true,
+      "iterations": 21,
+      "final_global_residual": 0.0006525439321993471,
+      "final_primal_residual": 0.01733918847245567,
+      "final_local_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 3.24664125224119e-15,
+      "estimated_physical_rotation_3x3": [
+        [
+          0.9197831351838828,
+          -0.039167713937213244,
+          -0.3904675075038124
+        ],
+        [
+          -0.11162572177578717,
+          0.9277906867483192,
+          -0.35601143214946934
+        ],
+        [
+          0.3762162708726749,
+          0.37103952857884887,
+          0.8489941023132278
+        ]
+      ],
+      "transport_objective": 0.0849472426501334,
+      "relative_global_fit_ratio": 1.01565853497548,
+      "applicability_qualification": {
+        "decision": "accepted_numerically_compatible",
+        "accepted": true,
+        "reasons": [],
+        "final_global_residual": 0.0006525439321993471,
+        "final_primal_residual": 0.01733918847245567,
+        "final_local_marginal_error": 5.551115123125783e-17,
+        "rotation_orthogonality_error": 3.24664125224119e-15,
+        "relative_global_fit_ratio": 1.01565853497548,
+        "max_relative_fit_ratio": 1.5,
+        "required_rotation_structure": "repeated_3d_blocks",
+        "observed_rotation_structure": "repeated_3d_blocks",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 35,
+        "initial_loss": 0.4029570909229333,
+        "final_loss": 0.31298067550015557,
+        "mean_entropy": 0.052588654036620316,
+        "normalized_mean_entropy": 0.03793469519282875,
+        "min_group_mass": 0.1398204487012913,
+        "max_group_mass": 0.40458294152793023,
+        "group_mass": [
+          0.1398204487012913,
+          0.40458294152793023,
+          0.21446983725335966,
+          0.2411267725174187
+        ],
+        "min_prototype_distance": 6.670701102032007,
+        "max_row_sum_error": 2.220446049250313e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 50,
+        "initial_loss": 0.40759203969612107,
+        "final_loss": 0.31443663669560606,
+        "mean_entropy": 0.05755789599107888,
+        "normalized_mean_entropy": 0.041519245555166125,
+        "min_group_mass": 0.12086363356100498,
+        "max_group_mass": 0.4227451555852938,
+        "group_mass": [
+          0.4227451555852938,
+          0.22623621041161213,
+          0.12086363356100498,
+          0.23015500044208914
+        ],
+        "min_prototype_distance": 6.90338660124542,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    },
+    {
+      "seed": 1723,
+      "samples": 100,
+      "feature_dimension": 57,
+      "source_camera": "00_00",
+      "target_camera": "00_21",
+      "source_frame_first": 10000,
+      "source_frame_last": 10099,
+      "common_scale": 30.58094799722134,
+      "rotation_frobenius_error": 0.02554539249511522,
+      "rotation_frobenius_error_per_dimension": 0.0033835698933706642,
+      "paired_alignment_mse": 1.4537082387300639e-05,
+      "paired_recall_at_1": 1.0,
+      "paired_recall_at_5": 1.0,
+      "unaligned_recall_at_1": 0.02,
+      "unaligned_recall_at_5": 0.08,
+      "admm_converged": true,
+      "iterations": 20,
+      "final_global_residual": 0.0007080619512072409,
+      "final_primal_residual": 0.017462279545686663,
+      "final_local_marginal_error": 4.163336342344337e-17,
+      "rotation_orthogonality_error": 2.9094771497761384e-15,
+      "estimated_physical_rotation_3x3": [
+        [
+          0.9173208412033512,
+          -0.04643684232367296,
+          -0.3954315287998449
+        ],
+        [
+          -0.10934646072441846,
+          0.9256024591950345,
+          -0.3623581640575358
+        ],
+        [
+          0.382839164429424,
+          0.3756377340032698,
+          0.8439967221333676
+        ]
+      ],
+      "transport_objective": 0.0862228428005413,
+      "relative_global_fit_ratio": 1.0107541045111492,
+      "applicability_qualification": {
+        "decision": "accepted_numerically_compatible",
+        "accepted": true,
+        "reasons": [],
+        "final_global_residual": 0.0007080619512072409,
+        "final_primal_residual": 0.017462279545686663,
+        "final_local_marginal_error": 4.163336342344337e-17,
+        "rotation_orthogonality_error": 2.9094771497761384e-15,
+        "relative_global_fit_ratio": 1.0107541045111492,
+        "max_relative_fit_ratio": 1.5,
+        "required_rotation_structure": "repeated_3d_blocks",
+        "observed_rotation_structure": "repeated_3d_blocks",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 41,
+        "initial_loss": 0.40922701040709003,
+        "final_loss": 0.303745906194954,
+        "mean_entropy": 0.05988884141012965,
+        "normalized_mean_entropy": 0.043200667253489825,
+        "min_group_mass": 0.13904939030933408,
+        "max_group_mass": 0.42997457157605695,
+        "group_mass": [
+          0.42997457157605695,
+          0.2077681488505292,
+          0.22320788926407978,
+          0.13904939030933408
+        ],
+        "min_prototype_distance": 6.85740439971948,
+        "max_row_sum_error": 2.220446049250313e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 40,
+        "initial_loss": 0.407769849828309,
+        "final_loss": 0.3019819880078396,
+        "mean_entropy": 0.0585481813450712,
+        "normalized_mean_entropy": 0.04223358543980097,
+        "min_group_mass": 0.1390141990733863,
+        "max_group_mass": 0.44002800160277095,
+        "group_mass": [
+          0.22278544323323857,
+          0.44002800160277095,
+          0.1981723560906042,
+          0.1390141990733863
+        ],
+        "min_prototype_distance": 7.238100614753821,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    }
+  ],
+  "restart_stability_qualification": {
+    "decision": "accepted_stable_multistart",
+    "accepted": true,
+    "reason": null,
+    "healthy_indices": [
+      0,
+      1,
+      2
+    ],
+    "selected_index": 0,
+    "consensus_indices": [
+      0,
+      1,
+      2
+    ],
+    "required_consensus_count": 3,
+    "max_rotation_disagreement_degrees": 5.0,
+    "min_consensus_fraction": 0.8,
+    "pairwise_angle_degrees": [
+      [
+        0.0,
+        0.20990866758081841,
+        0.5986268006744699
+      ],
+      [
+        0.20990866758081841,
+        0.0,
+        0.6060787406855841
+      ],
+      [
+        0.5986268006744699,
+        0.6060787406855841,
+        0.0
+      ]
+    ]
+  },
+  "summary": {
+    "restart_count": 3,
+    "individually_accepted_count": 3,
+    "admm_converged_count": 3,
+    "rotation_frobenius_error_mean_evaluation_only": 0.037974647661277484,
+    "rotation_frobenius_error_max_evaluation_only": 0.04492000792408266,
+    "selected_seed": 1721,
+    "selected_rotation_frobenius_error_evaluation_only": 0.043458542564634564,
+    "selected_paired_recall_at_1_evaluation_only": 1.0
+  }
+}

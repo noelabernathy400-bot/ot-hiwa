@@ -14,6 +14,7 @@ if str(SCRIPTS) not in sys.path:
 from joint_prototypes import (  # noqa: E402
     JointPrototypeConfig,
     optimize_joint_prototypes,
+    prototype_separation_loss,
     standardize,
 )
 from soft_groups import assignment_entropy, learn_soft_groups  # noqa: E402
@@ -79,6 +80,16 @@ class JointPrototypeTests(unittest.TestCase):
                 target_entropy=0.5,
                 config=JointPrototypeConfig(n_groups=2),
             )
+
+    def test_cosine_hinge_separation_is_bounded_and_scale_invariant(self) -> None:
+        repeated = np.asarray([[1.0, 0.0], [10.0, 0.0]])
+        orthogonal = np.asarray([[1.0, 0.0], [0.0, 3.0]])
+        self.assertGreater(prototype_separation_loss(repeated, margin=0.2), 0.0)
+        self.assertEqual(prototype_separation_loss(orthogonal, margin=0.2), 0.0)
+        self.assertAlmostEqual(
+            prototype_separation_loss(repeated, margin=0.2),
+            prototype_separation_loss(7.0 * repeated, margin=0.2),
+        )
 
 
 if __name__ == "__main__":

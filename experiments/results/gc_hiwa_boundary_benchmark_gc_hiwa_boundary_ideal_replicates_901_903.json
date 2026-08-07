@@ -1,0 +1,1729 @@
+{
+  "experiment": "gc_hiwa_fixed_core_known_truth_boundary_benchmark",
+  "scope": "fixed adapters, fixed soft groups, full-support hierarchical OT, ADMM consensus, and ROCA; learned encoders and joint prototype updates are excluded",
+  "truth_usage": "truth rotation, paired rows, and group labels are withheld from fitting and used only after fitting for scoring",
+  "oracle_component_control": "oracle-component controls receive only the true determinant component to isolate group and consensus recovery; soft_roca is the label-free branch-selection method",
+  "parameters": {
+    "seeds": [
+      901,
+      902,
+      903
+    ],
+    "scenarios": [
+      "ideal_rotation",
+      "ideal_reflection"
+    ],
+    "methods": [
+      "soft_uniform_oracle_component",
+      "soft_transport_oracle_component",
+      "soft_roca"
+    ],
+    "groups": 4,
+    "temperature": 0.5,
+    "entropy_weight": 0.05,
+    "samples_per_group": 8,
+    "maxiter": 100,
+    "tol": 0.02,
+    "mu": 0.05,
+    "group_sinkhorn_iterations": 200,
+    "local_iterations": 24,
+    "local_sinkhorn_iterations": 60,
+    "tag": "gc_hiwa_boundary_ideal_replicates_901_903"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "scikit_learn": "1.9.0"
+  },
+  "records": [
+    {
+      "scenario": "ideal_rotation",
+      "seed": 901,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.013352211142366364,
+          "final_loss": 0.01334187380805655,
+          "mean_entropy": 0.023589778577326734,
+          "normalized_mean_entropy": 0.017016428284588995,
+          "min_group_mass": 0.24772336849867688,
+          "max_group_mass": 0.25107190660859413,
+          "group_mass": [
+            0.25107190660859413,
+            0.25063158681265024,
+            0.25057313808007886,
+            0.24772336849867688
+          ],
+          "min_prototype_distance": 2.5220912834007216,
+          "max_row_sum_error": 3.3306690738754696e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.009367711881241933,
+          "final_loss": 0.009362080218845131,
+          "mean_entropy": 0.037613388611157206,
+          "normalized_mean_entropy": 0.02713232461017296,
+          "min_group_mass": 0.24893740812566212,
+          "max_group_mass": 0.25049286358633166,
+          "group_mass": [
+            0.2502154465921342,
+            0.2503542816958721,
+            0.24893740812566212,
+            0.25049286358633166
+          ],
+          "min_prototype_distance": 2.2921735301090127,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_uniform_oracle_component",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": 0.00626295952049138,
+      "paired_alignment_mse": 0.00016610863393637455,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 72,
+      "final_global_residual": 0.01867761289874998,
+      "final_primal_residual": 0.01890442939251109,
+      "final_dual_residual": 0.0021567049669825858,
+      "final_local_marginal_error": 4.511201268950931e-05,
+      "group_row_marginal_error": 1.892930256985892e-14,
+      "group_column_marginal_error": 0.0,
+      "rotation_orthogonality_error": 6.982221887729274e-16,
+      "transport_objective": 0.08492826663598552,
+      "consensus_weighting": "uniform"
+    },
+    {
+      "scenario": "ideal_rotation",
+      "seed": 901,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.013352211142366364,
+          "final_loss": 0.01334187380805655,
+          "mean_entropy": 0.023589778577326734,
+          "normalized_mean_entropy": 0.017016428284588995,
+          "min_group_mass": 0.24772336849867688,
+          "max_group_mass": 0.25107190660859413,
+          "group_mass": [
+            0.25107190660859413,
+            0.25063158681265024,
+            0.25057313808007886,
+            0.24772336849867688
+          ],
+          "min_prototype_distance": 2.5220912834007216,
+          "max_row_sum_error": 3.3306690738754696e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.009367711881241933,
+          "final_loss": 0.009362080218845131,
+          "mean_entropy": 0.037613388611157206,
+          "normalized_mean_entropy": 0.02713232461017296,
+          "min_group_mass": 0.24893740812566212,
+          "max_group_mass": 0.25049286358633166,
+          "group_mass": [
+            0.2502154465921342,
+            0.2503542816958721,
+            0.24893740812566212,
+            0.25049286358633166
+          ],
+          "min_prototype_distance": 2.2921735301090127,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_transport_oracle_component",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": 0.005788173327079454,
+      "paired_alignment_mse": 0.00011255012104886056,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 36,
+      "final_global_residual": 1.2272006010680608e-05,
+      "final_primal_residual": 0.018339614185293982,
+      "final_dual_residual": 1.417049194752631e-06,
+      "final_local_marginal_error": 4.3916238601686116e-05,
+      "group_row_marginal_error": 5.184741524999481e-14,
+      "group_column_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 7.535161867690523e-16,
+      "transport_objective": 0.08491371491146041,
+      "consensus_weighting": "transport"
+    },
+    {
+      "scenario": "ideal_rotation",
+      "seed": 901,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.013352211142366364,
+          "final_loss": 0.01334187380805655,
+          "mean_entropy": 0.023589778577326734,
+          "normalized_mean_entropy": 0.017016428284588995,
+          "min_group_mass": 0.24772336849867688,
+          "max_group_mass": 0.25107190660859413,
+          "group_mass": [
+            0.25107190660859413,
+            0.25063158681265024,
+            0.25057313808007886,
+            0.24772336849867688
+          ],
+          "min_prototype_distance": 2.5220912834007216,
+          "max_row_sum_error": 3.3306690738754696e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.009367711881241933,
+          "final_loss": 0.009362080218845131,
+          "mean_entropy": 0.037613388611157206,
+          "normalized_mean_entropy": 0.02713232461017296,
+          "min_group_mass": 0.24893740812566212,
+          "max_group_mass": 0.25049286358633166,
+          "group_mass": [
+            0.2502154465921342,
+            0.2503542816958721,
+            0.24893740812566212,
+            0.25049286358633166
+          ],
+          "min_prototype_distance": 2.2921735301090127,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_roca",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": 0.005788173327079454,
+      "paired_alignment_mse": 0.00011255012104886056,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 36,
+      "final_global_residual": 1.2272006010680608e-05,
+      "final_primal_residual": 0.018339614185293982,
+      "final_dual_residual": 1.417049194752631e-06,
+      "final_local_marginal_error": 4.3916238601686116e-05,
+      "group_row_marginal_error": 5.184741524999481e-14,
+      "group_column_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 7.535161867690523e-16,
+      "transport_objective": 0.08491371491146041,
+      "consensus_weighting": "transport",
+      "roca_selected_correct_component": true,
+      "roca_qualification": {
+        "selected_sign": 1,
+        "decision": "unique_qualified_candidate",
+        "max_local_marginal_error": 0.001,
+        "candidates": [
+          {
+            "determinant_sign": -1,
+            "admm_converged": false,
+            "final_local_marginal_error": 2.2010028854728544e-05,
+            "orientation": {
+              "orientation_sign": -1,
+              "volume_product_margin": 194.9098991825144,
+              "source_volume": 14.926565537367095,
+              "target_volume": -13.05792003489201,
+              "target_order": [
+                2,
+                3,
+                0,
+                1
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          },
+          {
+            "determinant_sign": 1,
+            "admm_converged": true,
+            "final_local_marginal_error": 4.3916238601686116e-05,
+            "orientation": {
+              "orientation_sign": 1,
+              "volume_product_margin": 194.9098991825144,
+              "source_volume": 14.926565537367095,
+              "target_volume": 13.05792003489201,
+              "target_order": [
+                2,
+                3,
+                1,
+                0
+              ]
+            },
+            "orientation_error": null,
+            "qualified": true
+          }
+        ]
+      },
+      "roca_candidates": [
+        {
+          "determinant_sign": -1,
+          "admm_converged": false,
+          "rotation_frobenius_error": 2.000001275867848,
+          "transport_objective": 0.15007031559363926
+        },
+        {
+          "determinant_sign": 1,
+          "admm_converged": true,
+          "rotation_frobenius_error": 0.005788173327079454,
+          "transport_objective": 0.08491371491146041
+        }
+      ]
+    },
+    {
+      "scenario": "ideal_rotation",
+      "seed": 902,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.009492790193112657,
+          "final_loss": 0.009487568520686294,
+          "mean_entropy": 0.01917587183967668,
+          "normalized_mean_entropy": 0.013832467603911935,
+          "min_group_mass": 0.24836388204157606,
+          "max_group_mass": 0.2507898278015599,
+          "group_mass": [
+            0.25044731509020907,
+            0.2507898278015599,
+            0.25039897506665504,
+            0.24836388204157606
+          ],
+          "min_prototype_distance": 2.574719319551564,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.006046097527520413,
+          "final_loss": 0.006013261966698824,
+          "mean_entropy": 0.03808794334775655,
+          "normalized_mean_entropy": 0.027474643492734083,
+          "min_group_mass": 0.24641758677167994,
+          "max_group_mass": 0.2525749168268965,
+          "group_mass": [
+            0.2513929034372352,
+            0.24641758677167994,
+            0.24961459296418823,
+            0.2525749168268965
+          ],
+          "min_prototype_distance": 2.42174045104704,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_uniform_oracle_component",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": 2.8238419687589404,
+      "paired_alignment_mse": 6.078165306528,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": false,
+      "iterations": 100,
+      "final_global_residual": 0.255782348018954,
+      "final_primal_residual": 0.3073636350366247,
+      "final_dual_residual": 0.02953520149653953,
+      "final_local_marginal_error": 4.9278463660644206e-08,
+      "group_row_marginal_error": 4.942149967046561e-09,
+      "group_column_marginal_error": 2.7755575615628914e-17,
+      "rotation_orthogonality_error": 5.455828963173219e-16,
+      "transport_objective": 0.30436427653326564,
+      "consensus_weighting": "uniform"
+    },
+    {
+      "scenario": "ideal_rotation",
+      "seed": 902,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.009492790193112657,
+          "final_loss": 0.009487568520686294,
+          "mean_entropy": 0.01917587183967668,
+          "normalized_mean_entropy": 0.013832467603911935,
+          "min_group_mass": 0.24836388204157606,
+          "max_group_mass": 0.2507898278015599,
+          "group_mass": [
+            0.25044731509020907,
+            0.2507898278015599,
+            0.25039897506665504,
+            0.24836388204157606
+          ],
+          "min_prototype_distance": 2.574719319551564,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.006046097527520413,
+          "final_loss": 0.006013261966698824,
+          "mean_entropy": 0.03808794334775655,
+          "normalized_mean_entropy": 0.027474643492734083,
+          "min_group_mass": 0.24641758677167994,
+          "max_group_mass": 0.2525749168268965,
+          "group_mass": [
+            0.2513929034372352,
+            0.24641758677167994,
+            0.24961459296418823,
+            0.2525749168268965
+          ],
+          "min_prototype_distance": 2.42174045104704,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_transport_oracle_component",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": 0.0037598163243469187,
+      "paired_alignment_mse": 9.740154058147098e-05,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 42,
+      "final_global_residual": 2.6737376062963527e-05,
+      "final_primal_residual": 0.018499394607732957,
+      "final_dual_residual": 3.08736625347525e-06,
+      "final_local_marginal_error": 1.0296385793669496e-09,
+      "group_row_marginal_error": 2.4313884239290928e-14,
+      "group_column_marginal_error": 0.0,
+      "rotation_orthogonality_error": 5.418404177570747e-16,
+      "transport_objective": 0.0641059390921615,
+      "consensus_weighting": "transport"
+    },
+    {
+      "scenario": "ideal_rotation",
+      "seed": 902,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.009492790193112657,
+          "final_loss": 0.009487568520686294,
+          "mean_entropy": 0.01917587183967668,
+          "normalized_mean_entropy": 0.013832467603911935,
+          "min_group_mass": 0.24836388204157606,
+          "max_group_mass": 0.2507898278015599,
+          "group_mass": [
+            0.25044731509020907,
+            0.2507898278015599,
+            0.25039897506665504,
+            0.24836388204157606
+          ],
+          "min_prototype_distance": 2.574719319551564,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.006046097527520413,
+          "final_loss": 0.006013261966698824,
+          "mean_entropy": 0.03808794334775655,
+          "normalized_mean_entropy": 0.027474643492734083,
+          "min_group_mass": 0.24641758677167994,
+          "max_group_mass": 0.2525749168268965,
+          "group_mass": [
+            0.2513929034372352,
+            0.24641758677167994,
+            0.24961459296418823,
+            0.2525749168268965
+          ],
+          "min_prototype_distance": 2.42174045104704,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_roca",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": 0.0037598163243469187,
+      "paired_alignment_mse": 9.740154058147098e-05,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 42,
+      "final_global_residual": 2.6737376062963527e-05,
+      "final_primal_residual": 0.018499394607732957,
+      "final_dual_residual": 3.08736625347525e-06,
+      "final_local_marginal_error": 1.0296385793669496e-09,
+      "group_row_marginal_error": 2.4313884239290928e-14,
+      "group_column_marginal_error": 0.0,
+      "rotation_orthogonality_error": 5.418404177570747e-16,
+      "transport_objective": 0.0641059390921615,
+      "consensus_weighting": "transport",
+      "roca_selected_correct_component": true,
+      "roca_qualification": {
+        "selected_sign": 1,
+        "decision": "unique_qualified_candidate",
+        "max_local_marginal_error": 0.001,
+        "candidates": [
+          {
+            "determinant_sign": -1,
+            "admm_converged": false,
+            "final_local_marginal_error": 2.5758097907929993e-05,
+            "orientation": {
+              "orientation_sign": -1,
+              "volume_product_margin": 184.64822917371592,
+              "source_volume": -15.171020677962042,
+              "target_volume": 12.171114461793755,
+              "target_order": [
+                3,
+                0,
+                1,
+                2
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          },
+          {
+            "determinant_sign": 1,
+            "admm_converged": true,
+            "final_local_marginal_error": 1.0296385793669496e-09,
+            "orientation": {
+              "orientation_sign": 1,
+              "volume_product_margin": 184.64822917371592,
+              "source_volume": -15.171020677962042,
+              "target_volume": -12.171114461793755,
+              "target_order": [
+                3,
+                0,
+                2,
+                1
+              ]
+            },
+            "orientation_error": null,
+            "qualified": true
+          }
+        ]
+      },
+      "roca_candidates": [
+        {
+          "determinant_sign": -1,
+          "admm_converged": false,
+          "rotation_frobenius_error": 2.0000003068701626,
+          "transport_objective": 0.12288592666086959
+        },
+        {
+          "determinant_sign": 1,
+          "admm_converged": true,
+          "rotation_frobenius_error": 0.0037598163243469187,
+          "transport_objective": 0.0641059390921615
+        }
+      ]
+    },
+    {
+      "scenario": "ideal_rotation",
+      "seed": 903,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.013075555848516893,
+          "final_loss": 0.013072583523772293,
+          "mean_entropy": 0.01882434298998088,
+          "normalized_mean_entropy": 0.013578893139819168,
+          "min_group_mass": 0.2489790187179738,
+          "max_group_mass": 0.25053186840800096,
+          "group_mass": [
+            0.2504340809626904,
+            0.25053186840800096,
+            0.25005503191133477,
+            0.2489790187179738
+          ],
+          "min_prototype_distance": 2.5551980080874412,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 1,
+          "initial_loss": 0.014015072146185817,
+          "final_loss": 0.014014188968317716,
+          "mean_entropy": 0.012972021436799791,
+          "normalized_mean_entropy": 0.009357335498588193,
+          "min_group_mass": 0.24986560862686946,
+          "max_group_mass": 0.25014091076890016,
+          "group_mass": [
+            0.24995226262853917,
+            0.24986560862686946,
+            0.2500412179756912,
+            0.25014091076890016
+          ],
+          "min_prototype_distance": 2.7314189242192715,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_uniform_oracle_component",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": 2.828336202468188,
+      "paired_alignment_mse": 6.000300744770965,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": false,
+      "iterations": 100,
+      "final_global_residual": 0.09347166367691562,
+      "final_primal_residual": 0.1629990275978891,
+      "final_dual_residual": 0.01079317803709388,
+      "final_local_marginal_error": 1.813625658369757e-05,
+      "group_row_marginal_error": 1.2423172135456184e-07,
+      "group_column_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 1.4782722106104512e-15,
+      "transport_objective": 1.3768257887750277,
+      "consensus_weighting": "uniform"
+    },
+    {
+      "scenario": "ideal_rotation",
+      "seed": 903,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.013075555848516893,
+          "final_loss": 0.013072583523772293,
+          "mean_entropy": 0.01882434298998088,
+          "normalized_mean_entropy": 0.013578893139819168,
+          "min_group_mass": 0.2489790187179738,
+          "max_group_mass": 0.25053186840800096,
+          "group_mass": [
+            0.2504340809626904,
+            0.25053186840800096,
+            0.25005503191133477,
+            0.2489790187179738
+          ],
+          "min_prototype_distance": 2.5551980080874412,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 1,
+          "initial_loss": 0.014015072146185817,
+          "final_loss": 0.014014188968317716,
+          "mean_entropy": 0.012972021436799791,
+          "normalized_mean_entropy": 0.009357335498588193,
+          "min_group_mass": 0.24986560862686946,
+          "max_group_mass": 0.25014091076890016,
+          "group_mass": [
+            0.24995226262853917,
+            0.24986560862686946,
+            0.2500412179756912,
+            0.25014091076890016
+          ],
+          "min_prototype_distance": 2.7314189242192715,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_transport_oracle_component",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": 0.0014382549663418576,
+      "paired_alignment_mse": 8.900386354075529e-05,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 48,
+      "final_global_residual": 1.201737285651827e-05,
+      "final_primal_residual": 0.019789832756197924,
+      "final_dual_residual": 1.3876466907325853e-06,
+      "final_local_marginal_error": 2.1013581412612076e-06,
+      "group_row_marginal_error": 2.4868995751603507e-14,
+      "group_column_marginal_error": 2.7755575615628914e-17,
+      "rotation_orthogonality_error": 5.992396804170633e-16,
+      "transport_objective": 0.06686819072291074,
+      "consensus_weighting": "transport"
+    },
+    {
+      "scenario": "ideal_rotation",
+      "seed": 903,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.013075555848516893,
+          "final_loss": 0.013072583523772293,
+          "mean_entropy": 0.01882434298998088,
+          "normalized_mean_entropy": 0.013578893139819168,
+          "min_group_mass": 0.2489790187179738,
+          "max_group_mass": 0.25053186840800096,
+          "group_mass": [
+            0.2504340809626904,
+            0.25053186840800096,
+            0.25005503191133477,
+            0.2489790187179738
+          ],
+          "min_prototype_distance": 2.5551980080874412,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 1,
+          "initial_loss": 0.014015072146185817,
+          "final_loss": 0.014014188968317716,
+          "mean_entropy": 0.012972021436799791,
+          "normalized_mean_entropy": 0.009357335498588193,
+          "min_group_mass": 0.24986560862686946,
+          "max_group_mass": 0.25014091076890016,
+          "group_mass": [
+            0.24995226262853917,
+            0.24986560862686946,
+            0.2500412179756912,
+            0.25014091076890016
+          ],
+          "min_prototype_distance": 2.7314189242192715,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_roca",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": 0.0014382549663418576,
+      "paired_alignment_mse": 8.900386354075529e-05,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 48,
+      "final_global_residual": 1.201737285651827e-05,
+      "final_primal_residual": 0.019789832756197924,
+      "final_dual_residual": 1.3876466907325853e-06,
+      "final_local_marginal_error": 2.1013581412612076e-06,
+      "group_row_marginal_error": 2.4868995751603507e-14,
+      "group_column_marginal_error": 2.7755575615628914e-17,
+      "rotation_orthogonality_error": 5.992396804170633e-16,
+      "transport_objective": 0.06686819072291074,
+      "consensus_weighting": "transport",
+      "roca_selected_correct_component": true,
+      "roca_qualification": {
+        "selected_sign": 1,
+        "decision": "unique_qualified_candidate",
+        "max_local_marginal_error": 0.001,
+        "candidates": [
+          {
+            "determinant_sign": -1,
+            "admm_converged": false,
+            "final_local_marginal_error": 2.720797373512233e-05,
+            "orientation": {
+              "orientation_sign": -1,
+              "volume_product_margin": 235.2194041972264,
+              "source_volume": 15.155986429508586,
+              "target_volume": -15.51990068685045,
+              "target_order": [
+                3,
+                1,
+                2,
+                0
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          },
+          {
+            "determinant_sign": 1,
+            "admm_converged": true,
+            "final_local_marginal_error": 2.1013581412612076e-06,
+            "orientation": {
+              "orientation_sign": 1,
+              "volume_product_margin": 235.2194041972264,
+              "source_volume": 15.155986429508586,
+              "target_volume": 15.51990068685045,
+              "target_order": [
+                0,
+                1,
+                2,
+                3
+              ]
+            },
+            "orientation_error": null,
+            "qualified": true
+          }
+        ]
+      },
+      "roca_candidates": [
+        {
+          "determinant_sign": -1,
+          "admm_converged": false,
+          "rotation_frobenius_error": 2.000000073772121,
+          "transport_objective": 0.11815098162656
+        },
+        {
+          "determinant_sign": 1,
+          "admm_converged": true,
+          "rotation_frobenius_error": 0.0014382549663418576,
+          "transport_objective": 0.06686819072291074
+        }
+      ]
+    },
+    {
+      "scenario": "ideal_reflection",
+      "seed": 901,
+      "truth": {
+        "determinant_sign": -1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.013352211142366364,
+          "final_loss": 0.01334187380805655,
+          "mean_entropy": 0.023589778577326734,
+          "normalized_mean_entropy": 0.017016428284588995,
+          "min_group_mass": 0.24772336849867688,
+          "max_group_mass": 0.25107190660859413,
+          "group_mass": [
+            0.25107190660859413,
+            0.25063158681265024,
+            0.25057313808007886,
+            0.24772336849867688
+          ],
+          "min_prototype_distance": 2.5220912834007216,
+          "max_row_sum_error": 3.3306690738754696e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.00918609372370295,
+          "final_loss": 0.009176949209098999,
+          "mean_entropy": 0.03029875284576632,
+          "normalized_mean_entropy": 0.02185593023785372,
+          "min_group_mass": 0.24784504568256815,
+          "max_group_mass": 0.2510731444305601,
+          "group_mass": [
+            0.24784504568256815,
+            0.2500789014329435,
+            0.2510029084539282,
+            0.2510731444305601
+          ],
+          "min_prototype_distance": 2.35683735410079,
+          "max_row_sum_error": 3.3306690738754696e-16
+        }
+      },
+      "method": "soft_uniform_oracle_component",
+      "requested_determinant_sign": -1,
+      "estimated_determinant_sign": -1,
+      "rotation_frobenius_error": 2.4182938319012615,
+      "paired_alignment_mse": 5.4107610255434935,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": false,
+      "iterations": 100,
+      "final_global_residual": 0.026344649256625524,
+      "final_primal_residual": 0.14960097133266553,
+      "final_dual_residual": 0.0030420180680038045,
+      "final_local_marginal_error": 1.522982498430533e-05,
+      "group_row_marginal_error": 8.409362095562756e-11,
+      "group_column_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 2.060034355355593e-15,
+      "transport_objective": 0.6623362538975138,
+      "consensus_weighting": "uniform"
+    },
+    {
+      "scenario": "ideal_reflection",
+      "seed": 901,
+      "truth": {
+        "determinant_sign": -1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.013352211142366364,
+          "final_loss": 0.01334187380805655,
+          "mean_entropy": 0.023589778577326734,
+          "normalized_mean_entropy": 0.017016428284588995,
+          "min_group_mass": 0.24772336849867688,
+          "max_group_mass": 0.25107190660859413,
+          "group_mass": [
+            0.25107190660859413,
+            0.25063158681265024,
+            0.25057313808007886,
+            0.24772336849867688
+          ],
+          "min_prototype_distance": 2.5220912834007216,
+          "max_row_sum_error": 3.3306690738754696e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.00918609372370295,
+          "final_loss": 0.009176949209098999,
+          "mean_entropy": 0.03029875284576632,
+          "normalized_mean_entropy": 0.02185593023785372,
+          "min_group_mass": 0.24784504568256815,
+          "max_group_mass": 0.2510731444305601,
+          "group_mass": [
+            0.24784504568256815,
+            0.2500789014329435,
+            0.2510029084539282,
+            0.2510731444305601
+          ],
+          "min_prototype_distance": 2.35683735410079,
+          "max_row_sum_error": 3.3306690738754696e-16
+        }
+      },
+      "method": "soft_transport_oracle_component",
+      "requested_determinant_sign": -1,
+      "estimated_determinant_sign": -1,
+      "rotation_frobenius_error": 0.0036559503973185663,
+      "paired_alignment_mse": 9.842682294630843e-05,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 42,
+      "final_global_residual": 3.131647985526118e-06,
+      "final_primal_residual": 0.01854281487773398,
+      "final_dual_residual": 3.6161156149013076e-07,
+      "final_local_marginal_error": 1.705192492830964e-05,
+      "group_row_marginal_error": 1.1851630787873546e-14,
+      "group_column_marginal_error": 2.7755575615628914e-17,
+      "rotation_orthogonality_error": 7.845497544430756e-16,
+      "transport_objective": 0.0672085711674785,
+      "consensus_weighting": "transport"
+    },
+    {
+      "scenario": "ideal_reflection",
+      "seed": 901,
+      "truth": {
+        "determinant_sign": -1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.013352211142366364,
+          "final_loss": 0.01334187380805655,
+          "mean_entropy": 0.023589778577326734,
+          "normalized_mean_entropy": 0.017016428284588995,
+          "min_group_mass": 0.24772336849867688,
+          "max_group_mass": 0.25107190660859413,
+          "group_mass": [
+            0.25107190660859413,
+            0.25063158681265024,
+            0.25057313808007886,
+            0.24772336849867688
+          ],
+          "min_prototype_distance": 2.5220912834007216,
+          "max_row_sum_error": 3.3306690738754696e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.00918609372370295,
+          "final_loss": 0.009176949209098999,
+          "mean_entropy": 0.03029875284576632,
+          "normalized_mean_entropy": 0.02185593023785372,
+          "min_group_mass": 0.24784504568256815,
+          "max_group_mass": 0.2510731444305601,
+          "group_mass": [
+            0.24784504568256815,
+            0.2500789014329435,
+            0.2510029084539282,
+            0.2510731444305601
+          ],
+          "min_prototype_distance": 2.35683735410079,
+          "max_row_sum_error": 3.3306690738754696e-16
+        }
+      },
+      "method": "soft_roca",
+      "requested_determinant_sign": -1,
+      "estimated_determinant_sign": -1,
+      "rotation_frobenius_error": 0.0036559503973185663,
+      "paired_alignment_mse": 9.842682294630843e-05,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 42,
+      "final_global_residual": 3.131647985526118e-06,
+      "final_primal_residual": 0.01854281487773398,
+      "final_dual_residual": 3.6161156149013076e-07,
+      "final_local_marginal_error": 1.705192492830964e-05,
+      "group_row_marginal_error": 1.1851630787873546e-14,
+      "group_column_marginal_error": 2.7755575615628914e-17,
+      "rotation_orthogonality_error": 7.845497544430756e-16,
+      "transport_objective": 0.0672085711674785,
+      "consensus_weighting": "transport",
+      "roca_selected_correct_component": true,
+      "roca_qualification": {
+        "selected_sign": -1,
+        "decision": "unique_qualified_candidate",
+        "max_local_marginal_error": 0.001,
+        "candidates": [
+          {
+            "determinant_sign": -1,
+            "admm_converged": true,
+            "final_local_marginal_error": 1.705192492830964e-05,
+            "orientation": {
+              "orientation_sign": -1,
+              "volume_product_margin": 182.11517968480987,
+              "source_volume": 14.926565537367095,
+              "target_volume": -12.20074230933456,
+              "target_order": [
+                2,
+                3,
+                1,
+                0
+              ]
+            },
+            "orientation_error": null,
+            "qualified": true
+          },
+          {
+            "determinant_sign": 1,
+            "admm_converged": false,
+            "final_local_marginal_error": 4.835903137254344e-07,
+            "orientation": {
+              "orientation_sign": 1,
+              "volume_product_margin": 182.11517968480987,
+              "source_volume": 14.926565537367095,
+              "target_volume": 12.20074230933456,
+              "target_order": [
+                2,
+                3,
+                0,
+                1
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          }
+        ]
+      },
+      "roca_candidates": [
+        {
+          "determinant_sign": -1,
+          "admm_converged": true,
+          "rotation_frobenius_error": 0.0036559503973185663,
+          "transport_objective": 0.0672085711674785
+        },
+        {
+          "determinant_sign": 1,
+          "admm_converged": false,
+          "rotation_frobenius_error": 2.000000038201486,
+          "transport_objective": 0.14329067592884448
+        }
+      ]
+    },
+    {
+      "scenario": "ideal_reflection",
+      "seed": 902,
+      "truth": {
+        "determinant_sign": -1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.009492790193112657,
+          "final_loss": 0.009487568520686294,
+          "mean_entropy": 0.01917587183967668,
+          "normalized_mean_entropy": 0.013832467603911935,
+          "min_group_mass": 0.24836388204157606,
+          "max_group_mass": 0.2507898278015599,
+          "group_mass": [
+            0.25044731509020907,
+            0.2507898278015599,
+            0.25039897506665504,
+            0.24836388204157606
+          ],
+          "min_prototype_distance": 2.574719319551564,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.0066054046700430875,
+          "final_loss": 0.006601852670302132,
+          "mean_entropy": 0.026799082151818747,
+          "normalized_mean_entropy": 0.01933145146040242,
+          "min_group_mass": 0.2486595333517407,
+          "max_group_mass": 0.2512640307012687,
+          "group_mass": [
+            0.2512640307012687,
+            0.2486595333517407,
+            0.24883493134693538,
+            0.25124150460005523
+          ],
+          "min_prototype_distance": 2.544830060286645,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_uniform_oracle_component",
+      "requested_determinant_sign": -1,
+      "estimated_determinant_sign": -1,
+      "rotation_frobenius_error": 0.007392145627960563,
+      "paired_alignment_mse": 0.0001464750116924975,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 84,
+      "final_global_residual": 0.014969122540772081,
+      "final_primal_residual": 0.019947365807499468,
+      "final_dual_residual": 0.0017284853856894514,
+      "final_local_marginal_error": 0.00010499371928534998,
+      "group_row_marginal_error": 1.4738210651898953e-14,
+      "group_column_marginal_error": 0.0,
+      "rotation_orthogonality_error": 8.812855209015766e-16,
+      "transport_objective": 0.053617450613257345,
+      "consensus_weighting": "uniform"
+    },
+    {
+      "scenario": "ideal_reflection",
+      "seed": 902,
+      "truth": {
+        "determinant_sign": -1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.009492790193112657,
+          "final_loss": 0.009487568520686294,
+          "mean_entropy": 0.01917587183967668,
+          "normalized_mean_entropy": 0.013832467603911935,
+          "min_group_mass": 0.24836388204157606,
+          "max_group_mass": 0.2507898278015599,
+          "group_mass": [
+            0.25044731509020907,
+            0.2507898278015599,
+            0.25039897506665504,
+            0.24836388204157606
+          ],
+          "min_prototype_distance": 2.574719319551564,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.0066054046700430875,
+          "final_loss": 0.006601852670302132,
+          "mean_entropy": 0.026799082151818747,
+          "normalized_mean_entropy": 0.01933145146040242,
+          "min_group_mass": 0.2486595333517407,
+          "max_group_mass": 0.2512640307012687,
+          "group_mass": [
+            0.2512640307012687,
+            0.2486595333517407,
+            0.24883493134693538,
+            0.25124150460005523
+          ],
+          "min_prototype_distance": 2.544830060286645,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_transport_oracle_component",
+      "requested_determinant_sign": -1,
+      "estimated_determinant_sign": -1,
+      "rotation_frobenius_error": 0.0016695655996607165,
+      "paired_alignment_mse": 8.78282296016591e-05,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 49,
+      "final_global_residual": 7.875512099966588e-06,
+      "final_primal_residual": 0.01925095477698452,
+      "final_dual_residual": 9.09385806184373e-07,
+      "final_local_marginal_error": 0.00010546221403972861,
+      "group_row_marginal_error": 1.559863349598345e-14,
+      "group_column_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 7.694756015347349e-16,
+      "transport_objective": 0.05359868903239348,
+      "consensus_weighting": "transport"
+    },
+    {
+      "scenario": "ideal_reflection",
+      "seed": 902,
+      "truth": {
+        "determinant_sign": -1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.009492790193112657,
+          "final_loss": 0.009487568520686294,
+          "mean_entropy": 0.01917587183967668,
+          "normalized_mean_entropy": 0.013832467603911935,
+          "min_group_mass": 0.24836388204157606,
+          "max_group_mass": 0.2507898278015599,
+          "group_mass": [
+            0.25044731509020907,
+            0.2507898278015599,
+            0.25039897506665504,
+            0.24836388204157606
+          ],
+          "min_prototype_distance": 2.574719319551564,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.0066054046700430875,
+          "final_loss": 0.006601852670302132,
+          "mean_entropy": 0.026799082151818747,
+          "normalized_mean_entropy": 0.01933145146040242,
+          "min_group_mass": 0.2486595333517407,
+          "max_group_mass": 0.2512640307012687,
+          "group_mass": [
+            0.2512640307012687,
+            0.2486595333517407,
+            0.24883493134693538,
+            0.25124150460005523
+          ],
+          "min_prototype_distance": 2.544830060286645,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_roca",
+      "requested_determinant_sign": -1,
+      "estimated_determinant_sign": -1,
+      "rotation_frobenius_error": 0.0016695655996607165,
+      "paired_alignment_mse": 8.78282296016591e-05,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 49,
+      "final_global_residual": 7.875512099966588e-06,
+      "final_primal_residual": 0.01925095477698452,
+      "final_dual_residual": 9.09385806184373e-07,
+      "final_local_marginal_error": 0.00010546221403972861,
+      "group_row_marginal_error": 1.559863349598345e-14,
+      "group_column_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 7.694756015347349e-16,
+      "transport_objective": 0.05359868903239348,
+      "consensus_weighting": "transport",
+      "roca_selected_correct_component": true,
+      "roca_qualification": {
+        "selected_sign": -1,
+        "decision": "unique_qualified_candidate",
+        "max_local_marginal_error": 0.001,
+        "candidates": [
+          {
+            "determinant_sign": -1,
+            "admm_converged": true,
+            "final_local_marginal_error": 0.00010546221403972861,
+            "orientation": {
+              "orientation_sign": -1,
+              "volume_product_margin": 186.5962937668376,
+              "source_volume": -15.171020677962042,
+              "target_volume": 12.299521418350837,
+              "target_order": [
+                3,
+                0,
+                2,
+                1
+              ]
+            },
+            "orientation_error": null,
+            "qualified": true
+          },
+          {
+            "determinant_sign": 1,
+            "admm_converged": false,
+            "final_local_marginal_error": 2.9387497976135447e-05,
+            "orientation": {
+              "orientation_sign": 1,
+              "volume_product_margin": 186.5962937668376,
+              "source_volume": -15.171020677962042,
+              "target_volume": -12.299521418350837,
+              "target_order": [
+                3,
+                0,
+                1,
+                2
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          }
+        ]
+      },
+      "roca_candidates": [
+        {
+          "determinant_sign": -1,
+          "admm_converged": true,
+          "rotation_frobenius_error": 0.0016695655996607165,
+          "transport_objective": 0.05359868903239348
+        },
+        {
+          "determinant_sign": 1,
+          "admm_converged": false,
+          "rotation_frobenius_error": 2.000000132211753,
+          "transport_objective": 0.10510370386428874
+        }
+      ]
+    },
+    {
+      "scenario": "ideal_reflection",
+      "seed": 903,
+      "truth": {
+        "determinant_sign": -1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.013075555848516893,
+          "final_loss": 0.013072583523772293,
+          "mean_entropy": 0.01882434298998088,
+          "normalized_mean_entropy": 0.013578893139819168,
+          "min_group_mass": 0.2489790187179738,
+          "max_group_mass": 0.25053186840800096,
+          "group_mass": [
+            0.2504340809626904,
+            0.25053186840800096,
+            0.25005503191133477,
+            0.2489790187179738
+          ],
+          "min_prototype_distance": 2.5551980080874412,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.01143321003977077,
+          "final_loss": 0.01142200159022709,
+          "mean_entropy": 0.02842680009316829,
+          "normalized_mean_entropy": 0.02050560176137791,
+          "min_group_mass": 0.24891423990772976,
+          "max_group_mass": 0.25103225341121194,
+          "group_mass": [
+            0.25078661142401387,
+            0.24891423990772976,
+            0.25103225341121194,
+            0.24926689525704432
+          ],
+          "min_prototype_distance": 2.401187530680477,
+          "max_row_sum_error": 3.3306690738754696e-16
+        }
+      },
+      "method": "soft_uniform_oracle_component",
+      "requested_determinant_sign": -1,
+      "estimated_determinant_sign": -1,
+      "rotation_frobenius_error": 0.002148513965174532,
+      "paired_alignment_mse": 9.195693149514644e-05,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 59,
+      "final_global_residual": 0.001589239926212737,
+      "final_primal_residual": 0.018187075702636814,
+      "final_dual_residual": 0.00018350961984116496,
+      "final_local_marginal_error": 3.344595279956093e-06,
+      "group_row_marginal_error": 3.2751579226442118e-15,
+      "group_column_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 6.54589980685272e-16,
+      "transport_objective": 0.0673347072425385,
+      "consensus_weighting": "uniform"
+    },
+    {
+      "scenario": "ideal_reflection",
+      "seed": 903,
+      "truth": {
+        "determinant_sign": -1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.013075555848516893,
+          "final_loss": 0.013072583523772293,
+          "mean_entropy": 0.01882434298998088,
+          "normalized_mean_entropy": 0.013578893139819168,
+          "min_group_mass": 0.2489790187179738,
+          "max_group_mass": 0.25053186840800096,
+          "group_mass": [
+            0.2504340809626904,
+            0.25053186840800096,
+            0.25005503191133477,
+            0.2489790187179738
+          ],
+          "min_prototype_distance": 2.5551980080874412,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.01143321003977077,
+          "final_loss": 0.01142200159022709,
+          "mean_entropy": 0.02842680009316829,
+          "normalized_mean_entropy": 0.02050560176137791,
+          "min_group_mass": 0.24891423990772976,
+          "max_group_mass": 0.25103225341121194,
+          "group_mass": [
+            0.25078661142401387,
+            0.24891423990772976,
+            0.25103225341121194,
+            0.24926689525704432
+          ],
+          "min_prototype_distance": 2.401187530680477,
+          "max_row_sum_error": 3.3306690738754696e-16
+        }
+      },
+      "method": "soft_transport_oracle_component",
+      "requested_determinant_sign": -1,
+      "estimated_determinant_sign": -1,
+      "rotation_frobenius_error": 0.0019004955178729185,
+      "paired_alignment_mse": 8.897351458548545e-05,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 41,
+      "final_global_residual": 7.326760830960504e-06,
+      "final_primal_residual": 0.0186443215794701,
+      "final_dual_residual": 8.460214676086107e-07,
+      "final_local_marginal_error": 3.3472374305817265e-06,
+      "group_row_marginal_error": 4.107825191113079e-15,
+      "group_column_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 1.628648961995176e-15,
+      "transport_objective": 0.06733147851780458,
+      "consensus_weighting": "transport"
+    },
+    {
+      "scenario": "ideal_reflection",
+      "seed": 903,
+      "truth": {
+        "determinant_sign": -1,
+        "noise_std": 0.01,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0
+      },
+      "group_learning": {
+        "source": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.013075555848516893,
+          "final_loss": 0.013072583523772293,
+          "mean_entropy": 0.01882434298998088,
+          "normalized_mean_entropy": 0.013578893139819168,
+          "min_group_mass": 0.2489790187179738,
+          "max_group_mass": 0.25053186840800096,
+          "group_mass": [
+            0.2504340809626904,
+            0.25053186840800096,
+            0.25005503191133477,
+            0.2489790187179738
+          ],
+          "min_prototype_distance": 2.5551980080874412,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.01143321003977077,
+          "final_loss": 0.01142200159022709,
+          "mean_entropy": 0.02842680009316829,
+          "normalized_mean_entropy": 0.02050560176137791,
+          "min_group_mass": 0.24891423990772976,
+          "max_group_mass": 0.25103225341121194,
+          "group_mass": [
+            0.25078661142401387,
+            0.24891423990772976,
+            0.25103225341121194,
+            0.24926689525704432
+          ],
+          "min_prototype_distance": 2.401187530680477,
+          "max_row_sum_error": 3.3306690738754696e-16
+        }
+      },
+      "method": "soft_roca",
+      "requested_determinant_sign": -1,
+      "estimated_determinant_sign": -1,
+      "rotation_frobenius_error": 0.0019004955178729185,
+      "paired_alignment_mse": 8.897351458548545e-05,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": true,
+      "iterations": 41,
+      "final_global_residual": 7.326760830960504e-06,
+      "final_primal_residual": 0.0186443215794701,
+      "final_dual_residual": 8.460214676086107e-07,
+      "final_local_marginal_error": 3.3472374305817265e-06,
+      "group_row_marginal_error": 4.107825191113079e-15,
+      "group_column_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 1.628648961995176e-15,
+      "transport_objective": 0.06733147851780458,
+      "consensus_weighting": "transport",
+      "roca_selected_correct_component": true,
+      "roca_qualification": {
+        "selected_sign": -1,
+        "decision": "unique_qualified_candidate",
+        "max_local_marginal_error": 0.001,
+        "candidates": [
+          {
+            "determinant_sign": -1,
+            "admm_converged": true,
+            "final_local_marginal_error": 3.3472374305817265e-06,
+            "orientation": {
+              "orientation_sign": -1,
+              "volume_product_margin": 215.84255931206332,
+              "source_volume": 15.155986429508586,
+              "target_volume": -14.241406213707052,
+              "target_order": [
+                0,
+                2,
+                3,
+                1
+              ]
+            },
+            "orientation_error": null,
+            "qualified": true
+          },
+          {
+            "determinant_sign": 1,
+            "admm_converged": false,
+            "final_local_marginal_error": 1.0743489027218963e-06,
+            "orientation": {
+              "orientation_sign": 1,
+              "volume_product_margin": 215.84255931206332,
+              "source_volume": 15.155986429508586,
+              "target_volume": 14.241406213707052,
+              "target_order": [
+                1,
+                2,
+                3,
+                0
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          }
+        ]
+      },
+      "roca_candidates": [
+        {
+          "determinant_sign": -1,
+          "admm_converged": true,
+          "rotation_frobenius_error": 0.0019004955178729185,
+          "transport_objective": 0.06733147851780458
+        },
+        {
+          "determinant_sign": 1,
+          "admm_converged": false,
+          "rotation_frobenius_error": 2.000000237294548,
+          "transport_objective": 0.1299372516584565
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "scenario": "ideal_reflection",
+      "method": "soft_roca",
+      "n": 3,
+      "rotation_frobenius_error_mean": 0.002408670504950734,
+      "paired_alignment_mse_mean": 9.174285571115099e-05,
+      "source_group_ari_mean": 1.0,
+      "target_group_ari_mean": 1.0,
+      "converged_count": 3,
+      "roca_component_correct_count": 3
+    },
+    {
+      "scenario": "ideal_reflection",
+      "method": "soft_transport_oracle_component",
+      "n": 3,
+      "rotation_frobenius_error_mean": 0.002408670504950734,
+      "paired_alignment_mse_mean": 9.174285571115099e-05,
+      "source_group_ari_mean": 1.0,
+      "target_group_ari_mean": 1.0,
+      "converged_count": 3,
+      "roca_component_correct_count": 0
+    },
+    {
+      "scenario": "ideal_reflection",
+      "method": "soft_uniform_oracle_component",
+      "n": 3,
+      "rotation_frobenius_error_mean": 0.8092781638314656,
+      "paired_alignment_mse_mean": 1.8036664858288936,
+      "source_group_ari_mean": 1.0,
+      "target_group_ari_mean": 1.0,
+      "converged_count": 2,
+      "roca_component_correct_count": 0
+    },
+    {
+      "scenario": "ideal_rotation",
+      "method": "soft_roca",
+      "n": 3,
+      "rotation_frobenius_error_mean": 0.0036620815392560766,
+      "paired_alignment_mse_mean": 9.965184172369561e-05,
+      "source_group_ari_mean": 1.0,
+      "target_group_ari_mean": 1.0,
+      "converged_count": 3,
+      "roca_component_correct_count": 3
+    },
+    {
+      "scenario": "ideal_rotation",
+      "method": "soft_transport_oracle_component",
+      "n": 3,
+      "rotation_frobenius_error_mean": 0.0036620815392560766,
+      "paired_alignment_mse_mean": 9.965184172369561e-05,
+      "source_group_ari_mean": 1.0,
+      "target_group_ari_mean": 1.0,
+      "converged_count": 3,
+      "roca_component_correct_count": 0
+    },
+    {
+      "scenario": "ideal_rotation",
+      "method": "soft_uniform_oracle_component",
+      "n": 3,
+      "rotation_frobenius_error_mean": 1.8861470435825403,
+      "paired_alignment_mse_mean": 4.026210719977634,
+      "source_group_ari_mean": 1.0,
+      "target_group_ari_mean": 1.0,
+      "converged_count": 1,
+      "roca_component_correct_count": 0
+    }
+  ]
+}

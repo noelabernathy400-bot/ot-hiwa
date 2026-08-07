@@ -1,0 +1,56 @@
+{
+  "experiment": "pamap2_multi_subject_temporal_eligibility_audit",
+  "scope": "fixed-protocol data eligibility only; no model fitting or target-test label evaluation",
+  "parameters": {
+    "raw_directory": "D:\\ai\\ot-hiwa\\data\\raw\\pamap2\\PAMAP2_Dataset",
+    "subjects": [
+      101,
+      102
+    ],
+    "activities": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "window_samples": 200,
+    "counts_per_activity": {
+      "source_train": 8,
+      "source_validation": 2,
+      "target_adaptation": 3,
+      "target_test": 3
+    }
+  },
+  "environment": {
+    "python": "3.13.7"
+  },
+  "records": [
+    {
+      "subject": 101,
+      "protocol_file": "D:\\ai\\ot-hiwa\\data\\raw\\pamap2\\PAMAP2_Dataset\\Protocol\\subject101.dat",
+      "available": true,
+      "eligible": true,
+      "reason": null,
+      "row_count": 376417,
+      "samples": {
+        "source_train": 48,
+        "source_validation": 12,
+        "target_adaptation": 18,
+        "target_test": 18
+      }
+    },
+    {
+      "subject": 102,
+      "protocol_file": "D:\\ai\\ot-hiwa\\data\\raw\\pamap2\\PAMAP2_Dataset\\Protocol\\subject102.dat",
+      "available": false,
+      "eligible": false,
+      "reason": "protocol_file_missing"
+    }
+  ],
+  "eligible_subjects": [
+    101
+  ],
+  "eligible_count": 1
+}

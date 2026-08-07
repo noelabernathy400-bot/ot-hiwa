@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from datasets.pamap2 import PAMAP2SplitCounts, build_paired_windows, build_temporal_domain_adaptation_split, window_features
+from audit_multi_subject_eligibility import assess_subject
 
 
 def _rows() -> np.ndarray:
@@ -64,3 +65,15 @@ def test_temporal_split_has_disjoint_partitions_and_hides_adaptation_metadata() 
     assert split.source_train_labels.tolist() == [1, 1, 2, 2]
     assert split.evaluation_target_labels.tolist() == [1, 1, 2, 2]
     assert len(split.evaluation_pair_ids) == 4
+
+
+def test_multi_subject_eligibility_reports_missing_protocol_file(tmp_path: Path) -> None:
+    record = assess_subject(
+        tmp_path,
+        102,
+        window_samples=4,
+        counts=PAMAP2SplitCounts(source_train=1, source_validation=1, target_adaptation=1, target_test=1),
+    )
+    assert record["available"] is False
+    assert record["eligible"] is False
+    assert record["reason"] == "protocol_file_missing"

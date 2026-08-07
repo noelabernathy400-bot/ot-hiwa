@@ -1,0 +1,41 @@
+{
+  "experiment": "roca_cross_unlabeled_subsample_validation",
+  "status": "frozen_before_execution",
+  "purpose": "Test whether the already-defined material geometry-objective conflict marker remains informative when the source and target data instances change.",
+  "development_evidence": {
+    "inputs": [
+      "experiments/results/taco_faithful_baseline_full_support_roca_seeds_80_84.json",
+      "experiments/results/taco_faithful_baseline_full_support_roca_seeds_85_89.json"
+    ],
+    "frozen_marker": "geometric_sign != lower_objective_sign AND relative_objective_gap >= 0.01"
+  },
+  "data_instance_protocol": {
+    "source_population": "803 test-neural/test-movement rows",
+    "target_population": "623 train-movement rows",
+    "source_target_sampling": "independent unlabeled random sampling without replacement",
+    "max_samples_per_domain": 96,
+    "subset_seeds": [1001, 1002, 1003, 1004, 1005],
+    "labels_allowed_for_sampling_or_fit": false,
+    "stored_provenance": "source_indices and target_indices in each output JSON"
+  },
+  "solver_protocol": {
+    "solver_seed": 0,
+    "groups": 4,
+    "temperature_path": [0.25, 0.35, 0.5],
+    "entropy_weight": 0.05,
+    "profile": "audit",
+    "support_mode": "full",
+    "warm_start_hard": true,
+    "include_sparse": false
+  },
+  "analysis_protocol": {
+    "evaluation_only_fields": ["after_direction_accuracy", "after_velocity_r2"],
+    "primary_outputs": [
+      "ROCA branch correctness among all data instances",
+      "coverage after material-conflict abstention",
+      "wrong ROCA selections rejected by the marker",
+      "raw per-instance candidate records"
+    ],
+    "interpretation_rule": "No threshold, seed, solver setting, or sample size will be changed after inspecting these five outputs. If no incorrect ROCA selection occurs, report that selective-error calibration remains untested rather than claiming success."
+  }
+}

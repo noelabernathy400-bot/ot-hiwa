@@ -9,6 +9,7 @@ for path in (
     ROOT / "src",
     ROOT / "src" / "cc_hiwa",
     ROOT / "experiments" / "hiwa",
+    ROOT / "experiments" / "pamap2",
     ROOT / "experiments" / "roca",
 ):
     if str(path) not in sys.path:

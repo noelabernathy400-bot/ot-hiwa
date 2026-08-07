@@ -1,0 +1,119 @@
+{
+  "experiment": "panoptic_uncalibrated_cross_view_pose_coordinate_alignment",
+  "scope": "controlled real-data coordinate-frame validation; camera extrinsics and frame pairing are withheld from fitting and used only for final scoring",
+  "truth_usage": "calibration-derived relative rotation and synchronised frame identity are evaluation-only; no action labels, frame IDs, pair IDs, or camera extrinsics enter group learning or OT",
+  "parameters": {
+    "raw_directory": "data\\raw\\panoptic\\171204_pose2",
+    "source_camera": "00_00",
+    "target_camera": "00_01",
+    "max_frames": 200,
+    "seeds": [
+      1701
+    ],
+    "groups": 4,
+    "temperature": 0.5,
+    "entropy_weight": 0.05,
+    "maxiter": 30,
+    "tol": 0.02,
+    "mu": 0.05,
+    "local_gamma": 0.4,
+    "local_iterations": 12,
+    "local_sinkhorn_iterations": 40,
+    "tag": "panoptic_pose2_independent_window_0141_0339_1701"
+  },
+  "fixed_contract": {
+    "support_mode": "full",
+    "consensus_weighting": "transport",
+    "inner_entropy_mode": "fixed",
+    "soft_group_scaling_mode": "global_scalar (rotation-equivariant)",
+    "determinant_component": "+1, because physical camera-coordinate changes are proper rotations",
+    "rotation_structure": "I_19 kron R_3 (one physical camera rotation shared by all joints)"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "scikit_learn": "1.9.0"
+  },
+  "records": [
+    {
+      "seed": 1701,
+      "samples": 199,
+      "feature_dimension": 57,
+      "source_camera": "00_00",
+      "target_camera": "00_01",
+      "source_frame_first": 141,
+      "source_frame_last": 339,
+      "common_scale": 24.44758475197547,
+      "rotation_frobenius_error": 0.005750771336230578,
+      "rotation_frobenius_error_per_dimension": 0.0007617082712919579,
+      "paired_alignment_mse": 1.0540230045181289e-07,
+      "paired_recall_at_1": 1.0,
+      "paired_recall_at_5": 1.0,
+      "unaligned_recall_at_1": 0.010050251256281407,
+      "unaligned_recall_at_5": 0.04020100502512563,
+      "admm_converged": true,
+      "iterations": 21,
+      "final_global_residual": 0.0006883026240084886,
+      "final_primal_residual": 0.01864522715259726,
+      "final_local_marginal_error": 3.469446951953614e-17,
+      "rotation_orthogonality_error": 1.0895911775060587e-15,
+      "transport_objective": 0.13666687486547952,
+      "relative_global_fit_ratio": 1.0000022707477627,
+      "applicability_qualification": {
+        "decision": "accepted_numerically_compatible",
+        "accepted": true,
+        "reasons": [],
+        "final_global_residual": 0.0006883026240084886,
+        "final_primal_residual": 0.01864522715259726,
+        "final_local_marginal_error": 3.469446951953614e-17,
+        "rotation_orthogonality_error": 1.0895911775060587e-15,
+        "relative_global_fit_ratio": 1.0000022707477627,
+        "max_relative_fit_ratio": 1.5,
+        "required_rotation_structure": "repeated_3d_blocks",
+        "observed_rotation_structure": "repeated_3d_blocks",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 54,
+        "initial_loss": 0.21054083142174917,
+        "final_loss": 0.2004025561037256,
+        "mean_entropy": 0.08410499937342558,
+        "normalized_mean_entropy": 0.060668932755005234,
+        "min_group_mass": 0.103319316348444,
+        "max_group_mass": 0.44998829000554696,
+        "group_mass": [
+          0.16876100604955138,
+          0.2779313875964576,
+          0.44998829000554696,
+          0.103319316348444
+        ],
+        "min_prototype_distance": 6.043607836649109,
+        "max_row_sum_error": 2.220446049250313e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": false,
+        "status": 1,
+        "iterations": 53,
+        "initial_loss": 0.21152327147656344,
+        "final_loss": 0.20040250946836632,
+        "mean_entropy": 0.08431380130625883,
+        "normalized_mean_entropy": 0.060819551511518515,
+        "min_group_mass": 0.1034147040987073,
+        "max_group_mass": 0.4498957070227451,
+        "group_mass": [
+          0.2779284084850686,
+          0.4498957070227451,
+          0.1034147040987073,
+          0.16876118039347907
+        ],
+        "min_prototype_distance": 6.042547456725782,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    }
+  ]
+}

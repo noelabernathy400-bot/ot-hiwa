@@ -18,13 +18,37 @@ class SoftGroupResult:
     group_weights: np.ndarray
     feature_mean: np.ndarray
     feature_scale: np.ndarray
-    diagnostics: dict[str, float | int | bool | list[float]]
+    diagnostics: dict[str, float | int | bool | str | list[float]]
 
 
-def _standardize(features: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def _standardize(
+    features: np.ndarray,
+    *,
+    scaling_mode: str = "per_feature",
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Centre features and apply an explicitly chosen scale convention.
+
+    ``per_feature`` is the historical default.  It is useful for generic
+    heterogeneous tabular data, but it is *not* equivariant to an unknown
+    rotation because it rescales coordinate axes independently.
+
+    ``global_scalar`` centres each domain and divides it by one shared RMS
+    scalar.  If ``Y = X R.T`` for an orthogonal ``R``, then the standardized
+    arrays obey the same relation exactly.  Coordinate-alignment experiments
+    must use this mode; otherwise preprocessing invalidates their model.
+    """
     values = np.asarray(features, dtype=float)
+    if values.ndim != 2:
+        raise ValueError("features must be a two-dimensional array")
+    if scaling_mode not in {"per_feature", "global_scalar"}:
+        raise ValueError("scaling_mode must be 'per_feature' or 'global_scalar'")
     mean = values.mean(axis=0, keepdims=True)
-    scale = values.std(axis=0, keepdims=True)
+    if scaling_mode == "per_feature":
+        scale = values.std(axis=0, keepdims=True)
+    else:
+        centred = values - mean
+        scalar = float(np.sqrt(np.mean(centred**2)))
+        scale = np.full((1, values.shape[1]), scalar, dtype=float)
     scale = np.where(scale < EPS, 1.0, scale)
     return (values - mean) / scale, mean, scale
 
@@ -88,6 +112,7 @@ def learn_soft_groups(
     l2_weight: float = 1e-4,
     seed: int = 0,
     maxiter: int = 200,
+    scaling_mode: str = "per_feature",
 ) -> SoftGroupResult:
     values = np.asarray(features, dtype=float)
     if values.ndim != 2:
@@ -95,7 +120,7 @@ def learn_soft_groups(
     if not 1 < n_groups <= values.shape[0]:
         raise ValueError("n_groups must be between 2 and the sample count")
 
-    standardized, mean, scale = _standardize(values)
+    standardized, mean, scale = _standardize(values, scaling_mode=scaling_mode)
     kmeans = KMeans(n_clusters=n_groups, init="k-means++", n_init=10, random_state=seed)
     kmeans.fit(standardized)
     initial = kmeans.cluster_centers_.astype(float)
@@ -131,7 +156,8 @@ def learn_soft_groups(
     )
     nonzero_pairwise = pairwise[np.triu_indices(n_groups, k=1)]
 
-    diagnostics: dict[str, float | int | bool | list[float]] = {
+    diagnostics: dict[str, float | int | bool | str | list[float]] = {
+        "scaling_mode": scaling_mode,
         "success": bool(optimization.success),
         "status": int(optimization.status),
         "iterations": int(optimization.nit),

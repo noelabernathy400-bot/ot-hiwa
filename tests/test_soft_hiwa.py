@@ -17,10 +17,24 @@ from soft_groups import (  # noqa: E402
     build_sparse_group_supports,
     learn_soft_groups,
 )
-from soft_hiwa import SoftHiWA, _closed_form_rotation, _consensus_rotation_input, sinkhorn_weighted  # noqa: E402
+from soft_hiwa import (  # noqa: E402
+    SoftHiWA,
+    _closed_form_rotation,
+    _consensus_rotation_input,
+    _local_sinkhorn_gamma,
+    sinkhorn_weighted,
+)
 
 
 class SoftGroupTests(unittest.TestCase):
+    def test_fixed_inner_entropy_is_independent_of_group_transport_mass(self) -> None:
+        self.assertEqual(_local_sinkhorn_gamma(0.10, 0.50, "fixed"), 0.10)
+        self.assertEqual(_local_sinkhorn_gamma(0.10, 0.01, "fixed"), 0.10)
+        self.assertEqual(
+            _local_sinkhorn_gamma(0.10, 0.50, "legacy_inverse_group_mass"),
+            0.20,
+        )
+
     def test_transport_weighted_consensus_downweights_low_mass_group_pairs(self) -> None:
         local = np.zeros((1, 1, 2, 2))
         local[0, 0] = np.asarray([[1.0, 3.0], [5.0, 7.0]])
@@ -129,6 +143,18 @@ class WeightedTransportTests(unittest.TestCase):
         self.assertAlmostEqual(float(np.linalg.det(negative)), -1.0, places=10)
         np.testing.assert_allclose(positive.T @ positive, np.eye(3), atol=1e-10)
         np.testing.assert_allclose(negative.T @ negative, np.eye(3), atol=1e-10)
+
+    def test_repeated_3d_block_rotation_uses_one_physical_pose_rotation(self) -> None:
+        rng = np.random.default_rng(27)
+        rotation = _closed_form_rotation(
+            rng.normal(size=(57, 57)),
+            determinant_sign=1,
+            rotation_structure="repeated_3d_blocks",
+        )
+        base = rotation[:3, :3]
+        np.testing.assert_allclose(rotation, np.kron(np.eye(19), base), atol=1e-12)
+        np.testing.assert_allclose(base.T @ base, np.eye(3), atol=1e-12)
+        self.assertAlmostEqual(float(np.linalg.det(base)), 1.0, places=10)
 
     def test_invalid_determinant_sign_is_rejected(self) -> None:
         with self.assertRaisesRegex(ValueError, "determinant_sign"):

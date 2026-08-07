@@ -1,0 +1,275 @@
+{
+  "experiment": "fixed_four_group_value_gate_for_adaptive_group_count",
+  "scope": "fixed K=4 is compared only to an oracle true-K control on valid orthogonal synthetic pairs; neither fit receives group labels or pairings",
+  "truth_usage": "true group count, source labels, paired target rows and true rotation are evaluation-only; true K is supplied only to the explicitly labelled oracle control",
+  "parameters": {
+    "seeds": [
+      2101
+    ],
+    "true_groups": [
+      2,
+      4
+    ],
+    "fixed_groups": 4,
+    "samples_per_group": 10,
+    "noise_std": 0.05,
+    "temperature": 0.5,
+    "entropy_weight": 0.05,
+    "maxiter": 100,
+    "tol": 0.02,
+    "mu": 0.05,
+    "local_gamma": 0.4,
+    "local_iterations": 24,
+    "local_sinkhorn_iterations": 60,
+    "max_covariance_spectral_mismatch": 0.05,
+    "min_covariance_identifiability_margin": 0.02,
+    "tag": "gc_hiwa_group_count_identifiability_smoke_2101"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "scikit_learn": "1.9.0"
+  },
+  "records": [
+    {
+      "scenario": "valid_2_group_rotation",
+      "seed": 2101,
+      "true_groups": 2,
+      "oracle_true_group_count_control": false,
+      "learned_groups": 4,
+      "admm_converged": true,
+      "rotation_frobenius_error": 2.8284099955762194,
+      "paired_alignment_mse": 3.5015308629712467,
+      "relative_global_fit_ratio": 1.046511520052199,
+      "covariance_spectral_mismatch": 0.0001500347227534972,
+      "covariance_identifiability_margin": 0.0030260499275009583,
+      "applicability_qualification": {
+        "decision": "abstain",
+        "accepted": false,
+        "reasons": [
+          "rotation_geometry_weakly_identifiable"
+        ],
+        "final_global_residual": 0.0030675369945465224,
+        "final_primal_residual": 0.01930725203273491,
+        "final_local_marginal_error": 5.551115123125783e-17,
+        "rotation_orthogonality_error": 2.783285940005772e-15,
+        "relative_global_fit_ratio": 1.046511520052199,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectral_mismatch": 0.0001500347227534972,
+        "max_covariance_spectral_mismatch": 0.05,
+        "covariance_identifiability_margin": 0.0030260499275009583,
+        "min_covariance_identifiability_margin": 0.02,
+        "required_rotation_structure": null,
+        "observed_rotation_structure": "full",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 46,
+        "initial_loss": 0.00811143321071632,
+        "final_loss": -0.011376995258401796,
+        "mean_entropy": 0.6670205873793679,
+        "normalized_mean_entropy": 0.4811536467915288,
+        "min_group_mass": 0.24100794443617451,
+        "max_group_mass": 0.25898908683793154,
+        "group_mass": [
+          0.24100794443617451,
+          0.2543098460551073,
+          0.24569312267078652,
+          0.25898908683793154
+        ],
+        "min_prototype_distance": 1.3787248311907578,
+        "max_row_sum_error": 2.220446049250313e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 55,
+        "initial_loss": 0.00896952395417268,
+        "final_loss": -0.007930344940302217,
+        "mean_entropy": 0.6684507605734796,
+        "normalized_mean_entropy": 0.48218529867890747,
+        "min_group_mass": 0.23440495385635907,
+        "max_group_mass": 0.2655817340604249,
+        "group_mass": [
+          0.24500578856530336,
+          0.23440495385635907,
+          0.2550075235179126,
+          0.2655817340604249
+        ],
+        "min_prototype_distance": 1.3769595216205603,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    },
+    {
+      "scenario": "valid_2_group_rotation",
+      "seed": 2101,
+      "true_groups": 2,
+      "oracle_true_group_count_control": true,
+      "learned_groups": 2,
+      "admm_converged": true,
+      "rotation_frobenius_error": 0.015856714074248705,
+      "paired_alignment_mse": 0.002664387596611919,
+      "relative_global_fit_ratio": 1.0043881014712337,
+      "covariance_spectral_mismatch": 0.0001500347227534972,
+      "covariance_identifiability_margin": 0.0030260499275009583,
+      "applicability_qualification": {
+        "decision": "abstain",
+        "accepted": false,
+        "reasons": [
+          "rotation_geometry_weakly_identifiable"
+        ],
+        "final_global_residual": 6.0396915299688055e-05,
+        "final_primal_residual": 0.01764023759730259,
+        "final_local_marginal_error": 4.163336342344337e-17,
+        "rotation_orthogonality_error": 6.645188383534717e-16,
+        "relative_global_fit_ratio": 1.0043881014712337,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectral_mismatch": 0.0001500347227534972,
+        "max_covariance_spectral_mismatch": 0.05,
+        "covariance_identifiability_margin": 0.0030260499275009583,
+        "min_covariance_identifiability_margin": 0.02,
+        "required_rotation_structure": null,
+        "observed_rotation_structure": "full",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 1,
+        "initial_loss": 0.03145883272998536,
+        "final_loss": 0.03145879430995588,
+        "mean_entropy": 0.00031371141305212337,
+        "normalized_mean_entropy": 0.0004525898998805676,
+        "min_group_mass": 0.49999789453893123,
+        "max_group_mass": 0.5000021054610688,
+        "group_mass": [
+          0.5000021054610688,
+          0.49999789453893123
+        ],
+        "min_prototype_distance": 3.4086015493623383,
+        "max_row_sum_error": 2.220446049250313e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 1,
+        "initial_loss": 0.034241854904615364,
+        "final_loss": 0.03424179334619543,
+        "mean_entropy": 0.00041363257146006215,
+        "normalized_mean_entropy": 0.0005967456595955815,
+        "min_group_mass": 0.4999857541317576,
+        "max_group_mass": 0.5000142458682424,
+        "group_mass": [
+          0.5000142458682424,
+          0.4999857541317576
+        ],
+        "min_prototype_distance": 3.4034891895537487,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    },
+    {
+      "scenario": "valid_4_group_rotation",
+      "seed": 2101,
+      "true_groups": 4,
+      "oracle_true_group_count_control": true,
+      "learned_groups": 4,
+      "admm_converged": true,
+      "rotation_frobenius_error": 0.005917462897737946,
+      "paired_alignment_mse": 0.002302996301533819,
+      "relative_global_fit_ratio": 1.0678292496837645,
+      "covariance_spectral_mismatch": 0.004218508080009665,
+      "covariance_identifiability_margin": 0.38286039735430083,
+      "applicability_qualification": {
+        "decision": "accepted_numerically_compatible",
+        "accepted": true,
+        "reasons": [],
+        "final_global_residual": 2.6910557831348925e-05,
+        "final_primal_residual": 0.018409025970289775,
+        "final_local_marginal_error": 9.752291114747264e-05,
+        "rotation_orthogonality_error": 1.2646032772364864e-15,
+        "relative_global_fit_ratio": 1.0678292496837645,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectral_mismatch": 0.004218508080009665,
+        "max_covariance_spectral_mismatch": 0.05,
+        "covariance_identifiability_margin": 0.38286039735430083,
+        "min_covariance_identifiability_margin": 0.02,
+        "required_rotation_structure": null,
+        "observed_rotation_structure": "full",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      },
+      "source_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 5,
+        "initial_loss": 0.006226367692010696,
+        "final_loss": 0.0035207740294436723,
+        "mean_entropy": 0.17230900049802567,
+        "normalized_mean_entropy": 0.12429467025951778,
+        "min_group_mass": 0.23280069537181008,
+        "max_group_mass": 0.2665921178303638,
+        "group_mass": [
+          0.23280069537181008,
+          0.23497856204555925,
+          0.2665921178303638,
+          0.2656286247522669
+        ],
+        "min_prototype_distance": 1.8794484059160976,
+        "max_row_sum_error": 3.3306690738754696e-16
+      },
+      "target_soft_group_diagnostics": {
+        "scaling_mode": "global_scalar",
+        "success": true,
+        "status": 0,
+        "iterations": 7,
+        "initial_loss": 0.008044967982461843,
+        "final_loss": 0.0049858254911979445,
+        "mean_entropy": 0.17701335620962394,
+        "normalized_mean_entropy": 0.12768814558736802,
+        "min_group_mass": 0.23272999009908882,
+        "max_group_mass": 0.26743413235489816,
+        "group_mass": [
+          0.23272999009908882,
+          0.26743413235489816,
+          0.26659394763552774,
+          0.23324192991048526
+        ],
+        "min_prototype_distance": 1.87382757572378,
+        "max_row_sum_error": 2.220446049250313e-16
+      }
+    }
+  ],
+  "summary": [
+    {
+      "true_groups": 2,
+      "learned_groups": 2,
+      "runs": 1,
+      "accepted_count": 0,
+      "rotation_frobenius_error_mean": 0.015856714074248705,
+      "paired_alignment_mse_mean": 0.002664387596611919
+    },
+    {
+      "true_groups": 2,
+      "learned_groups": 4,
+      "runs": 1,
+      "accepted_count": 0,
+      "rotation_frobenius_error_mean": 2.8284099955762194,
+      "paired_alignment_mse_mean": 3.5015308629712467
+    },
+    {
+      "true_groups": 4,
+      "learned_groups": 4,
+      "runs": 1,
+      "accepted_count": 1,
+      "rotation_frobenius_error_mean": 0.005917462897737946,
+      "paired_alignment_mse_mean": 0.002302996301533819
+    }
+  ]
+}

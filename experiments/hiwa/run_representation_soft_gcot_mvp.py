@@ -91,7 +91,11 @@ def main() -> None:
     ensure_output_dirs()
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
-    source, target, _, _, evaluation = _problem(args.max_samples)
+    # `_problem` also returns the frozen sampling record.  The representation
+    # experiment does not alter that split, but must accept the current
+    # baseline contract so its result remains reproducible after subset support
+    # was added to the baseline runner.
+    source, target, _, _, evaluation, sampling = _problem(args.max_samples)
     solver_kwargs = _solver_kwargs(args.seed)
     source_input, source_scaler = _standardize(source) if args.normalize_input else (source, None)
     target_input, target_scaler = _standardize(target) if args.normalize_input else (target, None)
@@ -144,6 +148,7 @@ def main() -> None:
             "encoder_input_standardized": bool(args.normalize_input),
             "source_scaler": source_scaler,
             "target_scaler": target_scaler,
+            "sampling": sampling,
         },
         "evaluation": {
             "unaligned_direction_accuracy": _direction_accuracy(source, target, evaluation),

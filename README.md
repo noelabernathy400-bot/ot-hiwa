@@ -1,23 +1,40 @@
 # OT-HiWA
 
-The current primary line is **TACO-faithful Soft-GCOT HiWA** for MiHiA macaque neural--movement alignment: learned soft prototypes, weighted group empirical measures, group transport $P$, one weighted sample transport $Q_{ij}$ per group pair, and the original HiWA local/global orthogonal ADMM consensus.
+## Current research line
 
-## Priority
+The active, evidence-backed line is **GC-HiWA v2: applicability-aware unsupervised coordinate alignment**. It attempts to recover a declared structured orthogonal coordinate map only when two unpaired domains share geometric group structure; otherwise it abstains with explicit numerical and geometric reasons. Its primary application is uncalibrated cross-device / cross-view 3-D pose coordinates, using the structured family \(I_J\otimes SO(3)\), rather than an unrestricted rotation in \(O(3J)\).
 
-1. Reproduce and audit TACO-faithful Soft-GCOT HiWA.
-2. Test ROCA only on that unchanged baseline.
-3. Retain Joint-Prototype, CC-HiWA, PBMC, and GI-CC-HiWA as exploratory extensions.
+What is currently supported is deliberately narrow:
 
-## Quick start
+- known-truth synthetic recovery and explicit abstention boundaries;
+- controlled Panoptic multi-view pose recovery with withheld camera calibration and shuffled target frames;
+- a label-free ROCA branch-selection rule that abstains when its determinant branches are not sufficiently qualified.
+
+This repository does **not** currently support the claim that GC-HiWA universally improves cross-domain transfer or real cross-device semantic action recognition. The pending semantic-action validation is documented and frozen in `docs/research/真实语义动作验证的数据接入与冻结协议_2026-07-25.md`.
+
+The canonical mathematical contract and evidence record are:
+
+- `docs/research/GC-HiWA_v2_数学合同、适用性诊断与Panoptic验证_2026-07-23.md`
+- `Writing/GC-HiWA_v2_论文草稿.tex`（已编译 PDF：`Writing/GC-HiWA_v2_final.pdf`）
+- `docs/research/GC-HiWA_v2_完整研究笔记_Obsidian.md`
+- `Writing/终稿审查清单.md`
+- `docs/GC-HiWA_v2_仓库说明与复现指南.md`（仓库结构、运行入口与证据边界）
+
+## Reproducing the current verified checks
 
 ```powershell
 pip install -r requirements.txt
 $env:PYTHONPATH = "$PWD\src;$PWD\src\cc_hiwa;$PWD\experiments\hiwa;$PWD\experiments\roca"
 python -m pytest tests -q
-python experiments/hiwa/run_taco_faithful_baseline.py --seeds 50 51 52 53 54 --tag audit
+python experiments/synthetic/verify_gc_hiwa_v2_evidence.py
+python experiments/synthetic/run_gc_hiwa_boundary_benchmark.py --seeds 2201 2202 2203 2204 2205 --scenarios isospectral_nonorthogonal --methods soft_transport_oracle_component soft_roca --tag local_isospectral_audit
 ```
 
-The runner compares Hard HiWA, Soft-GCOT HiWA, its declared sparse approximation, and Soft-GCOT HiWA + ROCA. The default `audit` profile uses a fixed numerical budget and a common global-plus-primal ADMM stopping rule. It writes JSON plus accuracy and convergence figures. The deterministic 96-by-96 neural subset is a bounded audit subset; use `--max-samples 0` for the full data at substantially greater cost.
+The synthetic runner uses no labels, true rotation, pairing, or deformation during fitting; these quantities are evaluation-only. In the isospectral nonorthogonal condition, the source and target covariance spectra are deliberately identical, yet the method must abstain through the combined fit, convergence, and ROCA checks. The Panoptic protocol and its exact commands are recorded in the canonical mathematical contract above because the underlying data are not bundled.
+
+## Historical TACO / MiHiA line
+
+The remaining runner description and method table describe an earlier neural--movement development line. They remain useful as historical code and negative applicability evidence, but they are not the current primary claim and must not be cited as independent validation of GC-HiWA v2.
 
 Successful mainline runs automatically commit and push only their generated JSON and figures. Use `--no-sync-results` only for a local dry run; automatic sync refuses to proceed if unrelated changes are already staged.
 

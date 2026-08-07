@@ -66,6 +66,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-support-factor", type=float, default=1.5)
     parser.add_argument("--max-samples", type=int, default=96, help="Deterministic per-domain neural smoke subset; 0 uses all samples.")
     parser.add_argument(
+        "--subset-seed",
+        type=int,
+        default=None,
+        help=(
+            "Draw an unlabeled, without-replacement source/target subset with this seed. "
+            "The default keeps the historical evenly spaced deterministic subset."
+        ),
+    )
+    parser.add_argument(
         "--include-sparse",
         action=argparse.BooleanOptionalAction,
         default=True,
@@ -92,13 +101,37 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def _problem(max_samples: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, dict]:
+def _subsample_indices(
+    n_source: int,
+    n_target: int,
+    max_samples: int,
+    subset_seed: int | None,
+) -> tuple[np.ndarray, np.ndarray, dict]:
+    """Choose traceable unlabeled subsets without changing the legacy default."""
+    if max_samples <= 0:
+        source_index = np.arange(n_source)
+        target_index = np.arange(n_target)
+        return source_index, target_index, {"mode": "all_samples", "seed": None}
+    source_count = min(max_samples, n_source)
+    target_count = min(max_samples, n_target)
+    if subset_seed is None:
+        source_index = np.linspace(0, n_source - 1, source_count, dtype=int)
+        target_index = np.linspace(0, n_target - 1, target_count, dtype=int)
+        return source_index, target_index, {"mode": "legacy_evenly_spaced", "seed": None}
+    rng = np.random.default_rng(subset_seed)
+    source_index = np.sort(rng.choice(n_source, size=source_count, replace=False))
+    target_index = np.sort(rng.choice(n_target, size=target_count, replace=False))
+    return source_index, target_index, {"mode": "unlabeled_random_without_replacement", "seed": int(subset_seed)}
+
+
+def _problem(max_samples: int, subset_seed: int | None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, dict, dict]:
     data = load_demo()
     neural_all = FactorAnalysis(n_components=3, random_state=0).fit_transform(
         remove_constant_columns(data["test_neural"])
     )
-    source_index = np.arange(neural_all.shape[0]) if max_samples <= 0 else np.linspace(0, neural_all.shape[0] - 1, min(max_samples, neural_all.shape[0]), dtype=int)
-    target_index = np.arange(data["train_movement"].shape[0]) if max_samples <= 0 else np.linspace(0, data["train_movement"].shape[0] - 1, min(max_samples, data["train_movement"].shape[0]), dtype=int)
+    source_index, target_index, sampling = _subsample_indices(
+        neural_all.shape[0], data["train_movement"].shape[0], max_samples, subset_seed
+    )
     neural = neural_all[source_index]
     movement_xy = data["train_movement"][target_index]
     movement = movement_to_3d(movement_xy)
@@ -109,7 +142,15 @@ def _problem(max_samples: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.n
         "neural_labels": data["test_labels"][source_index],
         "movement_labels": data["train_labels"][target_index],
     }
-    return neural, movement, target_transform, oracle_rotation, evaluation
+    sampling.update(
+        {
+            "source_population_size": int(neural_all.shape[0]),
+            "target_population_size": int(data["train_movement"].shape[0]),
+            "source_indices": source_index.tolist(),
+            "target_indices": target_index.tolist(),
+        }
+    )
+    return neural, movement, target_transform, oracle_rotation, evaluation, sampling
 
 
 def _simplex_diagnostics(values: np.ndarray, assignments: np.ndarray) -> dict:
@@ -289,7 +330,9 @@ def main() -> None:
     if args.groups != 4:
         raise ValueError("ROCA baseline requires exactly four groups in 3D")
     ensure_output_dirs()
-    neural, movement, target_transform, oracle_rotation, evaluation = _problem(args.max_samples)
+    neural, movement, target_transform, oracle_rotation, evaluation, sampling = _problem(
+        args.max_samples, args.subset_seed
+    )
     records: list[dict] = []
     roca: list[dict] = []
     stage_records: list[dict] = []
@@ -338,6 +381,7 @@ def main() -> None:
         "label_usage": "labels are used only for final direction-accuracy and movement-R2 evaluation; never for fitting, branch selection, or hyperparameter selection",
         "frozen_configuration": {"representative_guidance_weight": 0.0, "representative_rotation_weight": 0.0, "component_conditioning_weight": 0.0, "rotation_anchor_weight": 0.0, "joint_prototypes": False},
         "parameters": vars(args),
+        "sampling": sampling,
         "stage_results": stage_records,
         "environment": {"python": platform.python_version(), "numpy": np.__version__, "scipy": scipy.__version__, "scikit_learn": sklearn.__version__},
         "convergence_rule": "A run is comparable only when both global and primal ADMM residuals are at or below tol; dual residual and objective are diagnostic traces.",

@@ -30,13 +30,17 @@ Thumbs.db
 tmp/
 *.tmp
 
-# Large data
+# Raw and large data (preserved locally; never versioned)
+data/raw/
 *.h5ad
 *.h5
 data/pbmc/
 data/bearing/
-data/raw/pamap2/
-data/raw/indy_loco/
+
+# Reproducible build products and historical export bundles
+Writing/build/
+deliverables/
+experiments/figures/
 
 # Archives
 *.7z

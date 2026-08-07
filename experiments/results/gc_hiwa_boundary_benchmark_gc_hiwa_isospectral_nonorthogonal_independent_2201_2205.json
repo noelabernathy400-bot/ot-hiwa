@@ -1,0 +1,1219 @@
+{
+  "experiment": "gc_hiwa_fixed_core_known_truth_boundary_benchmark",
+  "scope": "fixed adapters, rotation-equivariant soft groups, full-support hierarchical OT, ADMM consensus, and ROCA; learned encoders and joint prototype updates are excluded",
+  "truth_usage": "truth rotation, paired rows, and group labels are withheld from fitting and used only after fitting for scoring",
+  "oracle_component_control": "oracle-component controls receive only the true determinant component to isolate group and consensus recovery; soft_roca is the label-free branch-selection method",
+  "parameters": {
+    "seeds": [
+      2201,
+      2202,
+      2203,
+      2204,
+      2205
+    ],
+    "scenarios": [
+      "isospectral_nonorthogonal"
+    ],
+    "methods": [
+      "soft_transport_oracle_component",
+      "soft_roca"
+    ],
+    "groups": 4,
+    "temperature": 0.5,
+    "entropy_weight": 0.05,
+    "group_scaling_mode": "global_scalar",
+    "samples_per_group": 8,
+    "maxiter": 100,
+    "tol": 0.02,
+    "mu": 0.05,
+    "local_gamma": 0.4,
+    "group_sinkhorn_iterations": 200,
+    "local_iterations": 24,
+    "local_sinkhorn_iterations": 60,
+    "max_covariance_spectral_mismatch": 0.05,
+    "min_covariance_identifiability_margin": 0.02,
+    "roca_min_relative_objective_gap": 0.05,
+    "tag": "gc_hiwa_isospectral_nonorthogonal_independent_2201_2205"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "scikit_learn": "1.9.0"
+  },
+  "records": [
+    {
+      "scenario": "isospectral_nonorthogonal",
+      "seed": 2201,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.0,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0,
+        "cross_modal_target": false,
+        "single_rotation_truth_exists": false
+      },
+      "group_learning": {
+        "source": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.007289366365483279,
+          "final_loss": 0.007268360784506279,
+          "mean_entropy": 0.03340245947006722,
+          "normalized_mean_entropy": 0.024094781315480283,
+          "min_group_mass": 0.24648921545871338,
+          "max_group_mass": 0.2522277016783732,
+          "group_mass": [
+            0.2497315259992165,
+            0.2522277016783732,
+            0.25155155686369696,
+            0.24648921545871338
+          ],
+          "min_prototype_distance": 2.4659661431039557,
+          "max_row_sum_error": 3.3306690738754696e-16
+        },
+        "target": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.00906430061078096,
+          "final_loss": 0.009048926691433043,
+          "mean_entropy": 0.03389459331603774,
+          "normalized_mean_entropy": 0.024449780844997927,
+          "min_group_mass": 0.24748045864022325,
+          "max_group_mass": 0.25175089005658546,
+          "group_mass": [
+            0.25068749583564354,
+            0.25175089005658546,
+            0.2500811554675478,
+            0.24748045864022325
+          ],
+          "min_prototype_distance": 2.4395245323884067,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_transport_oracle_component",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": null,
+      "single_rotation_truth_exists": false,
+      "paired_alignment_mse": 5.230781639334771,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": false,
+      "iterations": 100,
+      "final_global_residual": 0.0002078287195408476,
+      "final_primal_residual": 0.04604202916565337,
+      "final_dual_residual": 2.3997993434448722e-05,
+      "final_local_marginal_error": 1.201185531075899e-08,
+      "group_row_marginal_error": 1.48947520983711e-11,
+      "group_column_marginal_error": 2.7755575615628914e-17,
+      "rotation_orthogonality_error": 9.465050878987628e-16,
+      "transport_objective": 0.2425370706092343,
+      "relative_global_fit_ratio": 5.246785775449463,
+      "covariance_spectral_mismatch": 4.277344357478553e-16,
+      "covariance_identifiability_margin": 0.2454971346757768,
+      "consensus_weighting": "transport",
+      "inner_entropy_mode": "fixed",
+      "applicability_qualification": {
+        "decision": "abstain",
+        "accepted": false,
+        "reasons": [
+          "admm_not_converged",
+          "single_rotation_fit_excessive"
+        ],
+        "final_global_residual": 0.0002078287195408476,
+        "final_primal_residual": 0.04604202916565337,
+        "final_local_marginal_error": 1.201185531075899e-08,
+        "rotation_orthogonality_error": 9.465050878987628e-16,
+        "relative_global_fit_ratio": 5.246785775449463,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectral_mismatch": 4.277344357478553e-16,
+        "max_covariance_spectral_mismatch": 0.05,
+        "covariance_identifiability_margin": 0.2454971346757768,
+        "min_covariance_identifiability_margin": 0.02,
+        "required_rotation_structure": null,
+        "observed_rotation_structure": "full",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      }
+    },
+    {
+      "scenario": "isospectral_nonorthogonal",
+      "seed": 2201,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.0,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0,
+        "cross_modal_target": false,
+        "single_rotation_truth_exists": false
+      },
+      "group_learning": {
+        "source": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.007289366365483279,
+          "final_loss": 0.007268360784506279,
+          "mean_entropy": 0.03340245947006722,
+          "normalized_mean_entropy": 0.024094781315480283,
+          "min_group_mass": 0.24648921545871338,
+          "max_group_mass": 0.2522277016783732,
+          "group_mass": [
+            0.2497315259992165,
+            0.2522277016783732,
+            0.25155155686369696,
+            0.24648921545871338
+          ],
+          "min_prototype_distance": 2.4659661431039557,
+          "max_row_sum_error": 3.3306690738754696e-16
+        },
+        "target": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.00906430061078096,
+          "final_loss": 0.009048926691433043,
+          "mean_entropy": 0.03389459331603774,
+          "normalized_mean_entropy": 0.024449780844997927,
+          "min_group_mass": 0.24748045864022325,
+          "max_group_mass": 0.25175089005658546,
+          "group_mass": [
+            0.25068749583564354,
+            0.25175089005658546,
+            0.2500811554675478,
+            0.24748045864022325
+          ],
+          "min_prototype_distance": 2.4395245323884067,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_roca_abstained",
+      "roca_selected_correct_component": false,
+      "roca_qualification": {
+        "selected_sign": null,
+        "decision": "no_qualified_candidate",
+        "max_local_marginal_error": 0.001,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectrum_compatible": true,
+        "covariance_spectral_mismatch": 4.277344357478553e-16,
+        "rotation_geometry_identifiable": true,
+        "covariance_identifiability_margin": 0.2454971346757768,
+        "min_relative_objective_gap": 0.05,
+        "relative_objective_gap": null,
+        "candidates": [
+          {
+            "determinant_sign": -1,
+            "admm_converged": false,
+            "final_local_marginal_error": 2.2264316048442763e-05,
+            "transport_objective": 0.374513742996219,
+            "relative_global_fit_ratio": 8.378803725205907,
+            "covariance_spectrum_compatible": true,
+            "rotation_geometry_identifiable": true,
+            "orientation": {
+              "orientation_sign": -1,
+              "volume_product_margin": 224.3232386273233,
+              "source_volume": -14.976355322427997,
+              "target_volume": 14.978493351542326,
+              "target_order": [
+                0,
+                1,
+                2,
+                3
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          },
+          {
+            "determinant_sign": 1,
+            "admm_converged": false,
+            "final_local_marginal_error": 1.201185531075899e-08,
+            "transport_objective": 0.2425370706092343,
+            "relative_global_fit_ratio": 5.246785775449463,
+            "covariance_spectrum_compatible": true,
+            "rotation_geometry_identifiable": true,
+            "orientation": {
+              "orientation_sign": 1,
+              "volume_product_margin": 224.3232386273233,
+              "source_volume": -14.976355322427997,
+              "target_volume": -14.978493351542326,
+              "target_order": [
+                0,
+                3,
+                2,
+                1
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          }
+        ]
+      },
+      "roca_candidates": [
+        {
+          "determinant_sign": -1,
+          "admm_converged": false,
+          "rotation_frobenius_error": null,
+          "transport_objective": 0.374513742996219
+        },
+        {
+          "determinant_sign": 1,
+          "admm_converged": false,
+          "rotation_frobenius_error": null,
+          "transport_objective": 0.2425370706092343
+        }
+      ]
+    },
+    {
+      "scenario": "isospectral_nonorthogonal",
+      "seed": 2202,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.0,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0,
+        "cross_modal_target": false,
+        "single_rotation_truth_exists": false
+      },
+      "group_learning": {
+        "source": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 3,
+          "initial_loss": 0.009559401384246933,
+          "final_loss": 0.009529699832154844,
+          "mean_entropy": 0.036774372956287,
+          "normalized_mean_entropy": 0.026527102747918235,
+          "min_group_mass": 0.24607277898725266,
+          "max_group_mass": 0.2527267928943583,
+          "group_mass": [
+            0.2495339254632671,
+            0.24607277898725266,
+            0.25166650265512175,
+            0.2527267928943583
+          ],
+          "min_prototype_distance": 2.4334061036872545,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 5,
+          "initial_loss": 0.011973596880110538,
+          "final_loss": 0.010666121894852724,
+          "mean_entropy": 0.10118526353468195,
+          "normalized_mean_entropy": 0.07298973895626426,
+          "min_group_mass": 0.2348708356073181,
+          "max_group_mass": 0.2644337991267081,
+          "group_mass": [
+            0.2348708356073181,
+            0.25020294824011574,
+            0.2504924170258579,
+            0.2644337991267081
+          ],
+          "min_prototype_distance": 1.862163858601345,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_transport_oracle_component",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": null,
+      "single_rotation_truth_exists": false,
+      "paired_alignment_mse": 0.3058555731168644,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": false,
+      "iterations": 100,
+      "final_global_residual": 0.00044270279437369443,
+      "final_primal_residual": 0.042310664627905635,
+      "final_dual_residual": 5.111891550053041e-05,
+      "final_local_marginal_error": 7.574137270149883e-08,
+      "group_row_marginal_error": 4.172516182565644e-08,
+      "group_column_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 8.77366254658473e-16,
+      "transport_objective": 0.4190062704725356,
+      "relative_global_fit_ratio": 6.264867367043658,
+      "covariance_spectral_mismatch": 1.155239298701436e-15,
+      "covariance_identifiability_margin": 0.237644031577298,
+      "consensus_weighting": "transport",
+      "inner_entropy_mode": "fixed",
+      "applicability_qualification": {
+        "decision": "abstain",
+        "accepted": false,
+        "reasons": [
+          "admm_not_converged",
+          "single_rotation_fit_excessive"
+        ],
+        "final_global_residual": 0.00044270279437369443,
+        "final_primal_residual": 0.042310664627905635,
+        "final_local_marginal_error": 7.574137270149883e-08,
+        "rotation_orthogonality_error": 8.77366254658473e-16,
+        "relative_global_fit_ratio": 6.264867367043658,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectral_mismatch": 1.155239298701436e-15,
+        "max_covariance_spectral_mismatch": 0.05,
+        "covariance_identifiability_margin": 0.237644031577298,
+        "min_covariance_identifiability_margin": 0.02,
+        "required_rotation_structure": null,
+        "observed_rotation_structure": "full",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      }
+    },
+    {
+      "scenario": "isospectral_nonorthogonal",
+      "seed": 2202,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.0,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0,
+        "cross_modal_target": false,
+        "single_rotation_truth_exists": false
+      },
+      "group_learning": {
+        "source": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 3,
+          "initial_loss": 0.009559401384246933,
+          "final_loss": 0.009529699832154844,
+          "mean_entropy": 0.036774372956287,
+          "normalized_mean_entropy": 0.026527102747918235,
+          "min_group_mass": 0.24607277898725266,
+          "max_group_mass": 0.2527267928943583,
+          "group_mass": [
+            0.2495339254632671,
+            0.24607277898725266,
+            0.25166650265512175,
+            0.2527267928943583
+          ],
+          "min_prototype_distance": 2.4334061036872545,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 5,
+          "initial_loss": 0.011973596880110538,
+          "final_loss": 0.010666121894852724,
+          "mean_entropy": 0.10118526353468195,
+          "normalized_mean_entropy": 0.07298973895626426,
+          "min_group_mass": 0.2348708356073181,
+          "max_group_mass": 0.2644337991267081,
+          "group_mass": [
+            0.2348708356073181,
+            0.25020294824011574,
+            0.2504924170258579,
+            0.2644337991267081
+          ],
+          "min_prototype_distance": 1.862163858601345,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_roca_abstained",
+      "roca_selected_correct_component": false,
+      "roca_qualification": {
+        "selected_sign": null,
+        "decision": "no_qualified_candidate",
+        "max_local_marginal_error": 0.001,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectrum_compatible": true,
+        "covariance_spectral_mismatch": 1.155239298701436e-15,
+        "rotation_geometry_identifiable": true,
+        "covariance_identifiability_margin": 0.237644031577298,
+        "min_relative_objective_gap": 0.05,
+        "relative_objective_gap": null,
+        "candidates": [
+          {
+            "determinant_sign": -1,
+            "admm_converged": false,
+            "final_local_marginal_error": 8.443334585775983e-07,
+            "transport_objective": 0.37415667253374285,
+            "relative_global_fit_ratio": 5.432857590411549,
+            "covariance_spectrum_compatible": true,
+            "rotation_geometry_identifiable": true,
+            "orientation": {
+              "orientation_sign": -1,
+              "volume_product_margin": 196.0577862190765,
+              "source_volume": 14.567200405910281,
+              "target_volume": -13.458851444065456,
+              "target_order": [
+                1,
+                0,
+                2,
+                3
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          },
+          {
+            "determinant_sign": 1,
+            "admm_converged": false,
+            "final_local_marginal_error": 7.574137270149883e-08,
+            "transport_objective": 0.4190062704725356,
+            "relative_global_fit_ratio": 6.264867367043658,
+            "covariance_spectrum_compatible": true,
+            "rotation_geometry_identifiable": true,
+            "orientation": {
+              "orientation_sign": 1,
+              "volume_product_margin": 196.0577862190763,
+              "source_volume": 14.567200405910281,
+              "target_volume": 13.458851444065443,
+              "target_order": [
+                2,
+                0,
+                1,
+                3
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          }
+        ]
+      },
+      "roca_candidates": [
+        {
+          "determinant_sign": -1,
+          "admm_converged": false,
+          "rotation_frobenius_error": null,
+          "transport_objective": 0.37415667253374285
+        },
+        {
+          "determinant_sign": 1,
+          "admm_converged": false,
+          "rotation_frobenius_error": null,
+          "transport_objective": 0.4190062704725356
+        }
+      ]
+    },
+    {
+      "scenario": "isospectral_nonorthogonal",
+      "seed": 2203,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.0,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0,
+        "cross_modal_target": false,
+        "single_rotation_truth_exists": false
+      },
+      "group_learning": {
+        "source": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 3,
+          "initial_loss": 0.008678797410487703,
+          "final_loss": 0.00864841478608195,
+          "mean_entropy": 0.03318016848709565,
+          "normalized_mean_entropy": 0.023934432266096577,
+          "min_group_mass": 0.24670493203436503,
+          "max_group_mass": 0.2525692573502812,
+          "group_mass": [
+            0.2525692573502812,
+            0.251040857200719,
+            0.2496849534146349,
+            0.24670493203436503
+          ],
+          "min_prototype_distance": 2.3728117226774206,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.009184261726013096,
+          "final_loss": 0.0091479662565348,
+          "mean_entropy": 0.04613770017751503,
+          "normalized_mean_entropy": 0.03328131562206139,
+          "min_group_mass": 0.24556259362792615,
+          "max_group_mass": 0.2521617244270983,
+          "group_mass": [
+            0.24556259362792615,
+            0.250373630201466,
+            0.2521617244270983,
+            0.2519020517435096
+          ],
+          "min_prototype_distance": 2.246889860838893,
+          "max_row_sum_error": 4.440892098500626e-16
+        }
+      },
+      "method": "soft_transport_oracle_component",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": null,
+      "single_rotation_truth_exists": false,
+      "paired_alignment_mse": 5.507278613086927,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": false,
+      "iterations": 100,
+      "final_global_residual": 0.00023594224798240485,
+      "final_primal_residual": 0.055333362748818005,
+      "final_dual_residual": 2.7244264077169378e-05,
+      "final_local_marginal_error": 5.538635424829643e-05,
+      "group_row_marginal_error": 2.5250357360562248e-12,
+      "group_column_marginal_error": 2.7755575615628914e-17,
+      "rotation_orthogonality_error": 1.2721611008151175e-15,
+      "transport_objective": 0.23716510807243335,
+      "relative_global_fit_ratio": 4.669607154314322,
+      "covariance_spectral_mismatch": 1.0389133288243004e-15,
+      "covariance_identifiability_margin": 0.2239046918774684,
+      "consensus_weighting": "transport",
+      "inner_entropy_mode": "fixed",
+      "applicability_qualification": {
+        "decision": "abstain",
+        "accepted": false,
+        "reasons": [
+          "admm_not_converged",
+          "single_rotation_fit_excessive"
+        ],
+        "final_global_residual": 0.00023594224798240485,
+        "final_primal_residual": 0.055333362748818005,
+        "final_local_marginal_error": 5.538635424829643e-05,
+        "rotation_orthogonality_error": 1.2721611008151175e-15,
+        "relative_global_fit_ratio": 4.669607154314322,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectral_mismatch": 1.0389133288243004e-15,
+        "max_covariance_spectral_mismatch": 0.05,
+        "covariance_identifiability_margin": 0.2239046918774684,
+        "min_covariance_identifiability_margin": 0.02,
+        "required_rotation_structure": null,
+        "observed_rotation_structure": "full",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      }
+    },
+    {
+      "scenario": "isospectral_nonorthogonal",
+      "seed": 2203,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.0,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0,
+        "cross_modal_target": false,
+        "single_rotation_truth_exists": false
+      },
+      "group_learning": {
+        "source": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 3,
+          "initial_loss": 0.008678797410487703,
+          "final_loss": 0.00864841478608195,
+          "mean_entropy": 0.03318016848709565,
+          "normalized_mean_entropy": 0.023934432266096577,
+          "min_group_mass": 0.24670493203436503,
+          "max_group_mass": 0.2525692573502812,
+          "group_mass": [
+            0.2525692573502812,
+            0.251040857200719,
+            0.2496849534146349,
+            0.24670493203436503
+          ],
+          "min_prototype_distance": 2.3728117226774206,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 2,
+          "initial_loss": 0.009184261726013096,
+          "final_loss": 0.0091479662565348,
+          "mean_entropy": 0.04613770017751503,
+          "normalized_mean_entropy": 0.03328131562206139,
+          "min_group_mass": 0.24556259362792615,
+          "max_group_mass": 0.2521617244270983,
+          "group_mass": [
+            0.24556259362792615,
+            0.250373630201466,
+            0.2521617244270983,
+            0.2519020517435096
+          ],
+          "min_prototype_distance": 2.246889860838893,
+          "max_row_sum_error": 4.440892098500626e-16
+        }
+      },
+      "method": "soft_roca_abstained",
+      "roca_selected_correct_component": false,
+      "roca_qualification": {
+        "selected_sign": null,
+        "decision": "no_qualified_candidate",
+        "max_local_marginal_error": 0.001,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectrum_compatible": true,
+        "covariance_spectral_mismatch": 1.0389133288243004e-15,
+        "rotation_geometry_identifiable": true,
+        "covariance_identifiability_margin": 0.2239046918774684,
+        "min_relative_objective_gap": 0.05,
+        "relative_objective_gap": null,
+        "candidates": [
+          {
+            "determinant_sign": -1,
+            "admm_converged": false,
+            "final_local_marginal_error": 5.008903836947916e-09,
+            "transport_objective": 0.3066654821267932,
+            "relative_global_fit_ratio": 5.961626068855726,
+            "covariance_spectrum_compatible": true,
+            "rotation_geometry_identifiable": true,
+            "orientation": {
+              "orientation_sign": -1,
+              "volume_product_margin": 216.89395508644597,
+              "source_volume": -14.800450589195027,
+              "target_volume": 14.65455080433754,
+              "target_order": [
+                0,
+                1,
+                3,
+                2
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          },
+          {
+            "determinant_sign": 1,
+            "admm_converged": false,
+            "final_local_marginal_error": 5.538635424829643e-05,
+            "transport_objective": 0.23716510807243335,
+            "relative_global_fit_ratio": 4.669607154314322,
+            "covariance_spectrum_compatible": true,
+            "rotation_geometry_identifiable": true,
+            "orientation": {
+              "orientation_sign": 1,
+              "volume_product_margin": 216.89395508644589,
+              "source_volume": -14.800450589195027,
+              "target_volume": -14.654550804337532,
+              "target_order": [
+                0,
+                1,
+                2,
+                3
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          }
+        ]
+      },
+      "roca_candidates": [
+        {
+          "determinant_sign": -1,
+          "admm_converged": false,
+          "rotation_frobenius_error": null,
+          "transport_objective": 0.3066654821267932
+        },
+        {
+          "determinant_sign": 1,
+          "admm_converged": false,
+          "rotation_frobenius_error": null,
+          "transport_objective": 0.23716510807243335
+        }
+      ]
+    },
+    {
+      "scenario": "isospectral_nonorthogonal",
+      "seed": 2204,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.0,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0,
+        "cross_modal_target": false,
+        "single_rotation_truth_exists": false
+      },
+      "group_learning": {
+        "source": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 3,
+          "initial_loss": 0.010416356462785974,
+          "final_loss": 0.010392285836376223,
+          "mean_entropy": 0.03394175009569027,
+          "normalized_mean_entropy": 0.024483797271072427,
+          "min_group_mass": 0.24673952020557904,
+          "max_group_mass": 0.25241114306834517,
+          "group_mass": [
+            0.25241114306834517,
+            0.25127327058206095,
+            0.24957606614401484,
+            0.24673952020557904
+          ],
+          "min_prototype_distance": 2.4026116888935833,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 3,
+          "initial_loss": 0.012250143329943087,
+          "final_loss": 0.012162368766542163,
+          "mean_entropy": 0.04427698859829113,
+          "normalized_mean_entropy": 0.0319390959381259,
+          "min_group_mass": 0.24597078159278035,
+          "max_group_mass": 0.25373516633323767,
+          "group_mass": [
+            0.25373516633323767,
+            0.25087566416996576,
+            0.24941838790401627,
+            0.24597078159278035
+          ],
+          "min_prototype_distance": 2.202373131084897,
+          "max_row_sum_error": 3.3306690738754696e-16
+        }
+      },
+      "method": "soft_transport_oracle_component",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": null,
+      "single_rotation_truth_exists": false,
+      "paired_alignment_mse": 5.643319770434961,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": false,
+      "iterations": 100,
+      "final_global_residual": 0.00020459892494384727,
+      "final_primal_residual": 0.05449311877915848,
+      "final_dual_residual": 2.3625048878447654e-05,
+      "final_local_marginal_error": 1.5900431910823194e-07,
+      "group_row_marginal_error": 4.446447265937792e-09,
+      "group_column_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 1.1734718911491362e-15,
+      "transport_objective": 0.27053712088093124,
+      "relative_global_fit_ratio": 4.337858694151479,
+      "covariance_spectral_mismatch": 5.640861217205902e-16,
+      "covariance_identifiability_margin": 0.2552246602674172,
+      "consensus_weighting": "transport",
+      "inner_entropy_mode": "fixed",
+      "applicability_qualification": {
+        "decision": "abstain",
+        "accepted": false,
+        "reasons": [
+          "admm_not_converged",
+          "single_rotation_fit_excessive"
+        ],
+        "final_global_residual": 0.00020459892494384727,
+        "final_primal_residual": 0.05449311877915848,
+        "final_local_marginal_error": 1.5900431910823194e-07,
+        "rotation_orthogonality_error": 1.1734718911491362e-15,
+        "relative_global_fit_ratio": 4.337858694151479,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectral_mismatch": 5.640861217205902e-16,
+        "max_covariance_spectral_mismatch": 0.05,
+        "covariance_identifiability_margin": 0.2552246602674172,
+        "min_covariance_identifiability_margin": 0.02,
+        "required_rotation_structure": null,
+        "observed_rotation_structure": "full",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      }
+    },
+    {
+      "scenario": "isospectral_nonorthogonal",
+      "seed": 2204,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.0,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0,
+        "cross_modal_target": false,
+        "single_rotation_truth_exists": false
+      },
+      "group_learning": {
+        "source": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 3,
+          "initial_loss": 0.010416356462785974,
+          "final_loss": 0.010392285836376223,
+          "mean_entropy": 0.03394175009569027,
+          "normalized_mean_entropy": 0.024483797271072427,
+          "min_group_mass": 0.24673952020557904,
+          "max_group_mass": 0.25241114306834517,
+          "group_mass": [
+            0.25241114306834517,
+            0.25127327058206095,
+            0.24957606614401484,
+            0.24673952020557904
+          ],
+          "min_prototype_distance": 2.4026116888935833,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 3,
+          "initial_loss": 0.012250143329943087,
+          "final_loss": 0.012162368766542163,
+          "mean_entropy": 0.04427698859829113,
+          "normalized_mean_entropy": 0.0319390959381259,
+          "min_group_mass": 0.24597078159278035,
+          "max_group_mass": 0.25373516633323767,
+          "group_mass": [
+            0.25373516633323767,
+            0.25087566416996576,
+            0.24941838790401627,
+            0.24597078159278035
+          ],
+          "min_prototype_distance": 2.202373131084897,
+          "max_row_sum_error": 3.3306690738754696e-16
+        }
+      },
+      "method": "soft_roca_abstained",
+      "roca_selected_correct_component": false,
+      "roca_qualification": {
+        "selected_sign": null,
+        "decision": "no_qualified_candidate",
+        "max_local_marginal_error": 0.001,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectrum_compatible": true,
+        "covariance_spectral_mismatch": 5.640861217205902e-16,
+        "rotation_geometry_identifiable": true,
+        "covariance_identifiability_margin": 0.2552246602674172,
+        "min_relative_objective_gap": 0.05,
+        "relative_objective_gap": null,
+        "candidates": [
+          {
+            "determinant_sign": -1,
+            "admm_converged": false,
+            "final_local_marginal_error": 6.754453738313913e-08,
+            "transport_objective": 0.4615671746909614,
+            "relative_global_fit_ratio": 8.054744995548097,
+            "covariance_spectrum_compatible": true,
+            "rotation_geometry_identifiable": true,
+            "orientation": {
+              "orientation_sign": -1,
+              "volume_product_margin": 216.31763193993834,
+              "source_volume": -14.77608713802023,
+              "target_volume": 14.639710088290775,
+              "target_order": [
+                2,
+                0,
+                3,
+                1
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          },
+          {
+            "determinant_sign": 1,
+            "admm_converged": false,
+            "final_local_marginal_error": 1.5900431910823194e-07,
+            "transport_objective": 0.27053712088093124,
+            "relative_global_fit_ratio": 4.337858694151479,
+            "covariance_spectrum_compatible": true,
+            "rotation_geometry_identifiable": true,
+            "orientation": {
+              "orientation_sign": 1,
+              "volume_product_margin": 216.31763193993834,
+              "source_volume": -14.77608713802023,
+              "target_volume": -14.639710088290775,
+              "target_order": [
+                2,
+                3,
+                0,
+                1
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          }
+        ]
+      },
+      "roca_candidates": [
+        {
+          "determinant_sign": -1,
+          "admm_converged": false,
+          "rotation_frobenius_error": null,
+          "transport_objective": 0.4615671746909614
+        },
+        {
+          "determinant_sign": 1,
+          "admm_converged": false,
+          "rotation_frobenius_error": null,
+          "transport_objective": 0.27053712088093124
+        }
+      ]
+    },
+    {
+      "scenario": "isospectral_nonorthogonal",
+      "seed": 2205,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.0,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0,
+        "cross_modal_target": false,
+        "single_rotation_truth_exists": false
+      },
+      "group_learning": {
+        "source": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 3,
+          "initial_loss": 0.008112393378271628,
+          "final_loss": 0.008087231440571531,
+          "mean_entropy": 0.035153361714331546,
+          "normalized_mean_entropy": 0.025357790307921037,
+          "min_group_mass": 0.2462824485026042,
+          "max_group_mass": 0.2525259095173373,
+          "group_mass": [
+            0.2525259095173373,
+            0.2516620899848991,
+            0.24952955199515942,
+            0.2462824485026042
+          ],
+          "min_prototype_distance": 2.4231056230257564,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 5,
+          "initial_loss": 0.008490646188384849,
+          "final_loss": 0.006459734544452235,
+          "mean_entropy": 0.10500087058505736,
+          "normalized_mean_entropy": 0.07574211764104305,
+          "min_group_mass": 0.22448315337525326,
+          "max_group_mass": 0.26853938435769914,
+          "group_mass": [
+            0.26853938435769914,
+            0.25542991243255214,
+            0.25154754983449523,
+            0.22448315337525326
+          ],
+          "min_prototype_distance": 2.223016030903272,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_transport_oracle_component",
+      "requested_determinant_sign": 1,
+      "estimated_determinant_sign": 1,
+      "rotation_frobenius_error": null,
+      "single_rotation_truth_exists": false,
+      "paired_alignment_mse": 5.742332722673041,
+      "source_group_ari": 1.0,
+      "target_group_ari": 1.0,
+      "admm_converged": false,
+      "iterations": 100,
+      "final_global_residual": 0.028332350549704403,
+      "final_primal_residual": 0.18891749879755207,
+      "final_dual_residual": 0.003271538043329336,
+      "final_local_marginal_error": 1.4182331962276197e-08,
+      "group_row_marginal_error": 5.882999642992104e-11,
+      "group_column_marginal_error": 5.551115123125783e-17,
+      "rotation_orthogonality_error": 1.2204481938629391e-15,
+      "transport_objective": 0.6373703204806014,
+      "relative_global_fit_ratio": 12.358338357675832,
+      "covariance_spectral_mismatch": 9.381727680347384e-16,
+      "covariance_identifiability_margin": 0.24771424864387762,
+      "consensus_weighting": "transport",
+      "inner_entropy_mode": "fixed",
+      "applicability_qualification": {
+        "decision": "abstain",
+        "accepted": false,
+        "reasons": [
+          "admm_not_converged",
+          "single_rotation_fit_excessive"
+        ],
+        "final_global_residual": 0.028332350549704403,
+        "final_primal_residual": 0.18891749879755207,
+        "final_local_marginal_error": 1.4182331962276197e-08,
+        "rotation_orthogonality_error": 1.2204481938629391e-15,
+        "relative_global_fit_ratio": 12.358338357675832,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectral_mismatch": 9.381727680347384e-16,
+        "max_covariance_spectral_mismatch": 0.05,
+        "covariance_identifiability_margin": 0.24771424864387762,
+        "min_covariance_identifiability_margin": 0.02,
+        "required_rotation_structure": null,
+        "observed_rotation_structure": "full",
+        "scope": "necessary numerical compatibility check only; acceptance does not prove semantic equivalence or exact recovery"
+      }
+    },
+    {
+      "scenario": "isospectral_nonorthogonal",
+      "seed": 2205,
+      "truth": {
+        "determinant_sign": 1,
+        "noise_std": 0.0,
+        "mixed_transform_fraction": 0.0,
+        "realized_mixed_transform_fraction": 0.0,
+        "group_shift": 0.0,
+        "nonorthogonal_scale": 0.0,
+        "cross_modal_target": false,
+        "single_rotation_truth_exists": false
+      },
+      "group_learning": {
+        "source": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 3,
+          "initial_loss": 0.008112393378271628,
+          "final_loss": 0.008087231440571531,
+          "mean_entropy": 0.035153361714331546,
+          "normalized_mean_entropy": 0.025357790307921037,
+          "min_group_mass": 0.2462824485026042,
+          "max_group_mass": 0.2525259095173373,
+          "group_mass": [
+            0.2525259095173373,
+            0.2516620899848991,
+            0.24952955199515942,
+            0.2462824485026042
+          ],
+          "min_prototype_distance": 2.4231056230257564,
+          "max_row_sum_error": 2.220446049250313e-16
+        },
+        "target": {
+          "scaling_mode": "global_scalar",
+          "success": true,
+          "status": 0,
+          "iterations": 5,
+          "initial_loss": 0.008490646188384849,
+          "final_loss": 0.006459734544452235,
+          "mean_entropy": 0.10500087058505736,
+          "normalized_mean_entropy": 0.07574211764104305,
+          "min_group_mass": 0.22448315337525326,
+          "max_group_mass": 0.26853938435769914,
+          "group_mass": [
+            0.26853938435769914,
+            0.25542991243255214,
+            0.25154754983449523,
+            0.22448315337525326
+          ],
+          "min_prototype_distance": 2.223016030903272,
+          "max_row_sum_error": 2.220446049250313e-16
+        }
+      },
+      "method": "soft_roca_abstained",
+      "roca_selected_correct_component": false,
+      "roca_qualification": {
+        "selected_sign": null,
+        "decision": "no_qualified_candidate",
+        "max_local_marginal_error": 0.001,
+        "max_relative_fit_ratio": 1.5,
+        "covariance_spectrum_compatible": true,
+        "covariance_spectral_mismatch": 9.381727680347384e-16,
+        "rotation_geometry_identifiable": true,
+        "covariance_identifiability_margin": 0.24771424864387762,
+        "min_relative_objective_gap": 0.05,
+        "relative_objective_gap": null,
+        "candidates": [
+          {
+            "determinant_sign": -1,
+            "admm_converged": false,
+            "final_local_marginal_error": 5.445457252765666e-07,
+            "transport_objective": 0.5681362391446323,
+            "relative_global_fit_ratio": 11.130723736773383,
+            "covariance_spectrum_compatible": true,
+            "rotation_geometry_identifiable": true,
+            "orientation": {
+              "orientation_sign": -1,
+              "volume_product_margin": 201.85099086469876,
+              "source_volume": -14.777097201901888,
+              "target_volume": 13.659718692160968,
+              "target_order": [
+                2,
+                1,
+                0,
+                3
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          },
+          {
+            "determinant_sign": 1,
+            "admm_converged": false,
+            "final_local_marginal_error": 1.4182331962276197e-08,
+            "transport_objective": 0.6373703204806014,
+            "relative_global_fit_ratio": 12.358338357675832,
+            "covariance_spectrum_compatible": true,
+            "rotation_geometry_identifiable": true,
+            "orientation": {
+              "orientation_sign": 1,
+              "volume_product_margin": 201.85099086469876,
+              "source_volume": -14.777097201901888,
+              "target_volume": -13.659718692160968,
+              "target_order": [
+                2,
+                1,
+                3,
+                0
+              ]
+            },
+            "orientation_error": null,
+            "qualified": false
+          }
+        ]
+      },
+      "roca_candidates": [
+        {
+          "determinant_sign": -1,
+          "admm_converged": false,
+          "rotation_frobenius_error": null,
+          "transport_objective": 0.5681362391446323
+        },
+        {
+          "determinant_sign": 1,
+          "admm_converged": false,
+          "rotation_frobenius_error": null,
+          "transport_objective": 0.6373703204806014
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "scenario": "isospectral_nonorthogonal",
+      "method": "soft_transport_oracle_component",
+      "n": 5,
+      "rotation_frobenius_error_mean": null,
+      "paired_alignment_mse_mean": 4.485913663729312,
+      "source_group_ari_mean": 1.0,
+      "target_group_ari_mean": 1.0,
+      "converged_count": 0,
+      "roca_component_correct_count": 0
+    }
+  ]
+}

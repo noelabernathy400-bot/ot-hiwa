@@ -1,0 +1,45 @@
+{
+  "experiment": "panoptic_controlled_source_pose_state_transfer",
+  "scope": "controlled downstream coordinate-transfer proxy, not a semantic action-recognition claim; source-defined pose-state labels fit only on chronological source-training frames",
+  "leakage_policy": "target frame identity and paired source state are evaluation-only; no target state labels, frame IDs, pairing, camera calibration, or truth rotation enters alignment or classifier fitting",
+  "alignment_result": "experiments\\results\\panoptic_pose2_person2_window10000_100frames_multistart_1721_1723.json",
+  "selected_alignment_seed": 1721,
+  "alignment_restart_stable": true,
+  "parameters": {
+    "train_fraction": 0.6,
+    "states": 4,
+    "source_samples": 60,
+    "source_holdout_samples": 40,
+    "target_holdout_samples": 40,
+    "source_frame_first": 10000,
+    "source_frame_last": 10099,
+    "source_camera": "00_00",
+    "target_camera": "00_21"
+  },
+  "metrics": {
+    "source_train": {
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0
+    },
+    "source_holdout": {
+      "accuracy": 0.6,
+      "balanced_accuracy": 0.8222222222222223
+    },
+    "target_raw_coordinate": {
+      "accuracy": 0.25,
+      "balanced_accuracy": 0.6666666666666666
+    },
+    "target_after_gc_hiwa": {
+      "accuracy": 0.575,
+      "balanced_accuracy": 0.8111111111111112
+    },
+    "aligned_minus_raw_accuracy": 0.32499999999999996,
+    "aligned_minus_raw_balanced_accuracy": 0.1444444444444446
+  },
+  "environment": {
+    "python": "3.13.7",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "scikit_learn": "1.9.0"
+  }
+}
