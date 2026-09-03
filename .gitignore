@@ -39,6 +39,7 @@ data/bearing/
 
 # Reproducible build products and historical export bundles
 Writing/build/
+Writing/build_detailed/
 deliverables/
 experiments/figures/
 
