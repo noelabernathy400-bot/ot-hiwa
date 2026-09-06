@@ -23,7 +23,7 @@ The canonical mathematical contract and evidence record are:
 
 - `docs/research/OT-HiWA项目进度总览_从零理解_2026-08-07.md`（首次阅读建议从这里开始）
 - `docs/research/GC-HiWA_v2_数学合同、适用性诊断与Panoptic验证_2026-07-23.md`
-- `Writing/GC-HiWA_v2_论文草稿.tex`（已编译 PDF：`Writing/GC-HiWA_v2_final.pdf`）
+- `Writing/GC-HiWA_v2_论文草稿.tex`（公开论文 PDF：[`papers/GC-HiWA_CN.pdf`](papers/GC-HiWA_CN.pdf)）
 - `docs/research/GC-HiWA_v2_完整研究笔记_Obsidian.md`
 - `Writing/终稿审查清单.md`
 - `docs/GC-HiWA_v2_仓库说明与复现指南.md`（仓库结构、运行入口与证据边界）
