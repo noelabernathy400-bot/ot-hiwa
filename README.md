@@ -1,5 +1,12 @@
 # OT-HiWA
 
+## Paper
+
+- [GC-HiWA English PDF](papers/GC-HiWA_EN.pdf)
+- [GC-HiWA 中文 PDF](papers/GC-HiWA_CN.pdf)
+
+The manuscript PDFs above are the project-specific copies previously published in the separate `papers` repository. They are included here so the code, evidence record, and paper can be reviewed from one repository.
+
 ## Current research line
 
 The active, evidence-backed line is **GC-HiWA v2: applicability-aware unsupervised coordinate alignment**. It attempts to recover a declared structured orthogonal coordinate map only when two unpaired domains share geometric group structure; otherwise it abstains with explicit numerical and geometric reasons. Its primary application is uncalibrated cross-device / cross-view 3-D pose coordinates, using the structured family \(I_J\otimes SO(3)\), rather than an unrestricted rotation in \(O(3J)\).
