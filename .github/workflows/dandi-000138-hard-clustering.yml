@@ -28,6 +28,20 @@ jobs:
           mkdir -p raw_dandi_000138
           dandi download "DANDI:000138/0.220113.0407" -o raw_dandi_000138
           find raw_dandi_000138 -type f -name '*.nwb' -print
+      - name: Inspect NLB hand time-series layout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import h5py
+          files=sorted(Path('raw_dandi_000138').rglob('*desc-train*.nwb'))
+          with h5py.File(files[0],'r') as h:
+              print('NWB root groups:',list(h.keys()))
+              print('Trial columns:',list(h['intervals/trials'].keys()))
+              def show(name,obj):
+                  if isinstance(obj,h5py.Group) and 'data' in obj and ('hand' in name.lower() or 'cursor' in name.lower()):
+                      print('Series:',name,'shape:',obj['data'].shape,'fields:',list(obj.keys()))
+              h.visititems(show)
+          PY
       - name: Run 4D K-means and generate projection figures
         shell: bash
         run: |
