@@ -35,6 +35,9 @@ DANDI 000138 (0.220113.0407), \`sub-Jenkins_ses-large_desc-train_behavior+ecephy
 - 原版停止条件仅看 \`||R_t-R_{t-1}||\`，短迭代预算会在局部共识尚未满足时提前停。将原版 stop tol 设为 1e-9，**另用 0.01 同时审核 global 与 primal**；不修改原版实现。
 - 保留同一测试集/归一化/误差定义；区分评价配对关系的 NRMSE 与只评价分布几何的 OT NRMSE。
 
+
+**复现证据**：[GitHub Actions 完整成功运行 #44059421834](https://github.com/noelabernathy400-bot/ot-hiwa/actions/runs/44059421834)。该运行重新下载官方 NWB、执行完整聚类和 Hard HiWA、验证原版源码 SHA-256 与五次共识收敛，并将处理后数据、图表及 JSON 提交到 `results/`。已比对与本地运行的两类 NRMSE，差异仅为浮点舍入级别。
+
 ## 下一步，尚未执行
 1. 分析五个 R 和 P 的结构稳定性；测量相对旋转与群组软/硬对应歧义。
 2. 仅在**评价环节**扫描神经—手运动时间滞后，检验 4D PCA（累计解释方差 13.06%）的代表性。
