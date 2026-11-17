@@ -1,0 +1,61 @@
+{
+  "dataset": "DANDI:000138",
+  "version": "0.220113.0407",
+  "official_training_nwb": "sub-Jenkins_ses-large_desc-train_behavior+ecephys.nwb",
+  "official_training_nwb_sha256": "1188ddf5b822dd9ac49afb8916f4b42a85867613cf7f169d0b04a1d1aeecd700",
+  "source": "https://dandiarchive.org/dandiset/000138/0.220113.0407",
+  "pipeline": "experiments/dandi_000138/run_hard_clustering.py",
+  "stage": "hard-clustering-only",
+  "bin_ms": 20,
+  "time_zero": "move_onset_time",
+  "window_ms": [
+    -100,
+    600
+  ],
+  "kinematics": [
+    "hand_pos_x",
+    "hand_pos_y",
+    "hand_vel_x",
+    "hand_vel_y"
+  ],
+  "neural_units": 162,
+  "neural_dimension": 4,
+  "behavior_dimension": 4,
+  "trial_count": 500,
+  "train_trials": 400,
+  "test_trials": 100,
+  "train_windows": 14000,
+  "test_windows": 3500,
+  "seed": 42,
+  "cluster_method": "KMeans",
+  "cluster_k": 4,
+  "neural_pca_explained_variance_ratio": [
+    0.04471691697835922,
+    0.038377560675144196,
+    0.025481300428509712,
+    0.022043563425540924
+  ],
+  "silhouette_train": {
+    "neural": 0.3396098017692566,
+    "hand": 0.3703158497810364
+  },
+  "cluster_sizes_train": {
+    "neural": [
+      4137,
+      4316,
+      3146,
+      2401
+    ],
+    "hand": [
+      2818,
+      6316,
+      2012,
+      2854
+    ]
+  },
+  "learning_uses_pairing": false,
+  "learning_uses_labels": false,
+  "hiwa_alignment_performed": false,
+  "actions_run": "https://github.com/noelabernathy400-bot/ot-hiwa/actions/runs/44055415908",
+  "artifact_id": 14315218813
+}
