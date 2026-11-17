@@ -33,6 +33,13 @@ jobs:
           working_directory: experiments/hyser
           os: debian
           latexmk_use_xelatex: true
+          extra_system_packages: "fonts-noto-cjk poppler-utils"
+          pre_compile: |
+            fc-cache -f
+            fc-list -f '%{family}\n' | grep -F 'Noto Serif CJK SC'
+          post_compile: |
+            pdffonts "Hyser_Hard_HiWA_实验报告.pdf" | grep -F 'NotoSerifCJK'
+            pdftotext "Hyser_Hard_HiWA_实验报告.pdf" - | grep -F '肌电'
       - name: Commit compiled report into experiment root
         run: |
           test -s experiments/hyser/Hyser_Hard_HiWA_实验报告.pdf
