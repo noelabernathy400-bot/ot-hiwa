@@ -231,7 +231,7 @@ def main():
     old=json.loads(args.archive.read_text(encoding="utf8"))
     boundary=json.loads(args.boundary.read_text(encoding="utf8"))
     assert hashlib.sha256(args.fixed.read_bytes()).hexdigest()==old["source_input_sha256"]
-    root=args.fixed.parents[1]
+    root=args.fixed.parents[2]
     hiwa=json.loads((root/"results/source_only_fixed_groups_outer500/hard_hiwa_results.json").read_text())
     with np.load(args.fixed,allow_pickle=False) as z:
         X=np.asarray(z["neural4"],float);Y=np.asarray(z["hand4"],float)
