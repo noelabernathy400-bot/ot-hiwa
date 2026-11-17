@@ -1,5 +1,23 @@
 # 实验日志（持续更新）
 
+## 2026-11-17 · 冻结模型最优传输代价重新评价
+
+在同一次唯一源域 KMeans、固定组标签与外迭代 500 次的原版 HiWA 上，只读取已存 R、P 而不重新训练。
+计算全域无约束精确 OT、同编号组精确 OT、学得 P 的跨组加权 OT；详见 [OT_EVALUATION.md](results/source_only_fixed_groups_outer500/ot_evaluation/OT_EVALUATION.md)。
+
+| 检验 | 原始 | HiWA 后五次平均 |
+|---|---:|---:|
+| 全域自由 W2² | 0.439478 | 0.404823 |
+| 固定同组 W2² | 1.231750 | 0.966421 |
+
+第三项使用原版已学习 P 对各组间测试 OT 代价加权，但不是原版训练精确目标：旧文件没有局部 R_ij、Q_ij、C_ij。
+同编号组 OT 不允许跨组，而原版 P 往往仍有非对角质量；这两个问题应当分开评价。
+
+![OT 代价对比](results/source_only_fixed_groups_outer500/ot_evaluation/ot_three_costs_before_after.png)
+
+---
+
+
 ## 2026-11-17 · 实验 D：唯一标签、原版 HiWA 延长 500 次迭代
 
 仅最大外迭代数从 140 增为 500，源域一次 KMeans、目标标签继承与全部其他超参数不变。
