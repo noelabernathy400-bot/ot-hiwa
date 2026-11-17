@@ -1,0 +1,79 @@
+name: Publish real DANDI 000138 fixed-source-group experiment and XeLaTeX PDF
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/dandi138-publish-fixed-source-groups.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish-verified-artifact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Retrieve exact verified computed artifact (no retraining)
+        shell: bash
+        run: |
+          mkdir -p /tmp/dandi-fixed-groups
+          gh run download 44078939266 \
+            --repo noelabernathy400-bot/ot-hiwa \
+            --name dandi138-one-fixed-source-group-HiWA \
+            --dir /tmp/dandi-fixed-groups
+          set -eu
+          found="$(find /tmp/dandi-fixed-groups -name frozen_label_metrics.json -type f -print -quit)"
+          test -n "$found"
+          src="$(dirname "$found")"
+          dst="projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups"
+          mkdir -p "$dst"
+          cp -a "$src"/. "$dst/"
+          test -s "$dst/frozen_label_metrics.json"
+          test -s "$dst/fixed_groups_4d.npz"
+          test -s "$dst/before_after_target_six_pairs.png"
+          echo "Reused the original verified experiment run without changing HiWA rotations"
+      - name: Materialize research log and LaTeX numeric table from saved JSON
+        run: |
+          python projects/dandi-000138-hiwa-4d/code/write_fixed_group_report.py
+      - name: Install XeLaTeX with Chinese fonts
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            texlive-xetex texlive-lang-chinese texlive-latex-extra texlive-fonts-recommended \
+            fonts-noto-cjk fonts-liberation fonts-dejavu-core poppler-utils
+      - name: Build official report from verified figures and real metric rows
+        run: |
+          cd projects/dandi-000138-hiwa-4d
+          mkdir -p _latex_build
+          xelatex -interaction=nonstopmode -halt-on-error -file-line-error -output-directory=_latex_build '四维HiWA统一源域分组实验.tex'
+          xelatex -interaction=nonstopmode -halt-on-error -file-line-error -output-directory=_latex_build '四维HiWA统一源域分组实验.tex'
+          cp '_latex_build/四维HiWA统一源域分组实验.pdf' '四维HiWA统一源域分组实验.pdf'
+          pdfinfo '四维HiWA统一源域分组实验.pdf' | grep Pages
+          test -s '四维HiWA统一源域分组实验.pdf'
+      - name: Commit fixed-label results without overwriting older experiment data
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- 'projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups' \
+              'projects/dandi-000138-hiwa-4d/EXPERIMENT_LOG.md' \
+              'projects/dandi-000138-hiwa-4d/四维HiWA统一源域分组实验.pdf'
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish source-only KMeans fixed-label HiWA real results and XeLaTeX PDF'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Archive published project output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dandi138-published-fixed-source-HIWA
+          path: |
+            projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups
+            projects/dandi-000138-hiwa-4d/四维HiWA统一源域分组实验.pdf
+          if-no-files-found: warn
