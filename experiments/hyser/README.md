@@ -34,3 +34,16 @@ python experiments/hyser/scripts/run_hard_original.py --out-dir experiments/hyse
 **所有当前已记录的数值结果均来自 2026-11-17 的真实 Hyser trial1，本目录中的直接调用原类脚本为后续标准化复跑入口，不能把它的存在当作已经完成的结果。**
 
 主要源码：[本仓库 Hard HiWA](../../src/hiwa/hiwa.py) · [SoftHiWA](../../src/cc_hiwa/soft_hiwa.py) · [原基线](../hiwa/run_taco_faithful_baseline.py)。
+
+
+## 2026-11-17 PCA 后标准化审计与正式报告
+
+**本目录根部已经保存 XeLaTeX 编译的四页实验报告：**
+
+- [Hyser_Hard_HiWA_实验报告.pdf](Hyser_Hard_HiWA_实验报告.pdf)：真实数据介绍、完整预处理、全 250 点 K-means / GMM 三维簇状图、HiWA 参数与 R²/相对平方误差
+- [LaTeX 源码](Hyser_Hard_HiWA_实验报告.tex)：可在仓库 GitHub Actions 中重新编译
+- [标准化与对齐详细结果](results/POST_PCA_NORMALIZATION_AUDIT.md)
+- [完整数值 JSON](results/POST_PCA_NORMALIZATION_AUDIT.json)
+- [直接调用用户新 GCOT 分支的复现脚本](scripts/run_hiwa_postpca_normalized.py)
+
+关键结论：之前 PCA 后的全量点云已经进行协方差白化；进一步检查逐维 Z-score 并按新 GCOT 源码结构复算后，当前零时延三维表示上的 Hard HiWA 配对 R² 仍为负。当前运行仅满足作者旋转变化停止条件，尚未满足严格 ADMM 共识。请参阅本次详细报告，不要将源码移植版的数字标成远程原版字节级执行结果。
