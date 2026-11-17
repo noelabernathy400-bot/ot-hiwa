@@ -1,4 +1,25 @@
-\documentclass[UTF8,fontset=fandol,11pt,a4paper]{ctexart}
+% !TeX program = xelatex
+% Source encoding: UTF-8. Compile with XeLaTeX (not pdfLaTeX).
+% Explicitly configure an embeddable CJK font; avoid Fandol PDF mapping
+% inconsistencies between TeX distributions and some PDF viewers.
+\documentclass[UTF8,fontset=none,11pt,a4paper]{ctexart}
+\usepackage{fontspec}
+\IfFontExistsTF{Noto Serif CJK SC}{%
+  \setCJKmainfont[BoldFont={Noto Serif CJK SC Bold}]{Noto Serif CJK SC}%
+  \setCJKsansfont{Noto Sans CJK SC}%
+  \setCJKmonofont{Noto Sans Mono CJK SC}%
+}{%
+  \IfFontExistsTF{SimSun}{%
+    \setCJKmainfont{SimSun}%
+    \IfFontExistsTF{SimHei}{\setCJKsansfont{SimHei}}{\setCJKsansfont{SimSun}}%
+    \setCJKmonofont{SimSun}%
+  }{%
+    \setCJKmainfont{FandolSong-Regular.otf}%
+    \setCJKsansfont{FandolHei-Regular.otf}%
+    \setCJKmonofont{FandolFang-Regular.otf}%
+  }%
+}
+
 \usepackage[margin=23mm,headheight=14pt]{geometry}
 \usepackage{amsmath,amssymb,booktabs,tabularx,graphicx}
 \usepackage[table]{xcolor}
