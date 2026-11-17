@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths:
       - .github/workflows/dandi138-source-only-fixed-groups.yml
+      - projects/dandi-000138-hiwa-4d/code/source_only_fixed_group_pipeline.py
+      - projects/dandi-000138-hiwa-4d/code/evaluate_fixed_group_alignment.py
+      - projects/dandi-000138-hiwa-4d/code/write_fixed_group_report.py
+      - projects/dandi-000138-hiwa-4d/四维HiWA统一源域分组实验.tex
   workflow_dispatch:
 
 permissions:
