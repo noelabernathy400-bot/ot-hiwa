@@ -59,3 +59,18 @@ python experiments/hyser/scripts/run_hard_original.py --out-dir experiments/hyse
 评估误差不在这些量化数据上计算，仍以原始全精度数值为准。
 PDF 中的早期图与当前250点实验在数据量及缩放上不同。用户上传的原始PNG直接用于对话中交付的 PDF，
 仓库自动构建则采用相同原始200点的可复现绘图数据重建四联布局。
+
+## 中文 XeLaTeX 编译说明（2026-11-17 修复）
+
+报告源文件 [Hyser_Hard_HiWA_实验报告.tex](Hyser_Hard_HiWA_实验报告.tex) 使用 UTF-8 编码和 `ctexart`，请**选择 XeLaTeX**，不要用 pdfLaTeX：
+
+```bash
+cd experiments/hyser
+python3 scripts/expand_clouds.py
+python3 scripts/render_report_figures.py
+latexmk -xelatex -interaction=nonstopmode -halt-on-error Hyser_Hard_HiWA_实验报告.tex
+```
+
+环境需要 Python `numpy`、`matplotlib` 用于绘图；XeLaTeX 需已安装 `ctex`、`fontspec`、`pgfplots` 等常见宏包。中文字体优先使用 **Noto Serif CJK SC / Noto Sans CJK SC**，Windows 可回退到 SimSun，最后可回退到 TeX Live 自带的 Fandol。GitHub Actions 在 Debian 编译环境中安装 `fonts-noto-cjk`，并使用 `pdffonts` 与 `pdftotext` 检查中文字体与可复制的中文字符，编译后的六页 PDF 自动提交到实验主目录。
+
+如果是 Overleaf：在 Menu → Compiler 里选择 **XeLaTeX**；如果是本地 TeXstudio / VS Code，请将默认编译器改为 XeLaTeX 并确保以 UTF-8 保存源文件。**不要向仓库上传或分发字体文件。**
