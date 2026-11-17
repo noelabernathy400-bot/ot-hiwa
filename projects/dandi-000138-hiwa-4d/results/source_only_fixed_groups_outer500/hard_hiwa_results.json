@@ -6,6 +6,7 @@
   "data_sha256": "a3b4394c199c658ffd9bc27b96de8309e3984cc367edc6f708b77e86c3140121",
   "parameters": {
     "clusters": "projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz",
+    "allow_group_supervised_diagnostic": true,
     "output": "projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500",
     "seeds": [
       42,
@@ -45,7 +46,8 @@
   "source_radius": 4.600036979534769,
   "target_radius": 1.9999999878881636,
   "evaluation_target_rms": 1.001985144133678,
-  "fit_uses_training_sample_pairing": false,
+  "fit_uses_training_sample_pairing": true,
+  "group_supervision_diagnostic": true,
   "fit_uses_test_data": false,
   "paired_metric": "sqrt(mean(||R*x_i-y_i||^2)) / sqrt(mean(||y_i||^2)), held-out paired windows",
   "ot_metric": "sqrt(minimum one-to-one test sample permutation mean(||R*x_i-y_perm(i)||^2)) / same target RMS",
