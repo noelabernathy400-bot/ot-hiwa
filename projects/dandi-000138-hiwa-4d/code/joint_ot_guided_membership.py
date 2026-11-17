@@ -304,7 +304,7 @@ def main():
     for method in ("hard","tau0.20"):
         controls[method]={}
         for k in lookup:
-            v=old["summary"][method][k]
+            v=old["summary"][method]["fixed_group_W2sq" if k=="same_group_W2sq" else k]
             controls[method][k]=dict(mean=v["mean"],sd_sample=v["sd"])
     controls["boundary"]={}
     for k,alt in [("total_PQ_OT_after","hierarchical_PQ_OT"),
