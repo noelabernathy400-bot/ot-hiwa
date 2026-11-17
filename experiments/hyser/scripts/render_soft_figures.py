@@ -39,7 +39,7 @@ def points():
 X,Y,labels=points()
 hard=json.loads((ROOT/'results/latest.json').read_text())
 soft=json.loads((ROOT/'results/soft_experiment_20261117.json').read_text())
-rhard=np.asarray(hard['methods']['fixed_matched_groups']['R'])
+rhard=np.asarray(hard['fixed']['R'])
 entry=next(x for x in soft['fixed_P_seed42']
            if x['name']=='soft_TPAMI_prototype_source_only_lambda1')
 rsoft=np.asarray(entry['R'])
@@ -103,7 +103,7 @@ fig.savefig(ROOT/'figures/06_soft_source_membership.png',dpi=170,bbox_inches='ti
 plt.close(fig)
 
 names=['Hard fixed','Soft KMeans tau=.5','Soft TPAMI prototype','Oracle']
-values=[hard['methods']['fixed_matched_groups']['r2'],
+values=[hard['fixed']['R2'],
         next(x for x in soft['fixed_P_seed42'] if x['name']=='soft_kmeans_tau0.5')['r2'],
         entry['r2'],soft['oracle']['r2']]
 fig,ax=plt.subplots(figsize=(8,3.5))
