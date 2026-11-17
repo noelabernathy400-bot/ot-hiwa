@@ -98,3 +98,10 @@ PhysioNet Hyser 2.0.0，subject01/session1，random sample1；256通道EMG 2048H
 对齐前全部共同基线0.241479354259；五种子均值±样本SD：Hard 0.19907977±0.00932565（平均降低17.56%）；Soft-Kmeans 0.20752896±0.02398257（14.06%）；Soft原型0.23126251±0.02942518（4.23%）。Soft-Kmeans seed40–43四次都非常接近并略优于Hard，但seed44 0.24741366劣于Hard0.20481031；Soft原型仅1/5次胜Hard。此前“Hard内部层级OT成本2.3608→0.3961”仍保留，但不是共享主指标，与本轮0.24148→0.19908不可混用。
 
 检验：所有R最大正交误差1.805e-15；任意独立打乱X/Y行序后结果保持不变。研究目标仍是分布对齐，不因较低同步R²否定分布对齐的改善；也不能因个别seed优势认定Soft全面更好。研究下步：稳健初始化、软隶属设计、跨试次验证。完整报告：[COMMON_W2_RESULTS](unsupervised_control/COMMON_W2_RESULTS.md)，[数据CSV](unsupervised_control/common_w2_unpaired_5seed.csv)，[R CSV](unsupervised_control/fitted_R_15runs.csv)，[脚本](unsupervised_control/evaluate_common_w2.py)。
+
+
+## 2026-11-17：新训练的完全无监督Soft K-means温度消融
+
+在前述统一W₂²主指标确定后，进一步**新运行10次独立两域软分组训练**：τ=0.25和τ=1.0，各seed40–44；其余条件固定（K=4、μ=.05、εs=.1、εg=.2、三维白化、自由P、ADMM/OT共同残差阈值）。加上此前已存在的τ=0.5五次训练得到：Hard平均W₂² **0.19907977**（改善17.56%）、Soft τ=.25 **0.19907906**（17.56%）、Soft τ=.5 **0.20752896**（14.06%）、Soft τ=1 **0.20093204**（16.79%）。全部新增10/10次通过本轮数值残差检查；τ=.25与Hard平均差只有约7×10^-7，不能视作实质性改进。τ=.5种子44退化、τ=1种子40退化，说明软温度与初始化的相互作用仍待研究。
+
+已保存 [完整温度试验报告](unsupervised_control/SOFT_TEMPERATURE_SWEEP.md)、[10条逐seed数值](unsupervised_control/temperature_sweep_unpaired_10new.csv)、[10个R矩阵](unsupervised_control/temperature_sweep_R_10new.csv)、[10个簇级P矩阵](unsupervised_control/temperature_sweep_P_10new.csv) 与 [可运行新训练程序](unsupervised_control/run_temperature_sweep.py)。另外重复τ=.5、seed42结果与历史W₂²=0.18870520630894314**完全相同**。训练与共同W₂²均未使用真实同步配对，R²仍只是辅助评价。这些是同一试次的拟合内数据，不提供跨试次泛化证明；依赖本地数值移植的代码来源限制仍在。
