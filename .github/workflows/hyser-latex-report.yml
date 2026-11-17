@@ -5,6 +5,8 @@ on:
     paths:
       - "experiments/hyser/data/visual_points_base36.txt"
       - "experiments/hyser/results/latest.json"
+      - "experiments/hyser/results/soft_experiment_20261117.json"
+      - "experiments/hyser/scripts/render_soft_figures.py"
       - "experiments/hyser/scripts/render_figures.py"
       - "experiments/hyser/Hyser_HardHiWA_最新实验.tex"
       - ".github/workflows/hyser-latex-report.yml"
@@ -23,9 +25,12 @@ jobs:
           fc-cache -f
           python3 -m pip install --quiet numpy matplotlib
           python3 experiments/hyser/scripts/render_figures.py
+          python3 experiments/hyser/scripts/render_soft_figures.py
           test -s experiments/hyser/figures/01_before_hiwa.png
           test -s experiments/hyser/figures/02_after_hiwa_free.png
           test -s experiments/hyser/figures/03_after_hiwa_fixed.png
+          test -s experiments/hyser/figures/05_hard_vs_soft_paired_2d3d.png
+          test -s experiments/hyser/figures/06_soft_source_membership.png
       - name: XeLaTeX with explicit Chinese font
         uses: xu-cheng/latex-action@v4
         with:
@@ -48,6 +53,9 @@ jobs:
           git add -f experiments/hyser/figures/02_after_hiwa_free.png
           git add -f experiments/hyser/figures/03_after_hiwa_fixed.png
           git add -f experiments/hyser/figures/04_free_group_transport.png
+          git add -f experiments/hyser/figures/05_hard_vs_soft_paired_2d3d.png
+          git add -f experiments/hyser/figures/06_soft_source_membership.png
+          git add -f experiments/hyser/figures/07_paired_R2_comparison.png
           if ! git diff --cached --quiet; then
             git commit -m "Publish latest source-only Hyser Hard HiWA PDF and plots"
             # Other project workflows can update main during XeLaTeX compilation.

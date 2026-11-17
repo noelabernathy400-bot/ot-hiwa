@@ -79,4 +79,73 @@ Oracle最小化总平方误差，而不一定最小化平均欧氏距离，
 \noindent\small 数值来自真实Hyser点云上按用户上传的GCOT/HiWA核心更新公式手工移植的本地求解器，
 而非直接导入远程源文件。全部250点用于拟合内评价，
 且同步关系被用于传递组标签，因此不是无监督算法的严格性能对比。\normalsize
+
+\clearpage
+\section{补充：源域软分组与继承隶属度}
+为了只检验分组软化的作用，本轮保留250对真实白化三维数据，目标域仍继承源域的同步组信息，
+只是把原本的$A_{ik}\in\{0,1\}$改为概率$A_{ik}\in(0,1)$，
+并令$B_{ik}=A_{ik}$。目标域从始至终\textbf{不再独立聚类}。
+
+一方面，固定源域K-means簇中心并软化距离：
+\[
+ A_{ik}\propto\exp\left(-\|x_i-c_k\|_2^2/\tau\right),\qquad \tau=0.5.
+\]
+另一方面，采用新GCOT代码的原型优化公式（只在源域学习）：
+\[
+ \min_C\|AC-X\|_F^2+
+ \frac{\lambda_h}{N}\sum_{ik}A_{ik}\log A_{ik},\qquad
+ A=\operatorname{softmax}(XC^\top),\quad\lambda_h=1.
+\]
+两个软模型均把同一个$A_i$传给目标域的同步窗口。
+这属于\textbf{已知组对应的Soft-GCOT式诊断变体}，
+不同于原论文在两域分别估计软分组的无监督GCOT。
+
+固定$P=I_4/4$，共同使用$\mu=0.05$、样本熵正则$\varepsilon_s=0.1$、
+Sinkhorn最多150次，比较平方距离运输代价和已知同步样本的预测误差。
+\begin{center}\small
+\begin{tabular}{lrrr}
+\toprule
+方法（seed42） & $R^2\uparrow$ & 相对平方误差$\downarrow$ & OT代价（前$\to$后）\\
+\midrule
+Hard K-means & $-0.15391$ & 1.15391 & 1.38439$\to$0.83598\\
+Soft K-means（$\tau=0.5$） & $-0.15096$ & 1.15096 & 1.35722$\to$0.83389\\
+Soft原型（$\lambda_h=1$） & $\mathbf{-0.14256}$ & $\mathbf{1.14256}$ & 1.14227$\to$0.75269\\
+配对正交Oracle & $-0.13693$ & 1.13693 & ---\\
+\bottomrule
+\end{tabular}
+\end{center}
+本表OT仅包括$X/\sqrt3,Y/\sqrt3$下的加权平方距离运输项，不包含熵项；
+分组概率改变了组测度，所以不同分组的OT\textbf{绝对值不是同一目标函数}。
+但是同步配对相对平方误差和$R^2$可直接比较。
+随机种子40--44的平均$R^2$分别为Hard $-0.15402$、
+Soft-K-means $-0.15104$、Soft原型$-0.14255$；15次均通过本轮检查的残差标准。
+
+\clearpage
+\begin{center}
+\includegraphics[width=.98\textwidth,height=.74\textheight,keepaspectratio]{figures/05_hard_vs_soft_paired_2d3d.png}
+\end{center}
+\noindent\small
+上排三维、下排二维；左侧是目标力量域，中间是Hard对齐后源域，
+右侧是软原型对齐后源域。颜色均使用原源域K-means参考组；
+软模型实际使用的是完整概率隶属度，并非图中显示的硬参考组。
+图形坐标经过可视化量化，数值表基于全精度原始数据。\normalsize
+
+\clearpage
+\section{软隶属度与自由组OT的反例}
+\begin{center}
+\includegraphics[width=.98\textwidth,height=.41\textheight,keepaspectratio]{figures/06_soft_source_membership.png}
+\end{center}
+源域软原型的平均隶属熵为$0.50027$ nat，平均最大隶属概率为$0.81484$；
+它不是简单地更改硬簇编号。
+
+若不固定已知组对应、允许组级传输$P$自由变化，使用$\mu=0.005$：
+Soft-K-means（$\tau=0.5$）的$R^2=-0.16348$、局部共识残差$1.0961$；
+Soft原型的$R^2=-0.64435$、局部共识残差$0.4371$。
+两者仅达到作者式旋转变化停止阈值，未满足严格ADMM共识残差；
+Soft原型的$P$还发生了组错配。\textbf{所以不能认为自由组GCOT必然优于Hard HiWA。}
+
+这250点全部用于同一试次的拟合内评价，且目标分组继承使用了真实时间配对。
+数值来自对用户GCOT源码公式的本地移植而非直接导入原仓库文件；
+尚不能据此给出无监督跨试次泛化的结论。
+
 \end{document}
