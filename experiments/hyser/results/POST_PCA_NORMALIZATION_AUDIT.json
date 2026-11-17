@@ -1,0 +1,97 @@
+{
+  "source": "Real Hyser PhysioNet hd-semg/2.0.0 random sample1, subject01 session1",
+  "n_windows": 250,
+  "split": null,
+  "dimension": 3,
+  "selected_fingers": [
+    "thumb",
+    "middle",
+    "index"
+  ],
+  "PCA_variance": [
+    0.8632036806138685,
+    0.050070076198376,
+    0.02223297418012388
+  ],
+  "pipeline": "EMG 256x51200, 0.1 s window RMS -> log1p -> Zscore(256) -> PCA3 -> post-PCA separate Z-score or separate covariance whitening; force 5x2500 -> 0.1 s mean -> select 3 -> post-scale",
+  "code": "Faithful local port of requested GCOT-reproducible-20261018 new-branch formulas, not direct module import; direct-import script included",
+  "params": {
+    "K": 4,
+    "seed": 42,
+    "mu": 0.005,
+    "tol": 0.1,
+    "stop": "legacy",
+    "maxiter": 300,
+    "inner_maxiter": 100,
+    "inner_tol": 0.01,
+    "epsilon_group": 0.2,
+    "epsilon_sample": 0.1,
+    "sinkhorn_maxiter": 150,
+    "group_sinkhorn_maxiter": 1000
+  },
+  "scenarios": {
+    "whiten": {
+      "before": {
+        "r2": -0.6740712078099416,
+        "relative_mse": 1.6740712078099416,
+        "distance": 1.97746714759756
+      },
+      "oracle": {
+        "r2": -0.13692797684174352,
+        "relative_mse": 1.1369279768417435,
+        "distance": 1.688373348601135
+      },
+      "kmeans": {
+        "r2": -0.8875704537412572,
+        "relative_mse": 1.8875704537412572,
+        "distance": 2.211618708938807,
+        "iters": 88,
+        "delta_R": 0.08931145543215947,
+        "consensus_F": 0.9110215683889822
+      },
+      "gmm_isomap": {
+        "r2": -1.16806767840689,
+        "relative_mse": 2.16806767840689,
+        "distance": 2.3978992724876775,
+        "iters": 43,
+        "delta_R": 0.07306882780712796,
+        "consensus_F": 1.8680180456853612
+      }
+    },
+    "zscore": {
+      "before": {
+        "r2": -0.7096015805090445,
+        "relative_mse": 1.7096015805090445,
+        "distance": 2.0019300912600464
+      },
+      "oracle": {
+        "r2": -0.189158313084399,
+        "relative_mse": 1.189158313084399,
+        "distance": 1.7141821025497161
+      },
+      "kmeans": {
+        "r2": -1.225411246025402,
+        "relative_mse": 2.225411246025402,
+        "distance": 2.36497476061583,
+        "iters": 109,
+        "delta_R": 0.08985715331423733,
+        "consensus_F": 0.53635730936079
+      },
+      "gmm_isomap": {
+        "r2": -1.2939245711377896,
+        "relative_mse": 2.2939245711377896,
+        "distance": 2.4509122379943444,
+        "iters": 46,
+        "delta_R": 0.04763142142405119,
+        "consensus_F": 3.761006424140229
+      }
+    }
+  },
+  "notes": [
+    "No paired data used in training",
+    "All 250 points also used for in-sample metrics",
+    "Legacy criterion only checks global rotation change",
+    "Full whitening already existed in previous all-250 version",
+    "Figure points quantized for plotting only"
+  ]
+}

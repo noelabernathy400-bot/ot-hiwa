@@ -1,0 +1,39 @@
+name: Build Hyser LaTeX report PDF
+on:
+  push:
+    branches: [main]
+    paths:
+      - "experiments/hyser/Hyser_Hard_HiWA_实验报告.tex"
+      - "experiments/hyser/figures/clouds_base36.txt"
+      - "experiments/hyser/scripts/expand_clouds.py"
+      - ".github/workflows/hyser-latex-report.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  compile-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Expand documented 250-point figure data
+        run: python3 experiments/hyser/scripts/expand_clouds.py
+      - name: Compile XeLaTeX PDF
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: Hyser_Hard_HiWA_实验报告.tex
+          working_directory: experiments/hyser
+          os: debian
+          latexmk_use_xelatex: true
+      - name: Commit compiled report into experiment root
+        run: |
+          test -s experiments/hyser/Hyser_Hard_HiWA_实验报告.pdf
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f experiments/hyser/Hyser_Hard_HiWA_实验报告.pdf
+          if ! git diff --cached --quiet; then
+            git commit -m "Compile Hyser experiment PDF from LaTeX"
+            git push
+          fi
