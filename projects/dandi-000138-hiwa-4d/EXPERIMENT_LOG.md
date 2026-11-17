@@ -1,5 +1,18 @@
 # 实验日志（持续更新）
 
+## 2026-11-17 · 实验 C：只聚类源域，唯一组标签贯穿三个点云
+
+**现行最新协议（旧两域独立 K-means 结果仅作历史）。** 源 4D K-means 一次，目标同一时间窗继承标签，Hard HiWA 只旋转源坐标，前后不重新分组。配对标签继承带有监督信息。
+
+四组训练样本数为 [4137, 4316, 3146, 2401]；详见 [正式实验结果](results/source_only_fixed_groups/RUN_REPORT.md)。
+
+1NN：37.31%；MAE：0.50042；配对 rMSE：1.61274；R²：-0.61619。
+
+[原始源域](results/source_only_fixed_groups/source_before_test_six.png) / [继承标签目标域](results/source_only_fixed_groups/target_shared_test_six.png) / [旋转后源域](results/source_only_fixed_groups/source_after_test_six.png) / [三域直接比较](results/source_only_fixed_groups/before_after_target_six_pairs.png)。
+
+---
+
+
 ## 2026-11-17 · 问题诊断与 LaTeX 报告（重要更新）
 
 **报告（项目根目录）：** [《四维 Hard HiWA 实验与问题诊断》PDF](四维HardHiWA实验与问题诊断.pdf) · [XeLaTeX 源码](四维HardHiWA实验与问题诊断.tex)。报告使用原始两张六投影聚类图，记录数据来源、处理步骤、冻结参数、两项 HiWA 指标及附加诊断。原版 `code/hiwa_original.py` **未修改**。

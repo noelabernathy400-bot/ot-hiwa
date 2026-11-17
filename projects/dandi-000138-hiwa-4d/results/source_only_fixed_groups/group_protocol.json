@@ -1,0 +1,43 @@
+{
+  "dataset": "DANDI:000138",
+  "version": "0.220113.0407",
+  "frozen_input_sha256": "adb71e375cffae2105a0aa37fb26ee6f7be4c331b72b132c8b1c1ea067615fd7",
+  "protocol": "KMeans(source TRAIN only); propagate labels by true neural/hand time-window index; NEVER cluster target; NEVER recluster after alignment",
+  "shared_label_uses_known_training_pairing": true,
+  "source_training_only_kmeans": true,
+  "target_clustering_performed": false,
+  "labels_reassigned_after_alignment": false,
+  "samples": 17500,
+  "training_windows": 14000,
+  "test_windows": 3500,
+  "K": 4,
+  "seed": 42,
+  "source_train_silhouette_sampled": 0.3405805520828789,
+  "source_group_sizes": [
+    4137,
+    4316,
+    3146,
+    2401
+  ],
+  "target_group_sizes": [
+    4137,
+    4316,
+    3146,
+    2401
+  ],
+  "source_norm_mean": [
+    1.1510968007704444e-06,
+    3.960188228770026e-07,
+    -7.808700037068255e-07,
+    -3.0485692955802993e-07
+  ],
+  "target_norm_mean": [
+    -6.0180555010447275e-09,
+    -1.124003340789516e-08,
+    -3.754441942354398e-09,
+    -4.584366771658616e-09
+  ],
+  "source_norm_radius": 4.600036979534769,
+  "target_norm_radius": 1.9999999878881636,
+  "label_sha256": "cc6056c539fe62449d6f799d50d56819b29daebd03aed67a34a9b00eeb982307"
+}
