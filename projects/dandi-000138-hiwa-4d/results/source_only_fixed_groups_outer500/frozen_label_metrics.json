@@ -1,0 +1,146 @@
+{
+  "experiment": "2026-11-17 source-only KMeans, paired label propagation, original Hard HiWA",
+  "dataset": "DANDI:000138/0.220113.0407",
+  "protocol": "KMeans fitted on source training features ONCE; all target labels inherited via known paired time-window ID; no second clustering, no post-alignment relabeling",
+  "paired_labels_use_supervision": true,
+  "original_hiwa_implementation_unchanged": true,
+  "original_solver_sha256": "4419e19004b06c7840d187ddb12a19b2ad97974dd28ad1dc9510d8ead741da6a",
+  "source_and_target_labels_identical": true,
+  "training_n": 14000,
+  "test_n": 3500,
+  "training_trials": 400,
+  "test_trials": 100,
+  "group_size_train": [
+    4137,
+    4316,
+    3146,
+    2401
+  ],
+  "group_size_test": [
+    1011,
+    1033,
+    777,
+    679
+  ],
+  "before_identity": {
+    "one_nn_shared_group": 0.23142857142857143,
+    "MAE": 0.531485858424442,
+    "RMSE": 0.6707795264761119,
+    "paired_relative_MSE": 1.7926562659232206,
+    "rMSE_rotation_proxy": 1.9646984225940962,
+    "R2": -0.7964864342687017
+  },
+  "supervised_train_pairing_procrustes_diagnostic": {
+    "one_nn_shared_group": 0.7274285714285714,
+    "MAE": 0.3816161432870931,
+    "RMSE": 0.5153604645729444,
+    "paired_relative_MSE": 1.0581801833391669,
+    "rMSE_rotation_proxy": 0.0,
+    "R2": -0.06044107870381943
+  },
+  "seed_results": [
+    {
+      "seed": 42,
+      "iterations": 500,
+      "converged": true,
+      "R_det": -1.0000000000000007,
+      "metrics": {
+        "one_nn_shared_group": 0.31857142857142856,
+        "MAE": 0.5188448641492795,
+        "RMSE": 0.6635857262755113,
+        "paired_relative_MSE": 1.754411630772126,
+        "rMSE_rotation_proxy": 1.980826377424145,
+        "R2": -0.7581600860788473
+      }
+    },
+    {
+      "seed": 43,
+      "iterations": 500,
+      "converged": true,
+      "R_det": 1.0000000000000004,
+      "metrics": {
+        "one_nn_shared_group": 0.4725714285714286,
+        "MAE": 0.48774793401876193,
+        "RMSE": 0.6251216337811037,
+        "paired_relative_MSE": 1.556920668711774,
+        "rMSE_rotation_proxy": 1.7389356915925422,
+        "R2": -0.5602471671460147
+      }
+    },
+    {
+      "seed": 44,
+      "iterations": 500,
+      "converged": true,
+      "R_det": 0.9999999999999997,
+      "metrics": {
+        "one_nn_shared_group": 0.6917142857142857,
+        "MAE": 0.40584232388410985,
+        "RMSE": 0.5252681532216864,
+        "paired_relative_MSE": 1.0992578287432173,
+        "rMSE_rotation_proxy": 0.09684149623686884,
+        "R2": -0.10160649012309775
+      }
+    },
+    {
+      "seed": 45,
+      "iterations": 500,
+      "converged": true,
+      "R_det": 0.9999999999999996,
+      "metrics": {
+        "one_nn_shared_group": 0.2865714285714286,
+        "MAE": 0.5445576907152433,
+        "RMSE": 0.6830803957053948,
+        "paired_relative_MSE": 1.8590071875919498,
+        "rMSE_rotation_proxy": 1.7557297920349522,
+        "R2": -0.862979120538208
+      }
+    },
+    {
+      "seed": 46,
+      "iterations": 500,
+      "converged": true,
+      "R_det": 0.9999999999999997,
+      "metrics": {
+        "one_nn_shared_group": 0.11771428571428572,
+        "MAE": 0.5313411055804756,
+        "RMSE": 0.6627851969925393,
+        "paired_relative_MSE": 1.7501812482247656,
+        "rMSE_rotation_proxy": 1.8910687541698754,
+        "R2": -0.7539206649457693
+      }
+    }
+  ],
+  "statistics": {
+    "one_nn_shared_group": {
+      "mean": 0.37742857142857145,
+      "sd_sample": 0.2162165392303158
+    },
+    "MAE": {
+      "mean": 0.497666783669574,
+      "sd_sample": 0.05547824620023882
+    },
+    "RMSE": {
+      "mean": 0.631968221195247,
+      "sd_sample": 0.06323287766804782
+    },
+    "paired_relative_MSE": {
+      "mean": 1.6039557128087665,
+      "sd_sample": 0.3024906588642111
+    },
+    "rMSE_rotation_proxy": {
+      "mean": 1.4926804222916767,
+      "sd_sample": 0.7866388422521957
+    },
+    "R2": {
+      "mean": -0.6073827057663875,
+      "sd_sample": 0.303136956856977
+    }
+  },
+  "graph_seed": 42,
+  "one_nn_label_policy": "target queries closest aligned source test point; target labels inherited from its paired source; no permutation",
+  "MAE_policy": "mean abs difference over paired four-dimensional heldout coordinates",
+  "paired_relative_MSE_policy": "SSE / sum_target_squared; no square root (different from unknown-groundtruth rotation-rMSE)",
+  "rMSE_rotation_proxy_policy": "original PyHiWA _rMSE using TRAIN-only Procrustes as surrogate R_gt; no actual R_gt exists",
+  "R2_policy": "1 - SSE/SST on held-out paired four-dimensional windows",
+  "caveat": "Target labels transferred via pairing; benchmark has correspondence supervision. DO NOT compare as unsupervised group-discovery HiWA."
+}
