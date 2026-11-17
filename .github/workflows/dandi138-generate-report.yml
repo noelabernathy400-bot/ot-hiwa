@@ -27,7 +27,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-            texlive-xetex texlive-lang-chinese texlive-latex-extra \
+            texlive-xetex texlive-lang-chinese texlive-latex-extra texlive-fonts-recommended \
             fonts-noto-cjk fonts-liberation fonts-dejavu-core poppler-utils
       - name: Compute frozen-data research diagnostics
         env:
