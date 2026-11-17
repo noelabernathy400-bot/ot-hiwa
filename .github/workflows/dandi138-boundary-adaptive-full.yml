@@ -1,0 +1,133 @@
+name: DANDI138 boundary adaptive soft GCOT selection and outer-test
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-boundary-adaptive-full.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  boundary-inner-selection-outer-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned-API scientific dependencies
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Run inner trial validation and outer sealed-test boundary adaptive ablation
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/run_boundary_adaptive_ablation.py \
+            --fixed projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz \
+            --archive projects/dandi-000138-hiwa-4d/results/controlled_hard_vs_soft_PQ/CONTROLLED_ABLATION.json \
+            --output projects/dandi-000138-hiwa-4d/results/boundary_adaptive_trial_cv \
+            --h-quantiles .10 .30 .60 --taus .20 .40 \
+            --val-trials 80 --val-seeds 42 43 44 --final-seeds 42 43 44 45 46 \
+            --outer 500 --inner 20 --local-sinkhorn 45 --group-sinkhorn 200 \
+            --eval-Q-iters 120
+      - name: Validate fixed original labels and sealed-trial model-selection protocol
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,numpy as np
+          folder=Path('projects/dandi-000138-hiwa-4d/results/boundary_adaptive_trial_cv')
+          j=json.loads((folder/'BOUNDARY_ADAPTIVE_RESULTS.json').read_text())
+          assert j['source_one_KMeans_only'] and j['original_hard_labels_unchanged']
+          assert j['target_membership_inherited_by_true_paired_window']
+          assert j['validation_train_trials']==320 and j['validation_trials']==80
+          assert j['final_test_trials']==100
+          assert len(j['validation_candidates'])==6 and len(j['test_runs'])==5
+          assert len(j['val_seed_list'])==3 and len(j['final_seed_list'])==5
+          assert j['selection_metric'].startswith('mean inner-val')
+          assert j['selected_h_tau']['h']>0
+          for row in j['validation_candidates']:
+              assert len(row['runs'])==3
+              assert row['h']>0 and row['tau']>0
+              assert 0<=row['entropy']<=1
+          for r in j['test_runs']:
+              assert r['OT_after']['max_Q_marginal_error']<1e-5
+              assert np.isfinite(list(r['evaluation'].values())).all()
+              assert np.linalg.norm(np.asarray(r['R']).T@np.asarray(r['R'])-np.eye(4),'fro')<1e-7
+              assert np.isfinite(r['train_components']['global_geometry_total_W2sq'])
+          for path in ['boundary_validation_grid.png',
+                       'boundary_vs_hard_soft_all_errors.png',
+                       'boundary_before_after_target_six_views.png']:
+              assert (folder/path).stat().st_size>40000
+          print('PASS: 6 candidates, 3 seed validation, 5 final seeds; test untouched by selection')
+          PY
+      - name: Append formal experimental result to project log
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('projects/dandi-000138-hiwa-4d')
+          j=json.loads((root/'results/boundary_adaptive_trial_cv/BOUNDARY_ADAPTIVE_RESULTS.json').read_text())
+          selected=j['selected_h_tau']
+          best=j['test_summary']
+          hd=j['archived_control_summaries']['hard']
+          ft=j['archived_control_summaries']['tau0.20']
+          header='## 2026-11-17 · 实验 G：Boundary-Adaptive Soft (内部验证独立选参)'
+          log=root/'EXPERIMENT_LOG.md'
+          old=log.read_text(encoding='utf-8')
+          if header not in old:
+              s=[header,'',
+                 '**研究问题**：只在 K-means 边界附近提高软隶属度，而组内部保持接近硬分配，'
+                 '能否在一个求解器与相同组标签下改善完整分层 OT 和固定同组 OT？',
+                 '',
+                 '设置：源域原 4D K-means K=4 一次，目标不聚类，目标权重直接由同步源继承；'
+                 '设 Δ=第二最近中心距离平方−最近中心距离平方，'
+                 'α=exp(−Δ/h)，A=(1−α)onehot+α distance-softmax(τ)。',
+                 '对原400个训练试次划 320/80 内部训练/验证，验证3 seeds、6 candidate，'
+                 '由**内部验证固定同组 OT**选 h/τ；原100测试试次仅用于最终5 seeds评估。',
+                 '',
+                 f"选中内部验证参数：{selected['name']}（h={selected['h']:.6f},τ={selected['tau']:.2f}）。",
+                 '',
+                 '| 方法 | 测试 P-Q 总 OT↓ | 固定同组 OT↓ | 全域 OT↓ | R²↑ |',
+                 '|---|---:|---:|---:|---:|']
+              for name,rows in [('Hard',hd),('固定 Soft τ=.20',ft),('Boundary soft',best)]:
+                  s.append(f"| {name} | {rows['hierarchical_PQ_OT']['mean']:.5f} | "
+                           f"{rows['same_group_W2sq']['mean']:.5f} | "
+                           f"{rows['global_W2sq']['mean']:.5f} | {rows['R2']['mean']:.5f} |")
+              s+=['',
+               f"新方法最终数值审计：{sum(r['strict_audit_passed'] for r in j['test_runs'])}/5，"
+               '其含义为满足预设数值残差阈值，不是全局最优证明。',
+               '**内验证依赖旧400训练试次拟合的原型、PCA和归一化，不是完全嵌套的无监督表示学习验证**；'
+               '原100试次测试集依然封存到选参之后。',
+               '',
+               '[完整正式报告](results/boundary_adaptive_trial_cv/BOUNDARY_ADAPTIVE_REPORT.md)',
+               '',
+               '![内部验证参数](results/boundary_adaptive_trial_cv/boundary_validation_grid.png)',
+               '',
+               '![四种误差对照](results/boundary_adaptive_trial_cv/boundary_vs_hard_soft_all_errors.png)',
+               '',
+               '---','','']
+              old=old.replace('# 实验日志（持续更新）\n',
+                  '# 实验日志（持续更新）\n\n'+'\n'.join(s),1)
+              log.write_text(old,encoding='utf-8')
+          PY
+      - name: Commit data, model outputs and plots as separate new experiment
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/boundary_adaptive_trial_cv \
+              projects/dandi-000138-hiwa-4d/EXPERIMENT_LOG.md
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish trial-wise validation selected boundary adaptive Soft GCOT, outer-test and full OT comparisons'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-boundary-adaptive-inner-CV-outer-test
+          path: projects/dandi-000138-hiwa-4d/results/boundary_adaptive_trial_cv
+          if-no-files-found: warn
