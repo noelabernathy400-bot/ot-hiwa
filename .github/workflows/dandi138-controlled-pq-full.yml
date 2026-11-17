@@ -1,0 +1,117 @@
+name: DANDI138 controlled GCOT hard-vs-soft TOTAL OT 5seed
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-controlled-pq-full.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  five-seed-controlled:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install scientific dependencies
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Run 5 common seeds x Hard, Soft tau .20 .40 .80, same exact GCOT solver
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/run_controlled_soft_hard_ablation.py \
+            --fixed projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz \
+            --hard projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/hard_hiwa_results.json \
+            --hard-ot projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/ot_evaluation/OT_HELDOUT_METRICS.json \
+            --output projects/dandi-000138-hiwa-4d/results/controlled_hard_vs_soft_PQ \
+            --seeds 42 43 44 45 46 --tau-grid .20 .40 .80 \
+            --outer 500 --inner 20 --sample-sinkhorn 45 --group-sinkhorn 200 \
+            --eval-Q-iters 120 --eval-per-group 32 \
+            --mu .05 --sample-gamma .1 --group-gamma .2
+      - name: Audit apples-to-apples source samples, labels, Q/P and metrics
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,numpy as np
+          d=Path('projects/dandi-000138-hiwa-4d/results/controlled_hard_vs_soft_PQ')
+          z=json.loads((d/'CONTROLLED_ABLATION.json').read_text())
+          assert z['same_training_indices_per_seed'] and z['same_initialization_per_seed']
+          assert z['target_membership_copied_by_true_pairing'] and not z['independent_target_clustering']
+          assert z['labels_never_changed']
+          assert set(z['runs'])=={'hard','tau0.20','tau0.40','tau0.80'}
+          assert all(len(x)==5 for x in z['runs'].values())
+          for seed_index in range(5):
+              rows=[x[seed_index] for x in z['runs'].values()]
+              assert len({r['seed'] for r in rows})==1
+              assert all(np.isfinite(list(r['metrics'].values())).all() for r in rows)
+              assert all(np.isfinite(r['heldout_after']['total_transport_W2sq']) for r in rows)
+              assert all(r['heldout_after']['max_Q_marginal_error']<1e-5 for r in rows)
+              assert all(r['training_total']['max_sample_Q_marginal_error']<1e-5 for r in rows)
+              assert all(np.linalg.norm(np.asarray(r['R']).T@np.asarray(r['R'])-np.eye(4),'fro')<1e-7 for r in rows)
+              assert all(abs(np.asarray(r['P']).sum()-1)<1e-8 for r in rows)
+          assert (d/'controlled_soft_hard_all_OT_errors.png').stat().st_size>40000
+          assert (d/'hard_soft_target_six_pairs.png').stat().st_size>100000
+          print('PASS: 5x4 matched solver runs, fixed membership, exact source objective and heldout P-Q')
+          PY
+      - name: Insert full P-Q transport, OT and prediction results in experiment log
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('projects/dandi-000138-hiwa-4d')
+          data=json.loads((root/'results/controlled_hard_vs_soft_PQ/CONTROLLED_ABLATION.json').read_text())
+          header="## 2026-11-17 · 实验 F：完全同一 GCOT 求解器的 Hard vs Soft 温度消融"
+          log=root/'EXPERIMENT_LOG.md'
+          content=log.read_text(encoding='utf8')
+          if header not in content:
+              t=[header,"",
+                "现行 **控制变量实验**：源域唯一 KMeans、目标继承源隶属度、配对数据/训练采样/种子/求解器和迭代预算完全一致，",
+                "唯一改变量是每个训练点属于四组的权重：Hard one-hot 与 Soft τ=0.20/0.40/0.80。",
+                "",
+                "本次特别重新计算 **完整分层 P-Q 几何总传输代价**：",
+                "测试样本中 P 只用训练学习到的矩阵，Q 按原 GCOT 的 epsilon_sample/P_ij 重新求解。",
+                "几何代价与熵正则项拆开报告，训练完整目标的源码公式逐项校验通过。",
+                "",
+                "| 模式 | 测试 P-Q 总 OT 代价 | 固定同组 OT | 全域 OT | R² | 审计 |",
+                "|---|---:|---:|---:|---:|---:|"]
+              for name,x in data['summary'].items():
+                  t.append(f"| {name} | {x['total_PQ_OT_after']['mean']:.6f} | "
+                           f"{x['fixed_group_W2sq']['mean']:.6f} | "
+                           f"{x['global_W2sq']['mean']:.6f} | {x['R2']['mean']:.6f} | "
+                           f"{x['numerical_audit_passed']}/5 |")
+              t+=["","[详细逐种子数学与原始数值](results/controlled_hard_vs_soft_PQ/CONTROLLED_ABLATION.md)",
+                  "",
+                  "![四项误差比较](results/controlled_hard_vs_soft_PQ/controlled_soft_hard_all_OT_errors.png)",
+                  "",
+                  "**限制**：这里的 Soft 是固定源 KMeans 原型的距离 softmax，不是作者 TPAMI 对两域各自学习原型的完全无监督 Soft-GCOT；目标仍继承同步索引。",
+                  "温度对比为探索性测试集评价，不能使用测试结果进行无偏超参选择。",
+                  "",
+                  "---","",""]
+              content=content.replace('# 实验日志（持续更新）\n',
+                 '# 实验日志（持续更新）\n\n'+'\n'.join(t),1)
+              log.write_text(content,encoding='utf8')
+          PY
+      - name: Commit source-based results and plots to existing project
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/controlled_hard_vs_soft_PQ \
+              projects/dandi-000138-hiwa-4d/EXPERIMENT_LOG.md
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Controlled five-seed hard and soft membership ablation with exact P-Q total OT metrics'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-controlled-soft-hard-five-seed-total-OT
+          path: projects/dandi-000138-hiwa-4d/results/controlled_hard_vs_soft_PQ
+          if-no-files-found: warn
