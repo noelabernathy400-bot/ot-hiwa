@@ -38,6 +38,33 @@
 
 ---
 
+## 边界自适应软分组正式实验（2026-11-17）：320/80 内验证 + 100 外测试
+
+**结论：**选出的边界自适应 Soft 略微改善同编号固定组 OT，但整体分层总 OT 没有超过 Hard；没有证据表明其整体更优。
+
+在唯一源域 K-means(K=4) 的四维神经空间中，定义 Δ = 次近中心距离平方 − 最近中心距离平方，α = exp(−Δ/h)，最终隶属度 A = (1−α)×onehot + α×softmax(−距离平方/(2τ²))。目标域直接从同步源时间窗继承隶属度，不独立聚类，变换后组标签完全不变。
+
+在旧 400 个训练试次中分出 320/80 试次拟合/验证；h 在训练边界间隔 10%、30%、60% 分位数中选，τ∈{0.20,0.40}；三种种子做内部验证，预先约定按固定同组 OT 最小选参。最终在完整 400 训练试次重新拟合 5 seeds，对独立的 100 测试试次报告结果。PCA、标准化、唯一源域 K-means 原型沿用已在全部 400 训练试次拟合的缓存，故内部验证不是完全嵌套的表征预处理验证，但原 100 测试试次没有参与选参。
+
+**内部验证选择 h=0.209933、τ=0.20（最窄过渡）。**该方案的训练平均软隶属度熵 0.03328，平均 α 为 0.10370；内部验证组 OT 为 0.84835，而 Hard 为 0.84638，尚未超过 Hard。
+
+| 同 GCOT 求解器、5 seeds | P-Q 总 OT↓ | 固定同组 OT↓ | 全域 OT↓ | MAE↓ | R²↑ | 1NN↑ |
+|---|---:|---:|---:|---:|---:|---:|
+| Hard one-hot | **1.65257** | 0.98655 | **0.41854** | 0.52131 | -0.74185 | 36.19% |
+| 固定 Soft τ=0.20 | 1.65883 | **0.96980** | 0.42092 | **0.51901** | **-0.72735** | **36.48%** |
+| 边界自适应 Soft | 1.65493 | 0.97898 | 0.41977 | 0.52023 | -0.73633 | 36.22% |
+
+五种随机初始化全部通过数值审计。与 Hard 配对比较，边界自适应在 4/5 seed 上降低了固定同组 OT，但均值降幅仅约 0.77%；P-Q 总 OT 反而升高约 0.14%。改进幅度远小于不同种子的离散程度，不能宣称具有统计意义。不同隶属度的 P-Q 代价涉及不同组条件分布；固定同组与全域 OT 是重要的共同分布检验。
+
+![训练内部验证参数比较](results/boundary_adaptive_trial_cv/boundary_validation_grid.png)
+
+![Hard、固定 Soft、自适应 Soft 的测试误差](results/boundary_adaptive_trial_cv/boundary_vs_hard_soft_all_errors.png)
+
+![源域变换前、自适应变换后、目标域四维六投影](results/boundary_adaptive_trial_cv/boundary_before_after_target_six_views.png)
+
+[详细报告](results/boundary_adaptive_trial_cv/BOUNDARY_ADAPTIVE_REPORT.md) · [原始数据与全部种子 R/P/误差](results/boundary_adaptive_trial_cv/BOUNDARY_ADAPTIVE_RESULTS.json) · [可复现 Python](code/run_boundary_adaptive_ablation.py) · [成功实验记录](https://github.com/noelabernathy400-bot/ot-hiwa/actions/runs/44096230862)
+
+---
 ## 最新正式控制变量研究：同一求解器下 Soft 温度与总分层 OT
 
 此次使用**完全相同的用户 ZIP 中 GCOT 分层 OT 求解器**（不是把原版 PyHiWA 直接与 GCOT 相比），同一 DANDI 000138 四维数据、唯一源域 K-means 四个原型、相同训练/测试划分、相同 160 点训练池、5 个种子与相同初始化。仅改变组成员关系：**Hard one-hot 或源原型距离 softmax（τ=0.20/0.40/0.80）**。目标软隶属度按真实同步索引继承，没有额外目标域 K-means；变换后也不重新分组。
