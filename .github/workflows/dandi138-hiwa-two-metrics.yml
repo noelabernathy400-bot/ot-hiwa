@@ -1,0 +1,40 @@
+name: DANDI 000138 HiWA two-metric verification
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-hiwa-two-metrics.yml]
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: python -m pip install numpy scipy scikit-learn
+      - name: Recalculate HiWA evaluation from frozen 4D data and rotations
+        run: |
+          python projects/dandi-000138-hiwa-4d/code/evaluate_hiwa_two_metrics.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --alignment projects/dandi-000138-hiwa-4d/results/hard_hiwa/hard_hiwa_results.json \
+            --output /tmp/hiwa_rmse_r2_evaluation.json
+      - name: Check invariants and reported scores
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/hiwa_rmse_r2_evaluation.json'))
+          assert len(d['seeds']) == 5
+          assert all(s['converged'] for s in d['seeds'])
+          assert abs(d['statistics']['rMSE_proxy']['mean'] - 1.916213566087856) < 1e-8
+          assert abs(d['statistics']['R2']['mean'] - (-0.8947206764033258)) < 1e-8
+          assert d['ground_truth_rotation_known'] is False
+          print('Two-metric verification PASSED')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dandi138-hiwa-rmse-r2
+          path: /tmp/hiwa_rmse_r2_evaluation.json
