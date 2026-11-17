@@ -2,6 +2,15 @@
 
 **项目唯一入口：** [实验日志](EXPERIMENT_LOG.md) · [冻结协议](PROTOCOL.md) · [实验代码](code/) · [真实数据结果](results/)
 
+## 四维 Hard HiWA 正式技术报告（XeLaTeX 编译）
+
+- **[阅读 13 页 PDF：数据来源、预处理、两域原始簇图、算法与失败诊断](四维HardHiWA实验与问题诊断.pdf)**
+- [LaTeX 源码](四维HardHiWA实验与问题诊断.tex)（XeLaTeX / ctexart）
+- [新增问题诊断结果（JSON + PNG）](results/diagnostics/) · [诊断代码](code/) · [更新后的实验日志](EXPERIMENT_LOG.md)
+- [GitHub Actions 自动编译与可复现实验日志](https://github.com/noelabernathy400-bot/ot-hiwa/actions/workflows/dandi138-generate-report.yml)
+
+**新诊断摘要：** 神经四维 PCA 表示并非没有运动信息——同一留出测试集的监督全线性 Ridge 映射得到标准 `R²=0.2868`，但监督**正交** Procrustes 只有 `R²=-0.0604`，原版无监督 Hard HiWA 五次均值 `R²=-0.8947`。此外，在固定目标评价窗口条件下，由训练验证选取的神经领先行为 140ms 给出监督 Ridge 测试 `R²=0.3902`；目标域实际簇质量与原版 HiWA 强制的均匀 25% 组质量不一致。**以上监督模型和时间分析仅是诊断，不代表改进了 HiWA，不能据此断言存在已确定的生理时间延迟。**
+
 ## 核心研究问题
 神经放电的 4D PCA 表示和原生四维手部运动 \((x,y,v_x,v_y)\) 是否具有可由无监督 Hard HiWA 恢复的共通几何？通过原版 rMSE（代理参照）与标准 held-out R² 评价，是否真实改善运动预测？
 
