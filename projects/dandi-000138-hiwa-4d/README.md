@@ -38,6 +38,30 @@
 
 ---
 
+## 最新进展：Soft-GCOT vs Hard HiWA（五种初始化）
+
+复用相同 DANDI 000138 四维特征、trial 划分、唯一源域 K-means 四个中心、目标继承标签与同一留出测试样本。**Soft 使用固定源原型的距离 softmax（τ=0.40）生成连续隶属度，目标按配对索引继承；不对目标单独聚类，不改变原硬标签的 argmax 身份。** 使用上传压缩包原版 GCOT 分层 OT 求解器，保持对齐的全局正交输出，五种种子，outer=500、inner=20、sample Sinkhorn=45、40/组采样。Soft 与 Hard 的实现及每组有效支持不同，因而是方法级对照，不能将差异完全归因于软化本身。
+
+| 归一化测试指标 | 未对齐 | Hard（均值 ± SD） | Soft（均值 ± SD） |
+|---|---:|---:|---:|
+| 全域自由 OT W₂² ↓ | 0.43948 | **0.40482 ± 0.04367** | 0.42786 ± 0.03653 |
+| **同编号固定组 OT W₂² ↓** | 1.23175 | **0.96642 ± 0.29007** | 0.97591 ± 0.21394 |
+| MAE ↓ | 0.53149 | **0.49767 ± 0.05548** | 0.52215 ± 0.02929 |
+| R² ↑ | -0.79649 | **-0.60738 ± 0.30314** | -0.73686 ± 0.16337 |
+| 共享标签 1NN ↑ | 23.14% | **37.74% ± 21.62%** | 34.57% ± 17.19% |
+
+**阶段性判断：** Soft 对未对齐基线也能降低固定同组 OT（1.23175→0.97591，约 20.8%），但没有超越 Hard 平均值（0.96642）。这不意味着软分组一般无效；仅有五个随机种子，结论受当前温度、优化器、数据表示及结构假设限制。全部五个 Soft seed 通过预设数值审计，结果如实保留。
+
+![Hard/Soft/Target：相同标签三域直接散点比较](results/soft_fixedgroup_vs_hard/hard_soft_target_xy.png)
+
+![Hard Soft OT/R2 numerical comparison](results/soft_fixedgroup_vs_hard/soft_hard_global_groupOT_R2.png)
+
+[完整六投影三域散点图](results/soft_fixedgroup_vs_hard/hard_soft_target_six_pairs.png) · [详细对照报告](results/soft_fixedgroup_vs_hard/SOFT_HARD_COMPARISON.md) · [原始逐种子 R/P/指标 JSON](results/soft_fixedgroup_vs_hard/SOFT_HARD_COMPARISON.json) · [Soft-GCOT 运行器](code/run_soft_fixedgroup.py) · [上传压缩包原始 GCOT 源码快照](code/zip_gcot/)
+
+**方法学限定：**目标软隶属度基于已知同步配对索引继承，因此不是 TPAMI 原版中两域分别学习原型的无监督 Soft-GCOT；不能将本对照视为原论文 Soft-GCOT 性能的直接复现。
+
+---
+
 ## 当前正式结果：500 次以内运行的五个种子
 
 相同测试集、相同归一化、相同四维表示：

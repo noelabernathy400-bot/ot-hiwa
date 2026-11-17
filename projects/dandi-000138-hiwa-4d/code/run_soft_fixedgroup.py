@@ -245,7 +245,7 @@ def main():
                   else json.loads((args.hard.parent/"frozen_label_metrics.json").read_text())["statistics"])
         if hard_key in fromhard:
             hard_stats[metric]={"mean":float(fromhard[hard_key]["mean"]),
-                                "sample_sd":float(fromhard[hard_key].get("sample_sd",0.))}
+                                "sample_sd":float(fromhard[hard_key].get("sample_sd",fromhard[hard_key].get("sd_sample",0.)))}
     # Store source memberships for inspectability, but not redundant target B.
     np.savez_compressed(args.output/"soft_group_memberships.npz",
                         train_soft=soft[tr].astype(np.float32),
