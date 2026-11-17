@@ -6,6 +6,8 @@ on:
       - "experiments/hyser/Hyser_Hard_HiWA_实验报告.tex"
       - "experiments/hyser/figures/clouds_base36.txt"
       - "experiments/hyser/scripts/expand_clouds.py"
+      - "experiments/hyser/scripts/render_report_figures.py"
+      - "experiments/hyser/figures/original200_base36.txt"
       - ".github/workflows/hyser-latex-report.yml"
   workflow_dispatch:
 permissions:
@@ -20,6 +22,10 @@ jobs:
           persist-credentials: true
       - name: Expand documented 250-point figure data
         run: python3 experiments/hyser/scripts/expand_clouds.py
+      - name: Install plotting dependencies and generate source-based images
+        run: |
+          python3 -m pip install --quiet numpy matplotlib
+          python3 experiments/hyser/scripts/render_report_figures.py
       - name: Compile XeLaTeX PDF
         uses: xu-cheng/latex-action@v4
         with:
