@@ -12,6 +12,7 @@
 \fancyhead[L]{\footnotesize DANDI 000138 · 单次源域硬分组实验}
 \fancyhead[R]{\footnotesize 2026-11-17}
 \fancyfoot[C]{\thepage\ /\pageref{LastPage}}
+\makeatletter\let\primitiveinput\@@input\makeatother
 \newcommand{\R}{\mathbb{R}}
 \begin{document}
 
@@ -150,7 +151,7 @@ Procrustes，而非不存在的真实旋转 $R_{\mathrm{gt}}$。
 \begin{tabular}{lrrrrr}\toprule
 方法 & 共享标签 1NN $\uparrow$ & MAE $\downarrow$ &
 paired-rMSE $\downarrow$ & 旋转 rMSE 代理 $\downarrow$ & $R^2 \uparrow$\\\midrule
-\input{results/source_only_fixed_groups/metrics_rows.tex}
+\primitiveinput{results/source_only_fixed_groups/metrics_rows.tex}
 \bottomrule
 \end{tabular}}
 \end{table}
