@@ -1,0 +1,55 @@
+name: DANDI138 controlled Hard-vs-Soft PQ OT pilot
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-controlled-pq-pilot.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install scientific dependencies
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Pilot all four memberships in the SAME archive GCOT solver
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/run_controlled_soft_hard_ablation.py \
+            --fixed projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz \
+            --hard projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/hard_hiwa_results.json \
+            --hard-ot projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/ot_evaluation/OT_HELDOUT_METRICS.json \
+            --output projects/dandi-000138-hiwa-4d/results/controlled_soft_hard_pilot \
+            --seeds 42 --outer 3 --inner 3 --sample-sinkhorn 15 --eval-Q-iters 70
+      - name: Verify output structure and objective decomposition
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/controlled_soft_hard_pilot')
+          d=json.loads((p/'CONTROLLED_ABLATION.json').read_text())
+          assert set(d['runs'])=={'hard','tau0.20','tau0.40','tau0.80'}
+          assert all(len(v)==1 for v in d['runs'].values())
+          for rs in d['runs'].values():
+            s=rs[0]
+            assert np.isfinite(list(s['metrics'].values())).all()
+            assert s['heldout_after']['max_Q_marginal_error'] <1e-5
+            assert np.isfinite(s['training_total']['ZIP_original_entropy_objective_scaled'])
+          assert (p/'controlled_soft_hard_all_OT_errors.png').stat().st_size>10000
+          print('PILOT VERIFIED')
+          PY
+      - name: Upload pilot artifacts even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dandi138-controlled-pq-pilot
+          path: projects/dandi-000138-hiwa-4d/results/controlled_soft_hard_pilot
+          if-no-files-found: warn
