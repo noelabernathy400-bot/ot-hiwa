@@ -28,7 +28,7 @@ PhysioNet Hyser Random Task，subject01/session1/sample1，长25秒。
 \widetilde Y=(Y-\bar Y)\Sigma_Y^{-1/2},\quad
 \operatorname{Cov}(\widetilde X)\simeq\operatorname{Cov}(\widetilde Y)\simeq I_3.
 \]
-只在源域做一次K-means（$K=4$、seed42、n_init30），组大小为46、53、91、60；
+只在源域做一次K-means（$K=4$、seed42、初始化次数30），组大小为46、53、91、60；
 目标域按照同步窗口一一继承相同组标签，绝不单独聚类。传递组标签使用了真实配对，
 因此它是\textbf{已知组对应的诊断实验，而不是完全无监督HiWA}。
 
