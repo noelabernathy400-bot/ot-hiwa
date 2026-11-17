@@ -1,0 +1,74 @@
+{
+  "data": "real Hyser 250x3 separately whitened synchronized windows; synchronization evaluation only",
+  "protocol": "independent source/target KMeans and soft memberships, no label or paired information transferred during fit",
+  "common_params": {
+    "k": 4,
+    "mu": 0.05,
+    "epsilon_sample": 0.1,
+    "epsilon_group": 0.2,
+    "scale": "1/sqrt(3)",
+    "seeds": [
+      40,
+      41,
+      42,
+      43,
+      44
+    ],
+    "maxiter": 180,
+    "stop": {
+      "rotation_delta": 0.01,
+      "consensus": 0.01,
+      "marginal": 0.000001
+    }
+  },
+  "group_OT": "same entropic OT objective, 4x4 dual-root high accuracy numerical solver replacing 1000 Sinkhorn updates",
+  "r2_summary": {
+    "hard": {
+      "mean": -0.9200296563021775,
+      "sample_sd": 0.1667537980769105,
+      "mean_ot_after": 0.4193749397518777,
+      "passes": 5
+    },
+    "soft_kmeans": {
+      "mean": -0.8682007678791805,
+      "sample_sd": 0.04808095234757347,
+      "mean_ot_after": 0.445691492168191,
+      "passes": 5,
+      "hard_better_in": 2,
+      "soft_better_in": 3
+    },
+    "soft_prototype": {
+      "mean": -1.0479312360072892,
+      "sample_sd": 0.21157595139599755,
+      "mean_ot_after": 0.5135011134080292,
+      "passes": 5
+    }
+  },
+  "inherited_group_references": {
+    "hard_r2": -0.15390665810472481,
+    "soft_prototype_r2": -0.14256180632405013,
+    "paired_oracle_r2": -0.13692797684174352
+  },
+  "seed42": {
+    "hard": {
+      "r2": -0.864432299456789,
+      "ot_before": 2.3607938842519283,
+      "ot_after": 0.3960578464136195,
+      "P_mass_on_true_group_perm": 0.25000727852707105
+    },
+    "soft_kmeans": {
+      "r2": -0.8626041250358878,
+      "ot_before": 2.3349893798507617,
+      "ot_after": 0.4062982115216293,
+      "P_mass_on_true_group_perm": 0.25000762079968875
+    },
+    "soft_prototype": {
+      "r2": -1.1558221931269346,
+      "ot_before": 1.375091406894931,
+      "ot_after": 0.5053604105573143,
+      "P_mass_on_true_group_perm": 0.00020701475429679074
+    }
+  },
+  "convergence_limit": "Rotation change, primal consensus, marginal errors checked; not a formal global/KKT proof",
+  "code_provenance": "local faithful mathematical transcription of user GitHub code; group OT dual solver numerical precision upgrade; not original source executed byte-for-byte"
+}
