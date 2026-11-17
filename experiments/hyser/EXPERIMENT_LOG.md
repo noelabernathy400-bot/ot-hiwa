@@ -130,3 +130,23 @@
 ## 新上传的 GCOT 包源码核对（2026-11-17）
 
 已逐项检查用户指定分支 `experiments/dandi-000138-4d-hard-clustering-20261117` 下 `research/GCOT-reproducible-20261018/GC-OT`；它的 HiWA-GMM/HiWA-SSC、Isomap 辅助投影、作者默认 ADMM 参数与旧 Hyser K-means 直接对齐实验不等价。原作者内部 `_eval_R2` 缺平方，但新包 `evaluation/metrics.py` 的 R² 正确。旧250点特征的配对正交 Procrustes oracle SSE=849.2852 > SST=747，因此零时延 R² 的理论上界=-0.13693。仅后移力量 0.1s 的诊断 oracle R²=0.0562，可能存在时延或采样配对问题，不是独立验证。完整对照和新分支直接调用入口见 [新代码审计报告](results/GCOT_NEW_BRANCH_CODE_AUDIT.md) 和 [调用脚本](scripts/run_gcot_branch_hard.py)。
+
+
+## 2026-11-17 最终追加：PCA 后统一尺度、全250点重跑与 PDF
+
+依用户要求，停止 train/holdout 划分，将真实 Hyser sample1 的 250 对窗口全部用于一次性无监督拟合与事后指标评价。重新核对原始肌电 256×51200、手指力量 5×2500，采用 0.1 秒切窗，肌电 RMS→log1p→通道 Z-score→PCA3，力量 thumb/middle/index 3D。然后对两域独立对比 PCA 后 Z-score 与 HiWA 协方差白化。
+
+**实测结果（seed42, K4, 新 GCOT 包的作者参数 μ=.005、tol=.1、内层100、样本 Sinkhorn150、簇级1000）**：
+
+| 预处理 | 方法 | R² | 相对平方误差 | 平均同步配对距离 |
+|---|---|---:|---:|---:|
+| 白化 | 对齐前 | -0.6741 | 1.6741 | 1.9775 |
+| 白化 | K-means/3D HiWA | -0.8876 | 1.8876 | 2.2116 |
+| 白化 | GMM/Isomap HiWA | -1.1681 | 2.1681 | 2.3979 |
+| Z-score | 对齐前 | -0.7096 | 1.7096 | 2.0019 |
+| Z-score | K-means/3D HiWA | -1.2254 | 2.2254 | 2.3650 |
+| Z-score | GMM/Isomap HiWA | -1.2939 | 2.2939 | 2.4509 |
+
+白化后两域协方差均近 I3，说明量纲处理成功。白化零时延的正交 oracle 最高 R²=-0.13693。作者式 legacy 旋转停止准则在白化 K-means 88 轮、GMM 43 轮触发，但局部共识残差约 0.911 / 1.868，**不是严格 ADMM 收敛**。运行使用对新上传 GCOT 包逐公式核对的本地数值移植实现，仓库直接导入脚本尚未独立执行验证。
+
+**交付：**主目录 [LaTeX 编译的四页实验报告](Hyser_Hard_HiWA_实验报告.pdf)、[tex源码](Hyser_Hard_HiWA_实验报告.tex)、[完整记录](results/POST_PCA_NORMALIZATION_AUDIT.md)；报告中的簇图为真实 250 点，绘图坐标量化仅用于图像而非训练。
