@@ -1,3 +1,5 @@
+**实验类型：组级监督诊断（NOT UNSUPERVISED）**。目标训练标签或软隶属度从同步配对的源域标签传播，不能当作严格无监督 Hard HiWA / Soft-GCOT 基线；数值、图像及其他参数保留为历史诊断。见 [专项审计](https://github.com/noelabernathy400-bot/ot-hiwa/blob/main/projects/dandi-000138-hiwa-4d/GROUP_LABEL_LEAKAGE_AUDIT.md)。
+
 # 最终审计结果：同一来源 KMeans、固定组 Hard HiWA，outer≤500
 
 所有组标签严格复用 results/source_only_fixed_groups/fixed_groups_4d.npz；
