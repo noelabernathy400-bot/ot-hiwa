@@ -41,9 +41,9 @@ jobs:
           chosen=train[0] if train else files[0]
           print('Selected official NWB:',chosen,flush=True)
           cmd=[sys.executable,'-m','experiments.dandi_000138.run_hard_clustering',
-               '--nwb',str(chosen),'--k','4','--seed','42',
+               '--nwb',str(chosen.resolve()),'--k','4','--seed','42',
                '--output','results/dandi_000138/hard_clustering']
-          subprocess.run(cmd,cwd='research/GCOT-reproducible-20261018/GC-OT',check=False)
+          subprocess.run(cmd,cwd='research/GCOT-reproducible-20261018/GC-OT',check=True)
           PY
       - name: Archive results and diagnostic logs
         uses: actions/upload-artifact@v4
