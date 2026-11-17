@@ -103,3 +103,20 @@
 
 ### 变更记录
 - 2026-11-17：导入真实 Hyser trial1、250 对同步窗、K=4 独立硬分组与可视化、旧 Hard HiWA 扫描及未收敛的 110 轮运行；核对项目原代码并完成 0.01 双残差参考风格复测。建立本仓库实验目录。
+
+
+---
+
+## 2026-11-17 补充：Hard HiWA 10 seed 距离误差复跑
+
+本次重新运行按源仓库核心数值代码转录的 Hard HiWA，固定统一标准 `mu=.05, tol=.01, outer=200, sa=40, inner Sinkhorn=80, group Sinkhorn=300, K=4`，训练期双域分别协方差白化。10 seeds（0–9），8/10 ADMM 达到双残差阈值。记录了全部同步配对**平均欧氏距离、RMS、随机配对距离、oracle 最优正交误差**：
+
+- 训练集：对齐前 **1.9232**；收敛 seed 对齐后 **2.3492 ± 0.0670**；训练同步配对 oracle **1.6530**。
+- 同一条试次末尾留出：对齐前 **2.0850**；收敛 seed 对齐后 **2.1105 ± 0.1943**；训练 oracle 应用到留出 **1.9272**。
+- 留出 Top1 仅 **1.5%**（随机水平 2%）；跨域簇一致率 **12.5%**；不能判为对齐成功。
+- `mu=.02` 在 3 seeds 中 0/3 收敛；`mu=.2` 在 3 seeds 中 3/3 收敛，但留出距离为 2.308–2.380，改善 ADMM 收敛并未改善跨模态几何对齐。
+- 簇级 Sinkhorn 固定300次残差约 3e-4；seed0 提升到3000次后约 6e-5，仍不满足更严边缘精度。
+
+**关键来源限定：**此轮实际在本地调用的是对 GitHub 核心数值公式的忠实转录；仓库原版 `src.hiwa.hiwa.HiWA` 尚未在本轮执行环境直接拉取执行。因此本笔记不标注“原文件已完成独立复现”。仓库现已新增 `scripts/run_hard_distance_multiseed.py`，可以直接调用源仓库原类复现，运行输出与本轮数字仍需要对照核验。
+
+详见 [详细复跑记录](results/HARD_HIWA_DISTANCE_RERUN.md)、[逐seed CSV](results/hard_hiwa_distance_rerun.csv)、[JSON](results/hard_hiwa_distance_rerun.json)、[距离图](figures/hard_hiwa_distance_rerun.svg)。
