@@ -120,3 +120,8 @@
 **关键来源限定：**此轮实际在本地调用的是对 GitHub 核心数值公式的忠实转录；仓库原版 `src.hiwa.hiwa.HiWA` 尚未在本轮执行环境直接拉取执行。因此本笔记不标注“原文件已完成独立复现”。仓库现已新增 `scripts/run_hard_distance_multiseed.py`，可以直接调用源仓库原类复现，运行输出与本轮数字仍需要对照核验。
 
 详见 [详细复跑记录](results/HARD_HIWA_DISTANCE_RERUN.md)、[逐seed CSV](results/hard_hiwa_distance_rerun.csv)、[JSON](results/hard_hiwa_distance_rerun.json)、[距离图](figures/hard_hiwa_distance_rerun.svg)。
+
+
+## 2026-11-17 补算神经实验 R² 与相对平方误差
+
+使用旧版真实样本 hard-rerun 保存的 10 个最终旋转矩阵，严格按 `src/cc_hiwa/common.py::original_r2` 原神经实验公式（扩展到全部 3 个力量维）计算 R²。8/10 收敛：训练 R² 对齐前 **-0.6372** → 对齐后 **-1.1459±0.1084**；同试次末尾留出 **-1.2411** → **-1.1222±0.5045**。训练配对相对平方误差 **1.6372→2.1459±0.1084**；留出 **3.8316→3.7832±0.7863**。完整定义和逐种子结果见 [补算报告](results/HARD_HIWA_R2_RELATIVE_ERROR.md)。**原 HiWA 的旋转 rMSE 需要 Rgt，Hyser 没有真实 Rgt；不能将配对相对平方误差冒充旋转 rMSE。**
