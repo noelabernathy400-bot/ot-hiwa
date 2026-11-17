@@ -34,6 +34,8 @@ def scores(x, y, r, ix, iy, ref):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--clusters', required=True)
+    ap.add_argument('--allow-group-supervised-diagnostic', action='store_true',
+        help='Explicit opt-in to legacy paired-label group-supervised diagnostic; NOT unsupervised')
     ap.add_argument('--output', required=True)
     ap.add_argument('--seeds', type=int, nargs='+', default=[42, 43, 44, 45, 46])
     ap.add_argument('--fit-per-group', type=int, default=40)
@@ -57,6 +59,19 @@ def main():
     te = np.asarray(z['test_mask'], dtype=bool)
     lx = np.asarray(z['neural_groups'], dtype=int)
     ly = np.asarray(z['hand_groups'], dtype=int)
+    # Paired source-derived labels are for visualization ONLY.
+    supervised_groups = ('shared_labels' in z.files and
+                         np.array_equal(lx, ly) and
+                         np.array_equal(lx, np.asarray(z['shared_labels'], dtype=int)))
+    if supervised_groups and not args.allow_group_supervised_diagnostic:
+        raise ValueError(
+            'GROUP LABEL LEAKAGE: training target groups were copied from '
+            'source paired visualization labels. For strict unsupervised '
+            'training use results/clustering/clustered_4d.npz with independent '
+            'neural_groups/hand_groups. Reproducing old supervised diagnostic '
+            'requires --allow-group-supervised-diagnostic.')
+    if supervised_groups:
+        print('GROUP-SUPERVISED DIAGNOSTIC (not unsupervised)', flush=True)
     assert x.shape == y.shape and x.shape[1] == 4 and (tr & te).sum() == 0
     assert np.isfinite(x[tr | te]).all() and np.isfinite(y[tr | te]).all()
     assert set(lx[tr]) == set(range(4)) and set(ly[tr]) == set(range(4))
@@ -132,7 +147,9 @@ def main():
         'training_n': int(tr.sum()), 'test_n': int(te.sum()),
         'source_mean': mx.tolist(), 'target_mean': my.tolist(),
         'source_radius': sx, 'target_radius': sy, 'evaluation_target_rms': ref,
-        'fit_uses_training_sample_pairing': False, 'fit_uses_test_data': False,
+        'fit_uses_training_sample_pairing': bool(supervised_groups),
+        'group_supervision_diagnostic': bool(supervised_groups),
+        'fit_uses_test_data': False,
         'paired_metric': 'sqrt(mean(||R*x_i-y_i||^2)) / sqrt(mean(||y_i||^2)), held-out paired windows',
         'ot_metric': 'sqrt(minimum one-to-one test sample permutation mean(||R*x_i-y_perm(i)||^2)) / same target RMS',
         'evaluation_unpaired_subset_n': e,
