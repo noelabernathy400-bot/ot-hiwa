@@ -50,5 +50,17 @@ jobs:
           git add -f experiments/hyser/figures/04_free_group_transport.png
           if ! git diff --cached --quiet; then
             git commit -m "Publish latest source-only Hyser Hard HiWA PDF and plots"
-            git push
+            # Other project workflows can update main during XeLaTeX compilation.
+            # Rebase our additive generated-files commit, never force-push.
+            git fetch origin main
+            git rebase origin/main
+            for attempt in 1 2 3; do
+              if git push origin HEAD:main; then
+                exit 0
+              fi
+              git fetch origin main
+              git rebase origin/main
+            done
+            echo "Could not push after 3 safe retries" >&2
+            exit 1
           fi
