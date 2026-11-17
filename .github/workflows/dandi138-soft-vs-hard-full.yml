@@ -1,0 +1,101 @@
+name: DANDI138 full Soft-GCOT vs archived Hard HiWA
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-soft-vs-hard-full.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install scientific dependencies
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Run full-support soft group ZIP GCOT with same 500/20/45 budgets, five seeds
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/run_soft_fixedgroup.py \
+            --fixed projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz \
+            --hard projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/hard_hiwa_results.json \
+            --hard-ot projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/ot_evaluation/OT_HELDOUT_METRICS.json \
+            --output projects/dandi-000138-hiwa-4d/results/soft_fixedgroup_vs_hard \
+            --seeds 42 43 44 45 46 --outer 500 --inner 20 \
+            --sample-sinkhorn 45 --group-sinkhorn 200 --fit-per-group 40 \
+            --tau .4 --mu .05 --group-gamma .2 --sample-gamma .1 --stop-tol 1e-9
+      - name: Verify identical source grouping and frozen heldout OT before committing
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          root=Path('projects/dandi-000138-hiwa-4d/results/soft_fixedgroup_vs_hard')
+          s=json.loads((root/'SOFT_HARD_COMPARISON.json').read_text())
+          assert s['labels_remain_original_hard_kmeans']
+          assert s['same_test_subsets_used'] and s['original_training_algorithm_not_modified']
+          assert 0.01 < s['soft_train_entropy_normalized'] < 0.99
+          assert len(s['soft_seeds'])==5
+          assert s['config']['outer']==500 and s['config']['inner']==20
+          assert s['config']['fit_per_group']==40
+          assert abs(s['frozen_baseline']['global_W2_squared']-.4394775418275434)<1e-9
+          assert abs(s['frozen_baseline']['same_group_W2_squared']-1.231750040940598)<1e-9
+          assert all(np.isfinite(list(row['metrics'].values())).all() for row in s['soft_seeds'])
+          for filename in ['soft_hard_global_groupOT_R2.png','hard_soft_target_six_pairs.png','hard_soft_target_xy.png']:
+              assert (root/filename).stat().st_size>40000
+          print('PASS: same 4D, same ONE source KMeans, same held-out metrics, five seeds and budgets.')
+          PY
+      - name: Update experiment log with verified measured results
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          base=Path('projects/dandi-000138-hiwa-4d')
+          source=base/'results/soft_fixedgroup_vs_hard/SOFT_HARD_COMPARISON.json'
+          data=json.loads(source.read_text(encoding='utf8'))
+          heading="## 2026-11-17 · 实验 E：仅源聚类一次的 Soft-GCOT 对照"
+          log=base/'EXPERIMENT_LOG.md'
+          content=log.read_text(encoding='utf8')
+          if heading not in content:
+              fmt=lambda key: (f"Hard {data['hard_mean_sd'][key]['mean']:.5f} / "
+                               f"Soft {data['soft_mean_sd'][key]['mean']:.5f}")
+              note=heading+"\n\n软隶属度由源域唯一 KMeans 中心按距离 softmax 计算，目标由同步时窗继承，"
+              note+="算法采用用户压缩包的原版 GCOT 分层 OT 代码。"
+              note+="使用同一四维输入、相同 K=4 组来源、测试分割、OT 评价、5 seeds和训练迭代上限500。\n\n"
+              note+=f"软隶属度归一化熵 {data['soft_train_entropy_normalized']:.4f}，"
+              note+=f"数值审计通过 {sum(x['strict_audit_passed'] for x in data['soft_seeds'])}/5。\n\n"
+              note+="- 全域 OT W2²："+fmt('global_W2_squared')+"\n"
+              note+="- 固定同组 OT W2²："+fmt('same_group_W2_squared')+"\n"
+              note+="- R²："+fmt('R2')+"\n"
+              note+="- MAE："+fmt('MAE')+"\n\n"
+              note+="详情：[Soft-Hard 对照报告](results/soft_fixedgroup_vs_hard/SOFT_HARD_COMPARISON.md)。"
+              note+="注意算法实现有差异，不可完全归因于软分组本身；该变体使用同步对应传播目标组信息。\n\n---\n\n"
+              content=content.replace('# 实验日志（持续更新）\n','# 实验日志（持续更新）\n\n'+note,1)
+              log.write_text(content,encoding='utf8')
+          PY
+      - name: Commit results without overwriting original Hard baseline
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- 'projects/dandi-000138-hiwa-4d/results/soft_fixedgroup_vs_hard' \
+                     'projects/dandi-000138-hiwa-4d/EXPERIMENT_LOG.md'
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish DANDI 000138 Soft-GCOT five-seed experiment vs frozen Hard HiWA on identical OT samples'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Upload complete experiment files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DANDI138-softGCOT-vs-hard-fixedgroup-500iter
+          path: projects/dandi-000138-hiwa-4d/results/soft_fixedgroup_vs_hard
+          if-no-files-found: warn
