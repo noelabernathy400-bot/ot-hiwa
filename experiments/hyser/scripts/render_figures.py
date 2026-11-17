@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
 ROOT=Path(__file__).resolve().parents[1]
+(ROOT/'figures').mkdir(parents=True,exist_ok=True)
 COLORS=['#3589c2','#ee9b43','#33a46f','#d881b7']
 plt.rcParams.update({'font.family':'sans-serif','font.sans-serif':['Noto Sans CJK SC','Noto Sans CJK JP','DejaVu Sans'],'axes.unicode_minus':False})
 lines=(ROOT/'data/visual_points_base36.txt').read_text().splitlines()
