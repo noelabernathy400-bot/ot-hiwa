@@ -49,34 +49,47 @@ def _select_event(trials, n):
 
 
 def _find_hand_ts(f, flavor):
-    """Strictly find HAND, never silently substitute cursor or gaze."""
-    container = {'pos': 'Position', 'vel': 'Velocity'}[flavor]
-    root = f.get(f'processing/behavior/{container}')
-    if root is None:
-        raise ValueError(f'Missing processing/behavior/{container} group')
-    valid=[]
-    for key in root:
-        series=root[key]
-        if not isinstance(series,h5py.Group) or 'data' not in series:continue
-        if 'hand' not in key.lower():continue
-        ds=series['data']
-        if not isinstance(ds,h5py.Dataset) or ds.ndim != 2 or ds.shape[1] < 2:continue
-        valid.append((key,series))
-    if len(valid)!=1:
-        raise ValueError(f'Expected exactly one hand {container} series, got {[v[0] for v in valid]}; '
-                         f'available: {list(root.keys())}. This is intentional: do not substitute cursor.')
-    key,series=valid[0]
+    """Find HAND position/velocity regardless of NWB container layout.
+
+    Official NLB NWB datasets may store behavioral TimeSeries directly inside
+    a ProcessingModule rather than inside a Position/Velocity container.
+    Never substitute cursor position or velocity for hand measurements.
+    """
+    assert flavor in ("pos", "vel")
+    candidates=[]
+    def visit(name,obj):
+        if not isinstance(obj,h5py.Group) or 'data' not in obj:
+            return
+        key=name.lower().split('/')[-1]
+        if 'hand' not in key:
+            return
+        if flavor == 'pos' and not any(k in key for k in ('pos','position')):
+            return
+        if flavor == 'vel' and not any(k in key for k in ('vel','velocity')):
+            return
+        ds=obj['data']
+        if not isinstance(ds,h5py.Dataset) or ds.ndim!=2 or ds.shape[1]<2:
+            return
+        candidates.append((name,obj))
+    for root_name in ('processing','acquisition'):
+        if root_name in f:
+            f[root_name].visititems(lambda name,obj:visit(root_name+'/'+name,obj))
+    if len(candidates)!=1:
+        raise ValueError(f'Expected one hand {flavor} time series; found {[v[0] for v in candidates]}. '
+                         'No cursor substitution is permitted.')
+    name,series=candidates[0]
     xy=np.asarray(series['data'][:, :2],dtype=float)
-    if 'timestamps' in series:ts=np.asarray(series['timestamps'],dtype=float)
+    if 'timestamps' in series:
+        ts=np.asarray(series['timestamps'],dtype=float)
     elif 'starting_time' in series and 'rate' in series['starting_time'].attrs:
         start=float(series['starting_time'][()])
         rate=float(series['starting_time'].attrs['rate'])
         ts=start+np.arange(len(xy))/rate
     else:
-        raise ValueError(f'No timestamps or rate on {container}/{key}')
+        raise ValueError(f'No timestamps/rate on {name}')
     if len(ts)!=len(xy) or not np.all(np.diff(ts)>0):
-        raise ValueError(f'Invalid timestamps for {container}/{key}')
-    return key, ts, xy
+        raise ValueError(f'Invalid timestamps for {name}')
+    return name,ts,xy
 
 
 def _extract_spikes(units):
