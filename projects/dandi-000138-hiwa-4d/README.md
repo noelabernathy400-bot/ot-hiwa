@@ -1,44 +1,65 @@
-# DANDI 000138 × HiWA：四维神经—手部运动对齐
+# DANDI 000138 × HiWA：唯一源域硬聚类四维对齐
 
-**项目唯一入口：** [实验日志](EXPERIMENT_LOG.md) · [冻结协议](PROTOCOL.md) · [实验代码](code/) · [真实数据结果](results/)
+**当前正式实验：只在源域 K-means 聚类一次，目标域按同步对应继承源域标签。对齐前、目标域、对齐后的源域使用从始至终相同的组。**
 
-## 四维 Hard HiWA 正式技术报告（XeLaTeX 编译）
+- [最新正式 XeLaTeX PDF（outer≤500，五次数值审计通过）](四维HiWA统一源域分组实验.pdf)
+- [实验日志（按最新研究排列）](EXPERIMENT_LOG.md)
+- [500 次扩展的最终数值、R、P、全部图片](results/source_only_fixed_groups_outer500/)
+- [源域唯一 K-means 标签、原始两域图片及 140 次初始对齐（保留供复核）](results/source_only_fixed_groups/)
+- [源域唯一聚类及绘图程序](code/source_only_fixed_group_pipeline.py)
+- [原版 HiWA 运行器](code/run_hard_hiwa.py) · [原版算法源码](code/hiwa_original.py)
+- [全维度评价、标签一致性校验及出图](code/evaluate_fixed_group_alignment.py)
 
-- **[阅读 13 页 PDF：数据来源、预处理、两域原始簇图、算法与失败诊断](四维HardHiWA实验与问题诊断.pdf)**
-- [LaTeX 源码](四维HardHiWA实验与问题诊断.tex)（XeLaTeX / ctexart）
-- [新增问题诊断结果（JSON + PNG）](results/diagnostics/) · [诊断代码](code/) · [更新后的实验日志](EXPERIMENT_LOG.md)
-- [GitHub Actions 自动编译与可复现实验日志](https://github.com/noelabernathy400-bot/ot-hiwa/actions/workflows/dandi138-generate-report.yml)
+## 实验协议（冻结）
 
-**新诊断摘要：** 神经四维 PCA 表示并非没有运动信息——同一留出测试集的监督全线性 Ridge 映射得到标准 `R²=0.2868`，但监督**正交** Procrustes 只有 `R²=-0.0604`，原版无监督 Hard HiWA 五次均值 `R²=-0.8947`。此外，在固定目标评价窗口条件下，由训练验证选取的神经领先行为 140ms 给出监督 Ridge 测试 `R²=0.3902`；目标域实际簇质量与原版 HiWA 强制的均匀 25% 组质量不一致。**以上监督模型和时间分析仅是诊断，不代表改进了 HiWA，不能据此断言存在已确定的生理时间延迟。**
+1. 使用 DANDI:000138、MC_Maze_Large、v0.220113.0407 的已验证 NWB 派生数据。162 个神经放电通道→20ms 计数→平方根与平滑→训练统计标准化→PCA(4)。目标域是 (hand_pos_x,hand_pos_y,hand_vel_x,hand_vel_y) 原生四维，**不降维**。
+2. 500 个有效试次按 trial 独立划分为 400 训练/100 测试，对应 14000/3500 个窗口。只在神经域训练点云上 **KMeans(K=4, seed=42,n_init=20)**；四个训练簇分别为 (4137,4316,3146,2401)。
+3. 目标域每一个点的标签直接采用同一时间窗对应神经点的标签。测试神经点用训练源聚类器 predict，然后沿一一对应索引赋给测试目标。**不对目标域独立聚类，不在最优传输后再次聚类；颜色在全部可视化中不变。**
+4. 在保持上述组不动的前提下，原版 HiWA 对源域学习全局正交矩阵，目标域不旋转。仅输入源/目标相同的组编号，不直接以配对回归误差训练 HiWA。原版 HiWA 内每个域/簇独立采样 40 点。
+5. 固定 seeds 42–46，最终将最大外循环数从最初 140 扩至 **500**，其余原超参不变：mu=.05、局部 Sinkhorn gamma=.1、组间 Sinkhorn gamma=.2、局部最多 20 次。5/5 seed 通过 global-change≤.01、local-global residual≤.01、正交性和 OT 边缘审计（不是全局最优证明）。
 
-## 核心研究问题
-神经放电的 4D PCA 表示和原生四维手部运动 \((x,y,v_x,v_y)\) 是否具有可由无监督 Hard HiWA 恢复的共通几何？通过原版 rMSE（代理参照）与标准 held-out R² 评价，是否真实改善运动预测？
+**重要方法学限制：** 虽然 HiWA 仍利用分组上的非配对 OT 计算变换，但目标域组标签来自真实同步配对，因此这是**带有已知对应信息的组定义协议**，不是完全无监督的跨域聚类发现。1NN 也是用继承标签计算的固定组邻域一致性，不应冒充独立运动类别准确率。
 
-## 当前结果（2026-11-17）
-- **真实数据**：DANDI:000138，MC_Maze_Large，NWB 训练集，500 个试次，400 train / 100 test，每试次 35 个窗口。
-- **硬聚类**：两域独立 KMeans(K=4)；训练 silhouette：神经 0.33961，运动 0.37032。
-- **Hard HiWA（原版上传压缩包源码）**：5 个随机种子均通过 ADMM 残差审计（不是仅凭原版停止条件）。
-- **HiWA rMSE（代理值，非真值）**：identity 1.96470 → Hard HiWA **1.91621 ± 0.37054**（5 seeds）；原始真值旋转不存在，评估参照是仅使用训练同步配对得到的正交 Procrustes。
-- **标准测试 R²**：identity -0.79649 → Hard HiWA **-0.89472 ± 0.22508**（5 seeds）：平均更差，五个 seed 均为负数。
-- 原版 `_eval_R2` 未采用平方残差，不能把它返回值当成标准决定系数；评估脚本计算修正的标准 R²，**不修改原版 HiWA 求解器**。
-- **不能宣称**：Hard HiWA 已恢复正确逐时刻神经—运动映射，或 Soft-GCOT 优于 Hard。
-详见 [实验日志](EXPERIMENT_LOG.md)。
+## 当前正式结果：500 次以内运行的五个种子
 
-## 源码与来源
-- [code/hiwa_original.py](code/hiwa_original.py)：**逐字复制**自用户上传的 GCOT-reproducible-20261018.zip 内 `reference/HiWA/PyHiWA/src/hiwa.py`，SHA-256 `4419e19004b06c7840d187ddb12a19b2ad97974dd28ad1dc9510d8ead741da6a`；没有修改求解器。**不使用旧仓库 src/hiwa/**。
-- [code/run_hard_clustering.py](code/run_hard_clustering.py)：数据预处理和四维 KMeans；图片仅为二维投影。
-- [code/run_hard_hiwa.py](code/run_hard_hiwa.py)：调用原版 HiWA，历史 NRMSE 仅作为归档；额外审计最终局部旋转、全局旋转和 OT 边缘误差。
-- [code/evaluate_hiwa_two_metrics.py](code/evaluate_hiwa_two_metrics.py)：**当前主评价入口**；用冻结的 HiWA 旋转和测试集计算 rMSE 代理值及标准 R²。
-- [code/run_hard_hiwa_2metric.py](code/run_hard_hiwa_2metric.py)：以后完整实验统一使用此包装入口。
-- [code/summarize_results.py](code/summarize_results.py)：**历史 NRMSE 绘图**，保留用于复核，不再作为主结论。
-- 全压缩包的其他 GCOT 项目源码仍保存在 [原始快照（实验分支）](https://github.com/noelabernathy400-bot/ot-hiwa/tree/experiments/dandi-000138-4d-hard-clustering-20261117/research/GCOT-reproducible-20261018/)；该目录不是本实验的算法入口。
+相同测试集、相同归一化、相同四维表示：
 
-**数据协议**：[DANDI 官方数据版本 0.220113.0407](https://dandiarchive.org/dandiset/000138/0.220113.0407)。原始 NWB 约 149 MB，不放入 Git；完整处理输出及实验图存入 `results/`。
+| 评价 | 对齐前 Identity | Hard HiWA 五次均值 ± 样本 SD |
+|---|---:|---:|
+| 固定组标签的 1NN ↑ | 23.14% | **37.74% ± 21.62%** |
+| 平均绝对误差 MAE ↓ | 0.53149 | **0.49767 ± 0.05548** |
+| 配对相对平方误差 ↓ | 1.79266 | **1.60396 ± 0.30249** |
+| 旋转 rMSE 代理 ↓ | 1.96470 | **1.49268 ± 0.78664** |
+| 标准测试 R² ↑ | -0.79649 | **-0.60738 ± 0.30314** |
 
-## 本地复现
-```bash
-pip install numpy scipy scikit-learn h5py matplotlib
-python code/run_hard_clustering.py --nwb /path/to/sub-Jenkins_ses-large_desc-train_behavior+ecephys.nwb --output results/clustering --seed 42 --k 4
-OPENBLAS_NUM_THREADS=1 python code/run_hard_hiwa.py --clusters results/clustering/clustered_4d.npz --output results/hard_hiwa --seeds 42 43 44 45 46
-python code/evaluate_hiwa_two_metrics.py --clusters results/clustering/clustered_4d.npz --alignment results/hard_hiwa/hard_hiwa_results.json --output results/hard_hiwa/hiwa_rmse_r2_evaluation.json
-```
+各种子 test R² 分别是 -0.75816、-0.56025、-0.10161、-0.86298、-0.75392（seed 42–46）。**尽管平均改善且都通过数值审计，测试 R² 仍全为负，跨初始化变化很大**。最佳 seed 44 不能单独代表整个算法。
+
+rMSE 代理并非真实旋转恢复误差，因为此真实神经运动数据集没有旋转真值 Rgt；用训练集同步对应拟合的正交 Procrustes 作为参考。配对相对平方误差则是 SSE / sum(||target||²)，二者公式不同，均不取平方根。R² 使用标准 1−SSE/SST，独立评价器纠正了原版内部不标准的 _eval_R2 公式，原版算法代码没有修改。
+
+## 源域 → 对齐后源域 → 目标域：相同标签的图
+
+![固定组的传输前后以及目标域：第一组二维投影](results/source_only_fixed_groups_outer500/before_after_target_xy.png)
+
+[查看四维的全部六组二维投影（三列直接比较）](results/source_only_fixed_groups_outer500/before_after_target_six_pairs.png) · [对齐前源](results/source_only_fixed_groups_outer500/source_before_test_six.png) · [对齐后源](results/source_only_fixed_groups_outer500/source_after_test_six.png) · [目标域](results/source_only_fixed_groups_outer500/target_shared_test_six.png)
+
+所有图均显示相同的 3500 个留出测试时窗；主图固定画 seed 42，不按测试结果择优选择画图种子。目标点颜色来自其配对源点的 K-means 标签。二维仅为可视化，K-means 与 HiWA 均在四维完成。
+
+## 代码来源与复现
+
+算法：用户上传 GCOT-reproducible-20261018.zip 中的 reference/HiWA/PyHiWA/src/hiwa.py 原版，项目目录里的 code/hiwa_original.py 的 SHA256 为 4419e19004b06c7840d187ddb12a19b2ad97974dd28ad1dc9510d8ead741da6a；其他旧版 src/hiwa 代码不参与本轮实验。
+
+重现时先复用冻结的四维观测缓存，只重新分组、重新训练 HiWA：
+
+- Python：安装 numpy、scipy、scikit-learn、matplotlib。
+- 只聚类：python code/source_only_fixed_group_pipeline.py --input results/clustering/clustered_4d.npz --output results/source_only_fixed_groups --seed 42 --k 4
+- 原版 HiWA：python code/run_hard_hiwa.py --clusters results/source_only_fixed_groups/fixed_groups_4d.npz --output results/source_only_fixed_groups_outer500 --seeds 42 43 44 45 46 --outer 500
+- 评价与图：python code/evaluate_fixed_group_alignment.py --input results/source_only_fixed_groups/fixed_groups_4d.npz --alignment results/source_only_fixed_groups_outer500/hard_hiwa_results.json --output results/source_only_fixed_groups_outer500
+- 生成论文数值：python code/write_converged_summary.py
+
+上述命令相对于当前项目文件夹执行。GitHub Actions 的实际成功运行与全部计算工件保存在仓库历史及工作流运行记录中。
+
+## 历史实验（不再作为当前协议）
+
+- [旧实验：两域分别 K-means、140 次外循环](results/hard_hiwa/)——已废弃的分组设定，仅保留供方法论对比。
+- [新单次源聚类，但仅 140 次外循环](results/source_only_fixed_groups/)——三种子未满足额外残差审计，现已由 500 次实验替代。
+- [旧版技术诊断 PDF](四维HardHiWA实验与问题诊断.pdf)——仍描述原来的两个域独立分组实验，属于历史文档；现行报告是本 README 开头所链接的统一分组 PDF。
