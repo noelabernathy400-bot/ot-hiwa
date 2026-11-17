@@ -39,6 +39,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f experiments/hyser/Hyser_Hard_HiWA_实验报告.pdf
+          git add -f experiments/hyser/figures/initial200_hard_clusters_fourpanel.png
+          git add -f experiments/hyser/figures/all250_whitened_hard_clusters_3D.png
+          git add -f experiments/hyser/figures/all250_after_hard_hiwa_3D_overlay.png
+          git add -f experiments/hyser/figures/all250_after_hard_hiwa_2D_overlay.png
           if ! git diff --cached --quiet; then
             git commit -m "Compile Hyser experiment PDF from LaTeX"
             git push

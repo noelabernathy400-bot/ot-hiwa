@@ -47,3 +47,15 @@ python experiments/hyser/scripts/run_hard_original.py --out-dir experiments/hyse
 - [直接调用用户新 GCOT 分支的复现脚本](scripts/run_hiwa_postpca_normalized.py)
 
 关键结论：之前 PCA 后的全量点云已经进行协方差白化；进一步检查逐维 Z-score 并按新 GCOT 源码结构复算后，当前零时延三维表示上的 Hard HiWA 配对 R² 仍为负。当前运行仅满足作者旋转变化停止条件，尚未满足严格 ADMM 共识。请参阅本次详细报告，不要将源码移植版的数字标成远程原版字节级执行结果。
+
+## 2026-11-17：硬分组后点云与 PDF 排版修订
+
+已重新编译仓库根部 [Hyser_Hard_HiWA_实验报告.pdf](Hyser_Hard_HiWA_实验报告.pdf)。
+实验报告图像现为：早期200点真实硬聚类四联图（基于记录的200点重建原图布局）、正式250点完整白化独立硬簇、
+[Hard HiWA 对齐后三维叠加](figures/all250_after_hard_hiwa_3D_overlay.png) 与
+[二维叠加](figures/all250_after_hard_hiwa_2D_overlay.png)。
+
+图片由 [render_report_figures.py](scripts/render_report_figures.py) 从已保存的真实实验绘图点重建，属于**仅用于展示的坐标量化版**；
+评估误差不在这些量化数据上计算，仍以原始全精度数值为准。
+PDF 中的早期图与当前250点实验在数据量及缩放上不同。用户上传的原始PNG直接用于对话中交付的 PDF，
+仓库自动构建则采用相同原始200点的可复现绘图数据重建四联布局。
