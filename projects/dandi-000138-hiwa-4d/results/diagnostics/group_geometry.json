@@ -1,0 +1,208 @@
+{
+  "n_train_windows": 14000,
+  "neural_cluster_sizes": [
+    4137,
+    4316,
+    3146,
+    2401
+  ],
+  "hand_cluster_sizes": [
+    2818,
+    6316,
+    2012,
+    2854
+  ],
+  "neural_cluster_empirical_masses": [
+    0.2955,
+    0.3082857142857143,
+    0.22471428571428573,
+    0.1715
+  ],
+  "hand_cluster_empirical_masses": [
+    0.2012857142857143,
+    0.4511428571428571,
+    0.1437142857142857,
+    0.20385714285714285
+  ],
+  "HiWA_assumed_cluster_mass_each": 0.25,
+  "max_deviation_from_uniform_mass": {
+    "neural": 0.07849999999999999,
+    "hand": 0.20114285714285712
+  },
+  "time_aligned_cluster_cooccurrence": [
+    [
+      1396,
+      22,
+      152,
+      2567
+    ],
+    [
+      1346,
+      1214,
+      1557,
+      199
+    ],
+    [
+      15,
+      2974,
+      77,
+      80
+    ],
+    [
+      61,
+      2106,
+      226,
+      8
+    ]
+  ],
+  "max_pair_fraction_any_permutation": 0.5113571428571428,
+  "trivial_modal_behavior_cluster_fraction": 0.4511428571428571,
+  "per_seed_HiWA_transport_alignment_vs_true_time_cooccurrence": [
+    {
+      "seed": 42,
+      "det": -0.9999999999999997,
+      "best_transport_permutation": [
+        [
+          0,
+          2,
+          0.17587996997958383
+        ],
+        [
+          1,
+          0,
+          0.1675550872372578
+        ],
+        [
+          2,
+          1,
+          0.17090647732885314
+        ],
+        [
+          3,
+          3,
+          0.1753221423393231
+        ]
+      ],
+      "matched_paired_sample_fraction": 0.32,
+      "transport_permutation_mass": 0.6896636768850178,
+      "relative_pairwise_R_diff": 0.0
+    },
+    {
+      "seed": 43,
+      "det": 0.9999999999999991,
+      "best_transport_permutation": [
+        [
+          0,
+          3,
+          0.15994433870784716
+        ],
+        [
+          1,
+          0,
+          0.18052829005637414
+        ],
+        [
+          2,
+          1,
+          0.16713131898931502
+        ],
+        [
+          3,
+          2,
+          0.17953433038443417
+        ]
+      ],
+      "matched_paired_sample_fraction": 0.5080714285714285,
+      "transport_permutation_mass": 0.6871382781379705,
+      "relative_pairwise_R_diff": 2.0763596085080347
+    },
+    {
+      "seed": 44,
+      "det": 1.000000000000001,
+      "best_transport_permutation": [
+        [
+          0,
+          3,
+          0.17085507326644495
+        ],
+        [
+          1,
+          1,
+          0.16048898904611952
+        ],
+        [
+          2,
+          0,
+          0.1853569209571871
+        ],
+        [
+          3,
+          2,
+          0.17592397549557945
+        ]
+      ],
+      "matched_paired_sample_fraction": 0.28728571428571426,
+      "transport_permutation_mass": 0.692624958765331,
+      "relative_pairwise_R_diff": 3.463387551720575
+    },
+    {
+      "seed": 45,
+      "det": 0.9999999999999993,
+      "best_transport_permutation": [
+        [
+          0,
+          2,
+          0.18129609668132818
+        ],
+        [
+          1,
+          3,
+          0.1618075757298423
+        ],
+        [
+          2,
+          1,
+          0.17839263593150329
+        ],
+        [
+          3,
+          0,
+          0.20577856946559597
+        ]
+      ],
+      "matched_paired_sample_fraction": 0.24185714285714288,
+      "transport_permutation_mass": 0.7272748778082698,
+      "relative_pairwise_R_diff": 2.010362765721749
+    },
+    {
+      "seed": 46,
+      "det": 1.0000000000000002,
+      "best_transport_permutation": [
+        [
+          0,
+          2,
+          0.1809204739118293
+        ],
+        [
+          1,
+          3,
+          0.16487181844081228
+        ],
+        [
+          2,
+          0,
+          0.2007916020041786
+        ],
+        [
+          3,
+          1,
+          0.18585894741366427
+        ]
+      ],
+      "matched_paired_sample_fraction": 0.17657142857142857,
+      "transport_permutation_mass": 0.7324428417704845,
+      "relative_pairwise_R_diff": 3.130499221010697
+    }
+  ],
+  "notes": "The time-paired contingency is diagnostic only. Unsupervised fitting uses no matched labels. Hungarian cluster correspondence is not a neural decoder and KMeans labels are arbitrary."
+}

@@ -1,0 +1,163 @@
+{
+  "design": "Fixed target time indices [10,24] (110ms..390ms), same outcomes for all lag candidates; lag 20ms * integer; chosen on 80 train-validation trials only",
+  "best_validation_lag": {
+    "lag_bins": 7,
+    "lag_ms": 140,
+    "valid_R2": 0.38745346998312813,
+    "alpha": 0.001,
+    "test_R2_exploratory": 0.39015881353083703
+  },
+  "heldout_R2_chosen": 0.39015881353083703,
+  "test_trial_shuffled_R2_mean": -0.334151369584718,
+  "test_trial_shuffled_R2_sd": 0.05648343356402994,
+  "lag_curve": [
+    {
+      "lag_bins": -10,
+      "lag_ms": -200,
+      "valid_R2": 0.3702689149381305,
+      "alpha": 10.0,
+      "test_R2_exploratory": 0.38473972972007575
+    },
+    {
+      "lag_bins": -9,
+      "lag_ms": -180,
+      "valid_R2": 0.37172755430773563,
+      "alpha": 10.0,
+      "test_R2_exploratory": 0.3952698166674451
+    },
+    {
+      "lag_bins": -8,
+      "lag_ms": -160,
+      "valid_R2": 0.36794691463027285,
+      "alpha": 10.0,
+      "test_R2_exploratory": 0.39882694447379075
+    },
+    {
+      "lag_bins": -7,
+      "lag_ms": -140,
+      "valid_R2": 0.36231678619704843,
+      "alpha": 100.0,
+      "test_R2_exploratory": 0.3906160652142848
+    },
+    {
+      "lag_bins": -6,
+      "lag_ms": -120,
+      "valid_R2": 0.3565203459960419,
+      "alpha": 100.0,
+      "test_R2_exploratory": 0.38607705323238917
+    },
+    {
+      "lag_bins": -5,
+      "lag_ms": -100,
+      "valid_R2": 0.35105323761304374,
+      "alpha": 100.0,
+      "test_R2_exploratory": 0.37961881488805305
+    },
+    {
+      "lag_bins": -4,
+      "lag_ms": -80,
+      "valid_R2": 0.34654006453366115,
+      "alpha": 10.0,
+      "test_R2_exploratory": 0.3785090155404328
+    },
+    {
+      "lag_bins": -3,
+      "lag_ms": -60,
+      "valid_R2": 0.34283673155908134,
+      "alpha": 10.0,
+      "test_R2_exploratory": 0.37021387120403426
+    },
+    {
+      "lag_bins": -2,
+      "lag_ms": -40,
+      "valid_R2": 0.3395452361707778,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.36273041980879683
+    },
+    {
+      "lag_bins": -1,
+      "lag_ms": -20,
+      "valid_R2": 0.336496147492244,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.35628376078306756
+    },
+    {
+      "lag_bins": 0,
+      "lag_ms": 0,
+      "valid_R2": 0.3347231133228977,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.3534609274240298
+    },
+    {
+      "lag_bins": 1,
+      "lag_ms": 20,
+      "valid_R2": 0.3364504996642207,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.35593330390239886
+    },
+    {
+      "lag_bins": 2,
+      "lag_ms": 40,
+      "valid_R2": 0.3433788071701037,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.36412970811370293
+    },
+    {
+      "lag_bins": 3,
+      "lag_ms": 60,
+      "valid_R2": 0.35508239132279795,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.3761458187526986
+    },
+    {
+      "lag_bins": 4,
+      "lag_ms": 80,
+      "valid_R2": 0.3684602022292379,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.3875336867218757
+    },
+    {
+      "lag_bins": 5,
+      "lag_ms": 100,
+      "valid_R2": 0.379279934613604,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.39390391389198287
+    },
+    {
+      "lag_bins": 6,
+      "lag_ms": 120,
+      "valid_R2": 0.3854014722048832,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.39424874218864936
+    },
+    {
+      "lag_bins": 7,
+      "lag_ms": 140,
+      "valid_R2": 0.38745346998312813,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.39015881353083703
+    },
+    {
+      "lag_bins": 8,
+      "lag_ms": 160,
+      "valid_R2": 0.38642467436126704,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.38255978995514306
+    },
+    {
+      "lag_bins": 9,
+      "lag_ms": 180,
+      "valid_R2": 0.3819125535415029,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.3706659126943639
+    },
+    {
+      "lag_bins": 10,
+      "lag_ms": 200,
+      "valid_R2": 0.3726713971023854,
+      "alpha": 0.001,
+      "test_R2_exploratory": 0.35376663213894977
+    }
+  ],
+  "warning": "Correlation is non-causal; task time and trial structure can confound delay interpretation."
+}

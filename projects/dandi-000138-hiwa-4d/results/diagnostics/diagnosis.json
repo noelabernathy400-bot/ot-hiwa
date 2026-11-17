@@ -1,0 +1,344 @@
+{
+  "dataset": "DANDI:000138",
+  "method": "frozen 4D features, no re-fit HiWA",
+  "bin_ms": 20,
+  "lag_convention": "positive lag: neural(t) predicts hand(t+lag)",
+  "fit_trials": 320,
+  "validation_trials": 80,
+  "test_trials": 100,
+  "baseline_identity_R2": -0.7964864342687017,
+  "orthogonal_train_supervised_R2": -0.06044107870381943,
+  "hard_hiwa_R2_seeds": [
+    -0.8047848546546481,
+    -0.5486206314348314,
+    -1.0993311995029749,
+    -0.9550493783561991,
+    -1.0658175708758506
+  ],
+  "hard_hiwa_R2_mean": -0.8947207269649009,
+  "full_linear_ridge_zero_lag_R2": 0.28675253536183976,
+  "full_linear_ridge_zero_lag_per_target_dimension_R2": [
+    0.7231650453220992,
+    0.14449183661770826,
+    0.2106145977903947,
+    0.09812000079078043
+  ],
+  "train_and_test_canonical_correlations": {
+    "train": [
+      0.8613169903993912,
+      0.4792801961260238,
+      0.24110393057976343,
+      0.13252804893061465
+    ],
+    "test_descriptive": [
+      0.8647996211921826,
+      0.5113656431326671,
+      0.2813921510874081,
+      0.207016174241855
+    ]
+  },
+  "neural_target_crosscorr_train": [
+    [
+      0.5410292394333742,
+      0.19395891158632755,
+      0.12747991741822712,
+      -0.021913381626944107
+    ],
+    [
+      0.5793494296989367,
+      -0.19844491228738145,
+      0.41155402355315135,
+      0.06807923749231466
+    ],
+    [
+      0.13350293154006954,
+      0.13906575798519244,
+      -0.22595077763913027,
+      -0.12904314395374272
+    ],
+    [
+      0.26217403321921356,
+      0.08040845077095407,
+      0.013119272733081751,
+      0.23872682811458942
+    ]
+  ],
+  "neural_eigen_spectrum_train": [
+    0.342369805008363,
+    0.29383294589433206,
+    0.19509481702325318,
+    0.1687738657478856
+  ],
+  "hand_eigen_spectrum_train": [
+    0.3606889943651447,
+    0.2906135409049036,
+    0.1834091500083914,
+    0.1653597483953943
+  ],
+  "within_trial_demeaned_ridge_zero_lag_R2": 0.19354330393971853,
+  "lag_selection_train_validation_best": {
+    "lag_bins": 15,
+    "lag_ms": 300,
+    "validation_R2": 0.40181887604307054,
+    "ridge_alpha": 0.001,
+    "test_ridge_R2_exploratory": 0.3967425702064167,
+    "test_orthogonal_R2_exploratory": -0.012427959133088251
+  },
+  "selected_lag_heldout_R2": 0.3967425702064167,
+  "lag_curve_exploratory_with_test_scores": [
+    {
+      "lag_bins": -15,
+      "lag_ms": -300,
+      "validation_R2": 0.27502485766309437,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.3010789317158593,
+      "test_orthogonal_R2_exploratory": 0.05709875840835321
+    },
+    {
+      "lag_bins": -14,
+      "lag_ms": -280,
+      "validation_R2": 0.27565844499246894,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.3017852237878418,
+      "test_orthogonal_R2_exploratory": 0.07657648657247995
+    },
+    {
+      "lag_bins": -13,
+      "lag_ms": -260,
+      "validation_R2": 0.27582736660462914,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.3015585402784561,
+      "test_orthogonal_R2_exploratory": 0.0915024946211358
+    },
+    {
+      "lag_bins": -12,
+      "lag_ms": -240,
+      "validation_R2": 0.27582818853912516,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.30089924413390534,
+      "test_orthogonal_R2_exploratory": 0.10171430523255265
+    },
+    {
+      "lag_bins": -11,
+      "lag_ms": -220,
+      "validation_R2": 0.2754924203223287,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.2996395340967458,
+      "test_orthogonal_R2_exploratory": 0.10719970030078596
+    },
+    {
+      "lag_bins": -10,
+      "lag_ms": -200,
+      "validation_R2": 0.27479296025887656,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.29741038448696167,
+      "test_orthogonal_R2_exploratory": 0.1076302619749927
+    },
+    {
+      "lag_bins": -9,
+      "lag_ms": -180,
+      "validation_R2": 0.27398248873422804,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.29423437652269757,
+      "test_orthogonal_R2_exploratory": 0.1032226554315192
+    },
+    {
+      "lag_bins": -8,
+      "lag_ms": -160,
+      "validation_R2": 0.27347271250093164,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.29040804778112905,
+      "test_orthogonal_R2_exploratory": 0.09463495336799632
+    },
+    {
+      "lag_bins": -7,
+      "lag_ms": -140,
+      "validation_R2": 0.2733674940449482,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.28695156705617586,
+      "test_orthogonal_R2_exploratory": 0.08352949746101812
+    },
+    {
+      "lag_bins": -6,
+      "lag_ms": -120,
+      "validation_R2": 0.273591560972708,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.2845055297698196,
+      "test_orthogonal_R2_exploratory": 0.07117768232938582
+    },
+    {
+      "lag_bins": -5,
+      "lag_ms": -100,
+      "validation_R2": 0.27412438472988765,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.28317608844721853,
+      "test_orthogonal_R2_exploratory": 0.05738629356512448
+    },
+    {
+      "lag_bins": -4,
+      "lag_ms": -80,
+      "validation_R2": 0.27519234724234565,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.28280177805395657,
+      "test_orthogonal_R2_exploratory": 0.04111504892426443
+    },
+    {
+      "lag_bins": -3,
+      "lag_ms": -60,
+      "validation_R2": 0.2767605616744627,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.28313554661240803,
+      "test_orthogonal_R2_exploratory": 0.021611495270287162
+    },
+    {
+      "lag_bins": -2,
+      "lag_ms": -40,
+      "validation_R2": 0.2786041996423455,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.283965514923725,
+      "test_orthogonal_R2_exploratory": -0.0014881484820667978
+    },
+    {
+      "lag_bins": -1,
+      "lag_ms": -20,
+      "validation_R2": 0.280261594640541,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.2850307890910374,
+      "test_orthogonal_R2_exploratory": -0.028587203170268083
+    },
+    {
+      "lag_bins": 0,
+      "lag_ms": 0,
+      "validation_R2": 0.2814143472275017,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.2860052276176538,
+      "test_orthogonal_R2_exploratory": -0.06044107870381943
+    },
+    {
+      "lag_bins": 1,
+      "lag_ms": 20,
+      "validation_R2": 0.28564706023103004,
+      "ridge_alpha": 100.0,
+      "test_ridge_R2_exploratory": 0.29263404501969537,
+      "test_orthogonal_R2_exploratory": -0.02785309608610076
+    },
+    {
+      "lag_bins": 2,
+      "lag_ms": 40,
+      "validation_R2": 0.2905608255000043,
+      "ridge_alpha": 10.0,
+      "test_ridge_R2_exploratory": 0.3013313387785741,
+      "test_orthogonal_R2_exploratory": 0.001600005166945584
+    },
+    {
+      "lag_bins": 3,
+      "lag_ms": 60,
+      "validation_R2": 0.2974482290837358,
+      "ridge_alpha": 10.0,
+      "test_ridge_R2_exploratory": 0.31085790934608093,
+      "test_orthogonal_R2_exploratory": 0.028590378493678514
+    },
+    {
+      "lag_bins": 4,
+      "lag_ms": 80,
+      "validation_R2": 0.3076189974246011,
+      "ridge_alpha": 10.0,
+      "test_ridge_R2_exploratory": 0.32264927646006014,
+      "test_orthogonal_R2_exploratory": 0.053992511088580164
+    },
+    {
+      "lag_bins": 5,
+      "lag_ms": 100,
+      "validation_R2": 0.3215387232907809,
+      "ridge_alpha": 0.1,
+      "test_ridge_R2_exploratory": 0.3360603289037378,
+      "test_orthogonal_R2_exploratory": 0.07645050496725525
+    },
+    {
+      "lag_bins": 6,
+      "lag_ms": 120,
+      "validation_R2": 0.3373332143615687,
+      "ridge_alpha": 0.001,
+      "test_ridge_R2_exploratory": 0.3483471242802263,
+      "test_orthogonal_R2_exploratory": 0.09249007260481612
+    },
+    {
+      "lag_bins": 7,
+      "lag_ms": 140,
+      "validation_R2": 0.3523030923504009,
+      "ridge_alpha": 0.001,
+      "test_ridge_R2_exploratory": 0.35731091567639395,
+      "test_orthogonal_R2_exploratory": 0.09918928203496291
+    },
+    {
+      "lag_bins": 8,
+      "lag_ms": 160,
+      "validation_R2": 0.36517814713563934,
+      "ridge_alpha": 0.001,
+      "test_ridge_R2_exploratory": 0.3627660104328182,
+      "test_orthogonal_R2_exploratory": 0.09527258358169022
+    },
+    {
+      "lag_bins": 9,
+      "lag_ms": 180,
+      "validation_R2": 0.3727675767920905,
+      "ridge_alpha": 0.001,
+      "test_ridge_R2_exploratory": 0.3639065143593486,
+      "test_orthogonal_R2_exploratory": 0.07971839053321406
+    },
+    {
+      "lag_bins": 10,
+      "lag_ms": 200,
+      "validation_R2": 0.37423729450360677,
+      "ridge_alpha": 0.001,
+      "test_ridge_R2_exploratory": 0.3622499365546459,
+      "test_orthogonal_R2_exploratory": 0.05788066758321564
+    },
+    {
+      "lag_bins": 11,
+      "lag_ms": 220,
+      "validation_R2": 0.37330381554138803,
+      "ridge_alpha": 0.001,
+      "test_ridge_R2_exploratory": 0.36256187205424484,
+      "test_orthogonal_R2_exploratory": 0.037094101116798894
+    },
+    {
+      "lag_bins": 12,
+      "lag_ms": 240,
+      "validation_R2": 0.37494379794595545,
+      "ridge_alpha": 0.001,
+      "test_ridge_R2_exploratory": 0.3683032296759642,
+      "test_orthogonal_R2_exploratory": 0.02178651801525766
+    },
+    {
+      "lag_bins": 13,
+      "lag_ms": 260,
+      "validation_R2": 0.38150232491065406,
+      "ridge_alpha": 0.001,
+      "test_ridge_R2_exploratory": 0.37793373373810035,
+      "test_orthogonal_R2_exploratory": -0.021335088311353223
+    },
+    {
+      "lag_bins": 14,
+      "lag_ms": 280,
+      "validation_R2": 0.39162328410192593,
+      "ridge_alpha": 0.001,
+      "test_ridge_R2_exploratory": 0.3883847329374872,
+      "test_orthogonal_R2_exploratory": -0.011005958648798275
+    },
+    {
+      "lag_bins": 15,
+      "lag_ms": 300,
+      "validation_R2": 0.40181887604307054,
+      "ridge_alpha": 0.001,
+      "test_ridge_R2_exploratory": 0.3967425702064167,
+      "test_orthogonal_R2_exploratory": -0.012427959133088251
+    }
+  ],
+  "notes": [
+    "Only validation on training trials selects lag and Ridge alpha. Test-set per-lag curve is an exploratory diagnostic not a valid selection criterion.",
+    "Linear Ridge is a supervised upper benchmark for representational adequacy, not a run of HiWA.",
+    "R² is negative if held-out squared error exceeds constant held-out target mean.",
+    "Trial demeaned result removes between-trial offsets; per-trial centering in test is a diagnostic, not a causal decoder."
+  ]
+}
