@@ -1,5 +1,32 @@
 # 实验日志（持续更新）
 
+## 2026-11-17 · 实验 G：Boundary-Adaptive Soft (内部验证独立选参)
+
+**研究问题**：只在 K-means 边界附近提高软隶属度，而组内部保持接近硬分配，能否在一个求解器与相同组标签下改善完整分层 OT 和固定同组 OT？
+
+设置：源域原 4D K-means K=4 一次，目标不聚类，目标权重直接由同步源继承；设 Δ=第二最近中心距离平方−最近中心距离平方，α=exp(−Δ/h)，A=(1−α)onehot+α distance-softmax(τ)。
+对原400个训练试次划 320/80 内部训练/验证，验证3 seeds、6 candidate，由**内部验证固定同组 OT**选 h/τ；原100测试试次仅用于最终5 seeds评估。
+
+选中内部验证参数：hQ10_tau0.20（h=0.209933,τ=0.20）。
+
+| 方法 | 测试 P-Q 总 OT↓ | 固定同组 OT↓ | 全域 OT↓ | R²↑ |
+|---|---:|---:|---:|---:|
+| Hard | 1.65257 | 0.98655 | 0.41854 | -0.74185 |
+| 固定 Soft τ=.20 | 1.65883 | 0.96980 | 0.42092 | -0.72735 |
+| Boundary soft | 1.65493 | 0.97898 | 0.41977 | -0.73633 |
+
+新方法最终数值审计：5/5，其含义为满足预设数值残差阈值，不是全局最优证明。
+**内验证依赖旧400训练试次拟合的原型、PCA和归一化，不是完全嵌套的无监督表示学习验证**；原100试次测试集依然封存到选参之后。
+
+[完整正式报告](results/boundary_adaptive_trial_cv/BOUNDARY_ADAPTIVE_REPORT.md)
+
+![内部验证参数](results/boundary_adaptive_trial_cv/boundary_validation_grid.png)
+
+![四种误差对照](results/boundary_adaptive_trial_cv/boundary_vs_hard_soft_all_errors.png)
+
+---
+
+
 ## 2026-11-17 · 实验 F：严格 Hard–Soft 单求解器温度消融与完整 P–Q 总传输代价
 
 核心研究问题：在**仅有一次源域 K-means 分组并保持全部标签不变**时，仅将一对一 hard 组隶属度变为温度控制的 soft 隶属度，是否能够降低两层 OT 的实际几何代价？
