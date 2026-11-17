@@ -7,7 +7,7 @@
 \definecolor{titlec}{HTML}{22476A}
 \hypersetup{colorlinks=true,linkcolor=titlec,urlcolor=titlec,
   pdftitle={DANDI 000138: source-only fixed KMeans groups and Hard HiWA}}
-\graphicspath{{results/source_only_fixed_groups/}}
+\graphicspath{{results/source_only_fixed_groups_outer500/}{results/source_only_fixed_groups/}}
 \pagestyle{fancy}\fancyhf{}
 \fancyhead[L]{\footnotesize DANDI 000138 · 单次源域硬分组实验}
 \fancyhead[R]{\footnotesize 2026-11-17}
@@ -75,7 +75,7 @@ $Y=(p_x,p_y,v_x,v_y)\in\R^{17500\times4}$，
 以完全相同的源/目标组标签运行 Hard HiWA。
 求解过程包括局部最优传输、簇间 Sinkhorn、全局正交矩阵
 $\widehat R\in O(4)$ 的 ADMM 更新，
-\textbf{不修改原版算法}。外循环最多 140 次，
+\textbf{不修改原版算法}。外循环最多 500 次（140 次初跑部分种子未满足收敛审计），
 $\mu=0.05$，组间 Sinkhorn $\gamma=0.2$、200 次，
 实例级 $\gamma=0.1$、45 次，局部最多 20 次，
 每个域从每簇独立随机抽取 40 个窗口。
@@ -146,15 +146,24 @@ Procrustes，而非不存在的真实旋转 $R_{\mathrm{gt}}$。
 我们在独立评价器中计算标准 $R^2$，不修改原版求解器。
 
 \begin{table}[H]\centering\small
-\caption{真实重做实验，留出测试集指标。MAE 与 rMSE 为无量纲归一化数据上的值。}
+\caption{重新对齐并延长迭代至 500 次的正式指标；五次均通过预设数值审计。MAE 与 rMSE 在无量纲归一化坐标中计算。}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lrrrrr}\toprule
 方法 & 共享标签 1NN $\uparrow$ & MAE $\downarrow$ &
 paired-rMSE $\downarrow$ & 旋转 rMSE 代理 $\downarrow$ & $R^2 \uparrow$\\\midrule
-\primitiveinput{results/source_only_fixed_groups/metrics_rows.tex}
+\primitiveinput{results/source_only_fixed_groups_outer500/metrics_rows.tex}
 \bottomrule
 \end{tabular}}
 \end{table}
+\noindent\textbf{迭代与审计说明。}初次将最大外迭代数设为 140 时，
+有 3/5 个种子尚未满足全局变化或局部--全局共识的
+$\leq0.01$ 审计阈值。保持唯一簇标签、样本、超参数与种子全部不变，
+仅把原版 HiWA 外循环上限延至 500 次后，
+五次均满足该审计阈值，且正交性和 OT 簇边缘误差均通过。
+但 500 次是最大运行次数而非证明收敛到全局最优。
+不同种子所得正交解仍差异明显，平均 $R^2$ 尽管较未对齐改善，
+依然为负。
+
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{frozen_label_metrics.png}
 \caption{五个种子与未对齐基线：1NN、MAE、标准 $R^2$。}
