@@ -125,3 +125,8 @@
 ## 2026-11-17 补算神经实验 R² 与相对平方误差
 
 使用旧版真实样本 hard-rerun 保存的 10 个最终旋转矩阵，严格按 `src/cc_hiwa/common.py::original_r2` 原神经实验公式（扩展到全部 3 个力量维）计算 R²。8/10 收敛：训练 R² 对齐前 **-0.6372** → 对齐后 **-1.1459±0.1084**；同试次末尾留出 **-1.2411** → **-1.1222±0.5045**。训练配对相对平方误差 **1.6372→2.1459±0.1084**；留出 **3.8316→3.7832±0.7863**。完整定义和逐种子结果见 [补算报告](results/HARD_HIWA_R2_RELATIVE_ERROR.md)。**原 HiWA 的旋转 rMSE 需要 Rgt，Hyser 没有真实 Rgt；不能将配对相对平方误差冒充旋转 rMSE。**
+
+
+## 新上传的 GCOT 包源码核对（2026-11-17）
+
+已逐项检查用户指定分支 `experiments/dandi-000138-4d-hard-clustering-20261117` 下 `research/GCOT-reproducible-20261018/GC-OT`；它的 HiWA-GMM/HiWA-SSC、Isomap 辅助投影、作者默认 ADMM 参数与旧 Hyser K-means 直接对齐实验不等价。原作者内部 `_eval_R2` 缺平方，但新包 `evaluation/metrics.py` 的 R² 正确。旧250点特征的配对正交 Procrustes oracle SSE=849.2852 > SST=747，因此零时延 R² 的理论上界=-0.13693。仅后移力量 0.1s 的诊断 oracle R²=0.0562，可能存在时延或采样配对问题，不是独立验证。完整对照和新分支直接调用入口见 [新代码审计报告](results/GCOT_NEW_BRANCH_CODE_AUDIT.md) 和 [调用脚本](scripts/run_gcot_branch_hard.py)。

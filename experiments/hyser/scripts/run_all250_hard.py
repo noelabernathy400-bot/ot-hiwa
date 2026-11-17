@@ -58,6 +58,7 @@ def main():
     Ytrue=Yshuffled[np.argsort(perm)]
     cx=KMeans(n_clusters=4,random_state=42,n_init=30).fit_predict(X)
     cy=KMeans(n_clusters=4,random_state=42,n_init=30).fit_predict(Yshuffled)
+    np.savez_compressed(a.out_dir/"all250_input.npz",X=X,Yshuffle=Yshuffled,pair=np.argsort(perm),cluster_x=cx,cluster_y=cy)
     oracle_row,_=orthogonal_procrustes(X,Ytrue)
     result={'dataset':'Real Hyser sample1','samples_per_domain':250,'split':None,
        'selected_fingers':[FINGERS[i] for i in selected],
