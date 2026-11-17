@@ -1,0 +1,1050 @@
+{
+  "source_archive": "GCOT-reproducible-20261018.zip",
+  "archive_sha256": "28a0051485ef2a035f1fbac054791b34a274bb2fd1e5e1147ba6492178a0ad98",
+  "source_files": [
+    {
+      "path": "GC-OT/.gitignore",
+      "sha256": "616579dab7a489c76d073d746b7e53d25d92e641eea9e162a83e0f51170f3674",
+      "size": 115,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/.gitignore"
+    },
+    {
+      "path": "GC-OT/configs/experiments.json",
+      "sha256": "b22ed109213e004608c236d0947811a3ef6f16a8937a945391f50077f5fe8d40",
+      "size": 430,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/configs/experiments.json"
+    },
+    {
+      "path": "GC-OT/docs/CODE_STRUCTURE_CN.md",
+      "sha256": "1c63153236316bec1507e34bdf23a34750756c82c30bbe10915561430467166e",
+      "size": 1309,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/docs/CODE_STRUCTURE_CN.md"
+    },
+    {
+      "path": "GC-OT/docs/GCOT_NEURAL_REVISION_CN.md",
+      "sha256": "14fdd7957c0d420a124abc1dd060a1dfdac744ccc65b73c4e01de94bdee64e9f",
+      "size": 3115,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/docs/GCOT_NEURAL_REVISION_CN.md"
+    },
+    {
+      "path": "GC-OT/docs/provenance/hiwa_input_manifest_legacy.json",
+      "sha256": "89950eaee238893307293b478cbb425ee469491e6bfa4f744d649bcc6de61c47",
+      "size": 10817,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/docs/provenance/hiwa_input_manifest_legacy.json"
+    },
+    {
+      "path": "GC-OT/docs/provenance/hiwa_inputs_current.json",
+      "sha256": "99f6454ffadbfd6b7b98b812fe3e686bb3e35314740670bb7a9dc651074d4c1e",
+      "size": 10869,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/docs/provenance/hiwa_inputs_current.json"
+    },
+    {
+      "path": "GC-OT/docs/provenance/tpami_author_legacy/audit.json",
+      "sha256": "0057645f3bfa46a068f212bc7a0a99f5a3316bdd0c82088caeac4d54fc4ff4b8",
+      "size": 3409,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/docs/provenance/tpami_author_legacy/audit.json"
+    },
+    {
+      "path": "GC-OT/docs/provenance/tpami_author_legacy/environment-lock.txt",
+      "sha256": "f0272dc728ef311ec6cd99f5afad550730ab68ed159ef62921c5405fc4be5548",
+      "size": 394,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/docs/provenance/tpami_author_legacy/environment-lock.txt"
+    },
+    {
+      "path": "GC-OT/docs/provenance/tpami_author_legacy/manifest.json",
+      "sha256": "9e4090904dbaacd6f950c26103c8a6b0cea2424f0a0f705f19a4d0363bfb2d9e",
+      "size": 2967,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/docs/provenance/tpami_author_legacy/manifest.json"
+    },
+    {
+      "path": "GC-OT/docs/provenance/tpami_author_legacy/REPORT_CN.md",
+      "sha256": "bf44a725b3962509a9af1eb8eee5a74d7ce91948aed0c60bc56bc51c6c0dcdee",
+      "size": 3188,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/docs/provenance/tpami_author_legacy/REPORT_CN.md"
+    },
+    {
+      "path": "GC-OT/docs/provenance/tpami_author_legacy/summary.json",
+      "sha256": "1e54f8fcce111ec3baf4cfca0b6026a30c5d56a88f5a4729b29e21fd8fc24399",
+      "size": 593,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/docs/provenance/tpami_author_legacy/summary.json"
+    },
+    {
+      "path": "GC-OT/docs/PROVENANCE.md",
+      "sha256": "3ae875fd3692b7353c4698162fdad30d0253297dac980e136579c3f93d72e2ba",
+      "size": 1806,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/docs/PROVENANCE.md"
+    },
+    {
+      "path": "GC-OT/docs/TPAMI_IMPLEMENTATION_CN.md",
+      "sha256": "ba6fbaa82ebcafff601333f721bdfafad355d546f9d87dcda379b7224f450b0a",
+      "size": 8826,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/docs/TPAMI_IMPLEMENTATION_CN.md"
+    },
+    {
+      "path": "GC-OT/evaluation/__init__.py",
+      "sha256": "38d365a217d61c9a656971ee44b8736d73fe29c5fee5fc1cf6e32de555ec5be0",
+      "size": 293,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/evaluation/__init__.py"
+    },
+    {
+      "path": "GC-OT/evaluation/metrics.py",
+      "sha256": "2822b54c38afbe85c0f590b4383823c635d847b400fcf63d83dee9fd8bc4ed79",
+      "size": 11356,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/evaluation/metrics.py"
+    },
+    {
+      "path": "GC-OT/evaluation/validation.py",
+      "sha256": "937cf6d71afaa90fb1a382e791d67a044bc516ab2f09c056fd4602eca564db3f",
+      "size": 5917,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/evaluation/validation.py"
+    },
+    {
+      "path": "GC-OT/experiments/__init__.py",
+      "sha256": "f67a437b3910b0400486a45167d0001163081e3b8b3f1d6166df4e3a3adf3581",
+      "size": 44,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/__init__.py"
+    },
+    {
+      "path": "GC-OT/experiments/dandi_000688/__init__.py",
+      "sha256": "ef11d0e58877e2b241c1574607cff6d59c4691b2197d46d7b7a2aecfc81cee64",
+      "size": 58,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/dandi_000688/__init__.py"
+    },
+    {
+      "path": "GC-OT/experiments/dandi_000688/compare.py",
+      "sha256": "20cbf0497a87e5ceda12d378c47b26c52d4a0c0fb43690348d3137116001df8c",
+      "size": 5567,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/dandi_000688/compare.py"
+    },
+    {
+      "path": "GC-OT/experiments/dandi_000688/config.py",
+      "sha256": "cd5d72044cff9398e24b6d9a01642cc8dcf09854aa3062b096de2d9e22b98f0d",
+      "size": 1072,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/dandi_000688/config.py"
+    },
+    {
+      "path": "GC-OT/experiments/dandi_000688/plot.py",
+      "sha256": "392c892ea1267416e021c364839a22068b3f8bd540d3148447fcdb321e73df48",
+      "size": 3069,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/dandi_000688/plot.py"
+    },
+    {
+      "path": "GC-OT/experiments/dandi_000688/prepare.py",
+      "sha256": "c3b995f2820f0b456f7c9bc4b7760a05d7246c1c183dcb0c85c9ebcce9ec5147",
+      "size": 8048,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/dandi_000688/prepare.py"
+    },
+    {
+      "path": "GC-OT/experiments/dandi_000688/README.md",
+      "sha256": "7cfe943b00e15e9a368545c1812b9eb9f6d5a5ddb01e12430ea8f911b8b2bdfe",
+      "size": 1609,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/dandi_000688/README.md"
+    },
+    {
+      "path": "GC-OT/experiments/dandi_000688/run.py",
+      "sha256": "bb618bfbad8779b5ddd7afff1789b478f33618549eb702c9fd2c0039e738f7d9",
+      "size": 1694,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/dandi_000688/run.py"
+    },
+    {
+      "path": "GC-OT/experiments/neural/__init__.py",
+      "sha256": "024808abd3d5c33eae32c8ac1220a28c627d97420a05ba0055102ea60c7718b4",
+      "size": 43,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/neural/__init__.py"
+    },
+    {
+      "path": "GC-OT/experiments/neural/core.py",
+      "sha256": "852ddb81724ce6f3662d2fccbbe4bbe01ac7643bc79da48dd1e7f8191ff8ec0f",
+      "size": 9408,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/neural/core.py"
+    },
+    {
+      "path": "GC-OT/experiments/neural/run.py",
+      "sha256": "7b066dcd15b1b364f5528f626fd3c24509ac2cdfe52d85bbf2daf9d7661db735",
+      "size": 643,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/neural/run.py"
+    },
+    {
+      "path": "GC-OT/experiments/panoptic/__init__.py",
+      "sha256": "601727324e8fa2f4354d16b24e17ce5681e2c9fb98fea4107f52901f0a460a6f",
+      "size": 59,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/panoptic/__init__.py"
+    },
+    {
+      "path": "GC-OT/experiments/panoptic/compare.py",
+      "sha256": "465f9423b9960ecedce7b52f8e11263584f8891de19192e9152e074fdea952a1",
+      "size": 3858,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/panoptic/compare.py"
+    },
+    {
+      "path": "GC-OT/experiments/panoptic/config.py",
+      "sha256": "2af89f052d98f8bfb805a4f8e1f19bdc5acd271fb55a55af90b93aa9bf039832",
+      "size": 519,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/panoptic/config.py"
+    },
+    {
+      "path": "GC-OT/experiments/panoptic/plot.py",
+      "sha256": "6ebc674224769ce7d5fbf698c3c89b29fe7f0441ad56df4d83afc9c690c0aa90",
+      "size": 3536,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/panoptic/plot.py"
+    },
+    {
+      "path": "GC-OT/experiments/panoptic/prepare.py",
+      "sha256": "0ba73f969b1e87ac6df577356b63d1b409be99de4562f27316612c8ac1cacb80",
+      "size": 5724,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/panoptic/prepare.py"
+    },
+    {
+      "path": "GC-OT/experiments/panoptic/README.md",
+      "sha256": "37ca91f4dc1500b0608a43073dbfaa489d45d144e13086e139777f67b300b65b",
+      "size": 1080,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/panoptic/README.md"
+    },
+    {
+      "path": "GC-OT/experiments/panoptic/run.py",
+      "sha256": "2292f04e1c66bec777ef1fb4debbf0d6c36469e6ceca0382a98cca31e5eded26",
+      "size": 1190,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/panoptic/run.py"
+    },
+    {
+      "path": "GC-OT/experiments/reference.py",
+      "sha256": "533cd33faa3af163b22f4e687a2771caf7f8cec89b3e7e3e9ce640433e67ca30",
+      "size": 970,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/reference.py"
+    },
+    {
+      "path": "GC-OT/experiments/synthetic/__init__.py",
+      "sha256": "b54d69d1cb4d7ba6d0c72215233c7ba4776ebb9ea1e5528a026bef3fe4647f37",
+      "size": 34,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/synthetic/__init__.py"
+    },
+    {
+      "path": "GC-OT/experiments/synthetic/core.py",
+      "sha256": "c6b342a9e140e4dd1dc9d950a0286feeb3a5f52086a44679e7f3876484e804b4",
+      "size": 5187,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/synthetic/core.py"
+    },
+    {
+      "path": "GC-OT/experiments/synthetic/matlab/generate_synthetic_baselines.m",
+      "sha256": "bfbd910d81c162d2f3e2e0ba8b0158dca02438b7e9269ac8b290004abd71550e",
+      "size": 1541,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/synthetic/matlab/generate_synthetic_baselines.m"
+    },
+    {
+      "path": "GC-OT/experiments/synthetic/run.py",
+      "sha256": "6be1f1449f1bf0a4bbb78f3add51b7279c7a49a58a0f89827f2ae54dd6afbd7e",
+      "size": 692,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/experiments/synthetic/run.py"
+    },
+    {
+      "path": "GC-OT/gcot/__init__.py",
+      "sha256": "f4f219a447cac82319bb990fb745f370803a8d16c5e52b5f6931089ffb3922aa",
+      "size": 193,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/gcot/__init__.py"
+    },
+    {
+      "path": "GC-OT/gcot/alignment.py",
+      "sha256": "33cd57ee118d1589f82b932e9d826a08935e77c5848b255bd21bc653ba6f1f0e",
+      "size": 12693,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/gcot/alignment.py"
+    },
+    {
+      "path": "GC-OT/gcot/baselines.py",
+      "sha256": "8e8d43f1731397a6b2622999a72c41076d922648a91d3d8ac9f93e9cfa0549fc",
+      "size": 3983,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/gcot/baselines.py"
+    },
+    {
+      "path": "GC-OT/gcot/dad.py",
+      "sha256": "07395aa2cd1d53f962aa9468ada210ff6b3a0bebb94e2466959c511335cf867e",
+      "size": 4157,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/gcot/dad.py"
+    },
+    {
+      "path": "GC-OT/gcot/data.py",
+      "sha256": "d7921c3047627e12f0fad858adf17a69e4c12256db570b19090bb108900d0142",
+      "size": 2804,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/gcot/data.py"
+    },
+    {
+      "path": "GC-OT/gcot/grouping.py",
+      "sha256": "c96150de8f3008836883b81f679dfc6945610c98254e5127504d27018c884ae4",
+      "size": 3375,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/gcot/grouping.py"
+    },
+    {
+      "path": "GC-OT/gcot/numerics.py",
+      "sha256": "76cd79eefe81baa95c585d110b58927453250b2b9e7f208d2840c452b0236a79",
+      "size": 2933,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/gcot/numerics.py"
+    },
+    {
+      "path": "GC-OT/gcot/preprocessing.py",
+      "sha256": "9b0a6e9e71fa97966173f4700975d779d0935cd5482f0bd19645010da75b2ae6",
+      "size": 422,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/gcot/preprocessing.py"
+    },
+    {
+      "path": "GC-OT/pyproject.toml",
+      "sha256": "badb773c367e13e683cacfd30a0e702be2c1f36f11f871ca3a085495dc8a05d8",
+      "size": 543,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/pyproject.toml"
+    },
+    {
+      "path": "GC-OT/README.md",
+      "sha256": "3f01e6e031730596fd8ba5caa133bae06c9ea2a2ca67e717b79cca84975f483b",
+      "size": 2382,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/README.md"
+    },
+    {
+      "path": "GC-OT/requirements-lock.txt",
+      "sha256": "ebaf4bb1869aaaaa1d3f27a5d522074400e8e529bb6b2bb171106757b97f77fa",
+      "size": 416,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/requirements-lock.txt"
+    },
+    {
+      "path": "GC-OT/tests/test_author_parity.py",
+      "sha256": "af6282662efab5bfac5102817e29ebd1372a0ccb0e3e0e3a0e911ba9db475bfe",
+      "size": 2711,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/tests/test_author_parity.py"
+    },
+    {
+      "path": "GC-OT/tests/test_code_structure.py",
+      "sha256": "d2adc624e6b6a70f76c427a2573875e1f9cf40ebc59cdfe9d1052780e3e5d58a",
+      "size": 1182,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/tests/test_code_structure.py"
+    },
+    {
+      "path": "GC-OT/tests/test_dandi_000688.py",
+      "sha256": "fa1895e0139855594a3f91448879b6d3a9fdbff95a4ca52e0a108882401a7d31",
+      "size": 1432,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/tests/test_dandi_000688.py"
+    },
+    {
+      "path": "GC-OT/tests/test_gcot_neural_revision.py",
+      "sha256": "07bafe6ff00f846e2923604b5e1469716ae37b4de81f5ef82ddeab67f479dcf5",
+      "size": 4143,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/tests/test_gcot_neural_revision.py"
+    },
+    {
+      "path": "GC-OT/tests/test_hiwa_matched.py",
+      "sha256": "2c3fa954ff6016e68475243290bfeb41d8576883c6934ee015d2c866cfd2da02",
+      "size": 2584,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/tests/test_hiwa_matched.py"
+    },
+    {
+      "path": "GC-OT/tests/test_numerics.py",
+      "sha256": "a7d5c260afe3f224b36b45d8a2fa238db1d31bc1f63f80369b1fb15ca8878735",
+      "size": 4263,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/tests/test_numerics.py"
+    },
+    {
+      "path": "GC-OT/tests/test_panoptic.py",
+      "sha256": "54a44c89d1d871f60069d35c574a738693f4ddb44c14a39391271f98a1372328",
+      "size": 1019,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/tests/test_panoptic.py"
+    },
+    {
+      "path": "GC-OT/tests/test_single_run_metrics.py",
+      "sha256": "12ac96cf34f9df007850f1d34bbd51366b85e5f49c9e07694b24b12bd7230a37",
+      "size": 3059,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/tests/test_single_run_metrics.py"
+    },
+    {
+      "path": "GC-OT/tests/test_tpami_literal.py",
+      "sha256": "6f12fa56bd8dda7bc9b83c73bbbf0d037f83f376d7005b32e9c88ae5f1a7b15e",
+      "size": 2405,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/tests/test_tpami_literal.py"
+    },
+    {
+      "path": "GC-OT/vendor/DAD/decoder/main.py",
+      "sha256": "e57b45e45e6d42a61607a66b6a03a3fa94831657e0e0015560bc8481b853db9c",
+      "size": 12059,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/DAD/decoder/main.py"
+    },
+    {
+      "path": "GC-OT/vendor/DAD/decoder/supervised.py",
+      "sha256": "77e2ffa8e4656bfc562dcbe792181c9b261be42bfd32278c2f82d0554049e416",
+      "size": 169,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/DAD/decoder/supervised.py"
+    },
+    {
+      "path": "GC-OT/vendor/DAD/decoder/utils.py",
+      "sha256": "22b10f6e75f75872647145ff2b02cfe067c8ab49183b1df7dca49766e2649ff3",
+      "size": 1127,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/DAD/decoder/utils.py"
+    },
+    {
+      "path": "GC-OT/vendor/DAD/README.md",
+      "sha256": "7c4fdaef05c4166e4d05305eb0cd6ed78704fa855c0264c49144c7dd41c2574d",
+      "size": 37,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/DAD/README.md"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/computeV.m",
+      "sha256": "70bd7043553b67cff193c582b54c76361e0fa1a6963cb1cfb6d4a5b93cdd4688",
+      "size": 1851,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/computeV.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/DAD_3Dsearch.m",
+      "sha256": "7c91b6e27290e798703864b6413e1c75562418bea77ffcc73d1e1c8284e18d66",
+      "size": 2035,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/DAD_3Dsearch.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/downsamp_nd.m",
+      "sha256": "1b0d9cf63b52e9ebb4ee41f6d90d73ce122e3474812122966dd1f52b82a7ddb9",
+      "size": 202,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/downsamp_nd.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/error_nocenter.m",
+      "sha256": "e6913b2fef1396502d5f9b19f888a1f7108bed6a55fd9e2401dcbf0784ae860f",
+      "size": 601,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/error_nocenter.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/eval_KL.m",
+      "sha256": "b71d610b9a9b35c22f02e4a6e2b11e4ed37d69966bb25fd42a694b5f74f6f969",
+      "size": 889,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/eval_KL.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/gridsearch_3DKL.m",
+      "sha256": "19fa35d9063f22c1e63c61646ac69f4ac1d7963f83bf09ebc542e314ee5d7883",
+      "size": 2717,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/gridsearch_3DKL.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/mapX3D.m",
+      "sha256": "f6fd7e2744dfb90ca957bb1c5cd161f99e18d4849ad1cacaf68657d659e5c4c4",
+      "size": 53,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/mapX3D.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/normal.m",
+      "sha256": "1f53f5515378bc889c3eedde7ac41840a6dec734611142b898ec80ae897a2add",
+      "size": 124,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/normal.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/prob1.m",
+      "sha256": "99184d0cc86285ec2e4a54cd2e8efe41269b9b254fc6ceadd321fa747ba756ef",
+      "size": 248,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/prob1.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/prob_grid.m",
+      "sha256": "b823d94972c517b3edad51d41fbcfe52deb4950831d8d75a938e62b3f34d8238",
+      "size": 1131,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/prob_grid.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/remove_constcols.m",
+      "sha256": "0cfb1060aefcaf3649225aadaeb3227808335eb41bccdb5989d404f902016928",
+      "size": 75,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/remove_constcols.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/rotate_data.m",
+      "sha256": "bf385ae388be73a1524e41b2a78fa58b76f90ddafeb26c82eb6caa745664fc7e",
+      "size": 172,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/rotate_data.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/rotated_KLmin.m",
+      "sha256": "d2dfb5ecae3d93f86fe3c1244ccd80bc9cbd6f85d5dca3053b95276da1689503",
+      "size": 1426,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/rotated_KLmin.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/runDAD2d.m",
+      "sha256": "648cb1a1f3128461cfe6fc51a923e3d934038ff2d31b56284e4698ef53f61e99",
+      "size": 164,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/runDAD2d.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/runDAD3d.m",
+      "sha256": "36729f11d8751734b1acfd15297a0636e09cb0cb09cb7e02712bc7a0a2bd8da1",
+      "size": 1586,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/runDAD3d.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/main/sample_from_3Dgrid.m",
+      "sha256": "a34aa56e1e91d2d908c18ed8562fe8bbba0a6c800f48c6c530aeb04ba93d7c1e",
+      "size": 448,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/main/sample_from_3Dgrid.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/modelselect/apply_2Dmodelresults.m",
+      "sha256": "594abdb3f646e563e2921b7d5f6142e89e8bea73fa6586bfd18253760ff8621d",
+      "size": 2892,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/modelselect/apply_2Dmodelresults.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/modelselect/apply_2Dmodelselect.m",
+      "sha256": "b729025dfe9954bd71aec43e0fe6893608538940cb9ce9fd7b5dd0cded8b1a33",
+      "size": 3834,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/modelselect/apply_2Dmodelselect.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/modelselect/apply_mihimodelresults.m",
+      "sha256": "df1c5003877c467a7948d6333f52a6cfed02c7090a5fd1d42c068fdeb2536e53",
+      "size": 2855,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/modelselect/apply_mihimodelresults.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/modelselect/model_select.m",
+      "sha256": "60c7347bcbb4c982f76ae031a17ecd4433bd8578d66fe499b477a6c89c5df4f4",
+      "size": 10677,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/modelselect/model_select.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/modelselect/modelSelect_2D.m",
+      "sha256": "9f3870df0c08fd997057570ddac39cca8ec78ab6e9d6d69c939abc397f51b049",
+      "size": 4298,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/modelselect/modelSelect_2D.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/modelselect/select_model_manually.m",
+      "sha256": "6deb876cd4d64dde5d486464ef9fb2312cf6fa6cd04e000ebba2839fc46c97aa",
+      "size": 1097,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/modelselect/select_model_manually.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_alldata_visualize_kinematics_Fig2AB.m",
+      "sha256": "dae7ab0055412cfe0d478930dd19157ca1b0fde784df788656193d1671eaf4c5",
+      "size": 1345,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_alldata_visualize_kinematics_Fig2AB.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_allsubjects_compare.m",
+      "sha256": "98e04172a3550a4fd67d4683324c15a1c6d8508281c8bb8baa9e451560f1615a",
+      "size": 3214,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_allsubjects_compare.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_allsubjects_kinematics_Fig2BC.m",
+      "sha256": "c3a3a5e954eddcf1575dae7c6710264dd43b410094f8b322bed3e2f2985b0c7e",
+      "size": 1146,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_allsubjects_kinematics_Fig2BC.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_compare_results_across_subjects.m",
+      "sha256": "ca15e362dda70be2e798e803d52ecef7703bdd09a26c3919cde06549ca4e1eda",
+      "size": 2943,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_compare_results_across_subjects.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_compile2Dresults.m",
+      "sha256": "649db5268dd1b5986300ade2bd5297b69a82ca3265beb60f8a5a7b79e03b3458",
+      "size": 2662,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_compile2Dresults.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_jango_Fig6.m",
+      "sha256": "2410740e8627d53dda8ee6741ac1af5d4e295cc32d1b2c461a8c635d37f6f1ea",
+      "size": 3761,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_jango_Fig6.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_mihi_Fig5AB.m",
+      "sha256": "d07861738ec4ef6968b4826a84763305dc69c5b4160e1ba534c1393e8fecb470",
+      "size": 1778,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_mihi_Fig5AB.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_run2D_phasetrans_synthetic_Fig7.m",
+      "sha256": "e5e056b916ee1863c778bbb5f9e8670f01ffb17943fdea2006af7ee505f61fb6",
+      "size": 2293,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_run2D_phasetrans_synthetic_Fig7.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_run3D_2D_model_select_for_jango.m",
+      "sha256": "b646fc9d0299adefe53727bc557559f1a8eab115e3cd07e6650fbc8a5c39b563",
+      "size": 5994,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_run3D_2D_model_select_for_jango.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_run3D_chewie_main_mperich.m",
+      "sha256": "ff9b1cbd6f0962bad15dc96e22edbe0fe1bb984c16ebd4efe2ff25c1f13f8509",
+      "size": 2385,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_run3D_chewie_main_mperich.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_run3D_mihi_main_mperich.m",
+      "sha256": "a08f9a60360e98287520e26d3932ff10bb2d370bdd3292a38b00e0850334ea21",
+      "size": 1818,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_run3D_mihi_main_mperich.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_runchewiemihi_optimal_modelselect.m",
+      "sha256": "8d3149b3db64f9fbfd6b2f66a124d6d8e033de00b4e45417a9c603259eade9b8",
+      "size": 2396,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/scripts/script_runchewiemihi_optimal_modelselect.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/crossVaL.m",
+      "sha256": "083e90bc14271336b7be71417a08bef28b89a7f7d81b5691bbdeeb04c428cc27",
+      "size": 503,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/crossVaL.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/gaussian_prob.m",
+      "sha256": "9542192876c929ab30c490731cd0a2d2fb21e0d4e88b7716e492988d695199c4",
+      "size": 919,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/gaussian_prob.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/kalman_filter.m",
+      "sha256": "e25eebb152f5acaab0638b03af30867d813e8f00878b7e5646b929c67d7a6a87",
+      "size": 2899,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/kalman_filter.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/kalman_update.m",
+      "sha256": "66785c435b95834920039fc44a19e3a759d7ead8c15aedad05d63e63ecc6ae50",
+      "size": 1919,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/kalman_update.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/LinEst.m",
+      "sha256": "d4a1777da9a7dc082d1874957d2733e6ac9b4e930f248d481132575992d91a6a",
+      "size": 305,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/LinEst.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/LSoracle.m",
+      "sha256": "29c4d80f1f9cd727f52a034197ea7c65947b0f72252ff6c9560cf606bd99cfe8",
+      "size": 116,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/LSoracle.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/run_supervisedmethods.m",
+      "sha256": "4af92198f27e9b7f40890eb9aef4469f3cce7fff15148143e3d1c5ba1479bb41",
+      "size": 1223,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/run_supervisedmethods.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/train_kf.m",
+      "sha256": "0c98318ecd50ce0a8f072ac416fc4a2dc3f3b1f3551c82446b9e40ce018baf3c",
+      "size": 857,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/supdecoder/train_kf.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/colorData.m",
+      "sha256": "1aad45a00c40c8be92b15e2c7b715f2bb86632f0bde8ea8f94c330041003d2e7",
+      "size": 740,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/colorData.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/compare_dimreduction_methods.m",
+      "sha256": "bf48fb4a30e4988d678a0bb6f87a74014c1f45df25c8771e0b458a246564bee1",
+      "size": 1217,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/compare_dimreduction_methods.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/compile_alljangodata.m",
+      "sha256": "faffddc8bc2ea4ec8ff6d0605b2595b9022a193e30c37242ac9609612b4d7cf3",
+      "size": 3206,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/compile_alljangodata.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/compile_jango_neuraldata.m",
+      "sha256": "c4db346b6b02cf5929dfa1900b51ed784a8bd2578e319f95fc590a67fa082fc3",
+      "size": 1211,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/compile_jango_neuraldata.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/compile_reaching_data.m",
+      "sha256": "f8ae315e7da61c2bf491b041c6232db783ab2a85914cfd5b82e4dbb5451920e4",
+      "size": 2173,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/compile_reaching_data.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/evalMSE.m",
+      "sha256": "438974b2aa5a937ff40d358973c5734344c573b08a7559dff864bed05e58a0e8",
+      "size": 188,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/evalMSE.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/evalR2.m",
+      "sha256": "8053f3009aad35508b494730c7d9f0bb8f35242e0800a97a8d6add4ae8eb2fd9",
+      "size": 138,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/evalR2.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/evalTargetErr.m",
+      "sha256": "e5b8f82c462a266cba4cd259c26e54c23d393a34ef3657c8132bd830843272ae",
+      "size": 149,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/evalTargetErr.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/ff_trial_table_co.m",
+      "sha256": "22a9f0e0b6a65146b5dd78d264d38565b4946377f5b7e20ba115521be6bf0ecd",
+      "size": 6147,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/ff_trial_table_co.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/getdata.m",
+      "sha256": "d394d65bb7ffb732a0323871047bd389f37daf8985a16023212a84bcb83d2709",
+      "size": 458,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/getdata.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/getFR_overlap.m",
+      "sha256": "b7f31d72c0bf3b6e26b6229ef218b8ca565a25a8e512846bea896dca89dca667",
+      "size": 1102,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/getFR_overlap.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/imagesc_pixels.m",
+      "sha256": "577fb87a8dc7e4756780eb8311957d31e67d4216a0542a582b5ff22190e5698f",
+      "size": 1853,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/imagesc_pixels.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/normcol.m",
+      "sha256": "2adaa0b604157edbdf8e371527ef08e460a639e1c5418802edb533665d22c3bb",
+      "size": 446,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/normcol.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/norms.m",
+      "sha256": "4389f2d43803bd9af8d463b0629157d6ada042167079386664f333e1092d1186",
+      "size": 1327,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/norms.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/permutetrials.m",
+      "sha256": "049fd87b9d2fdb9b35be72a17e778fa45b111f00129821d445498adc41aa74e7",
+      "size": 419,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/permutetrials.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/prepare_dreamdata.m",
+      "sha256": "844e44ed00b95c9b80d8291946acc769c1cb0b7a237b750753fd6faa35c3e23e",
+      "size": 1342,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/prepare_dreamdata.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/prepare_superviseddata.m",
+      "sha256": "a88df440f23f5f9123c243216e747a12a64ac1a5e74d26e105396d7bce6c7760",
+      "size": 1545,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/prepare_superviseddata.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/removedirdata.m",
+      "sha256": "d4e32cd8ca67fb9f35dac620c1f5ac47e38326a961b2b415a0b838d78e037f6b",
+      "size": 1215,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/removedirdata.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/sample_after_gocue.m",
+      "sha256": "bc853c00627b84988c4011724b31a6f90f2d6e03681cf357e9a57f82678eaf1f",
+      "size": 319,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/sample_after_gocue.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/simmotorneurons.m",
+      "sha256": "31f8b98693e02e8ccc8d45bbb946293594a7ff3e222ffdbbb7769d08da218603",
+      "size": 2358,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/simmotorneurons.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/split_dataset.m",
+      "sha256": "76c4f7be872efce6592b4fce92e396d56ed3e4ce5cf81603b509c8c61672b762",
+      "size": 224,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/split_dataset.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/splitdataset.m",
+      "sha256": "68af698936208e1a0d14b80c7c53a3228f4ee74617729a1c7ffc358419e76e0d",
+      "size": 547,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/splitdataset.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/code/utils/visualize_performance_DAD.m",
+      "sha256": "6984489f7905f6f99bd7b4a0cc5489d0cbb3682a680fff62889b8ba6a7879758",
+      "size": 858,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/code/utils/visualize_performance_DAD.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/data/demo/readme.md",
+      "sha256": "4b688d8b837d97099bf8c12ed674037220904a5086bbcfd33a9fe10b30c1da41",
+      "size": 677,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/data/demo/readme.md"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/data/README.md",
+      "sha256": "868884a1df61c01de37f5f55913551a8a4c7ff7bb814608e619a2cd0a62d7957",
+      "size": 1051,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/data/README.md"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/README.md",
+      "sha256": "7524a8aa60a852a9e9f640b20f1f7ae46b76b21bb72a29462d52b8c080d5b07d",
+      "size": 3300,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/README.md"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/script_runDAD.m",
+      "sha256": "eb6c6d03eb4749cce1ae12f17b4989a7d6855859b312700c5e043df77c807745",
+      "size": 844,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/script_runDAD.m"
+    },
+    {
+      "path": "GC-OT/vendor/dad_matlab/DAD-master/script_runDAD_comparewithsup.m",
+      "sha256": "180b9c88aefff115123b7bd67baaa45bd5a1c5599f0e82e1ed60ba6436cf0234",
+      "size": 2010,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/dad_matlab/DAD-master/script_runDAD_comparewithsup.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/admmLasso_mat_func.m",
+      "sha256": "49a8d276ce34c1b476b1491ae9c4189c9b2f2c9903a39178a1788a02c373e5ff",
+      "size": 3536,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/admmLasso_mat_func.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/admmOutlier_mat_func.m",
+      "sha256": "7d343a64ffb0d8738365b1ec1ac0d7f7b3a861158c0ef5d4931a975926a70e4c",
+      "size": 4103,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/admmOutlier_mat_func.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/bestMap.m",
+      "sha256": "4c2d419e0f26fa3401e3ea0b1bb68105f7afdb002824d09e5ecf2604211452f7",
+      "size": 745,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/bestMap.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/BuildAdjacency.m",
+      "sha256": "cce620fefa94ff06b5ffda1149be89adaca95ec2faac7b54db12b87cbc007044",
+      "size": 1003,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/BuildAdjacency.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/computeLambda_mat.m",
+      "sha256": "a95eb95875da90164313b91625848b4cd999c0006eb1f5905d67802488a3e3b8",
+      "size": 698,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/computeLambda_mat.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/DataProjection.m",
+      "sha256": "65a444e5ed66619e3230c10280c126c9e0236c942679846c681e5746c63fc6d1",
+      "size": 757,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/DataProjection.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/errorCoef.m",
+      "sha256": "5e43f956e295b646182673725f7b1ed70bf9cc5705e66f814a0e69fd88032776",
+      "size": 561,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/errorCoef.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/errorLinSys.m",
+      "sha256": "f8c712f1ca43fedfa1d0497d3eb27208745b5cf343daff7a6c55c246afe98f97",
+      "size": 852,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/errorLinSys.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/matrixNormalize.m",
+      "sha256": "6da3d259d642b7b7f110a7e9cc5b1a3ef1bdd56501dbc4b0930c1b8fbce59eed",
+      "size": 594,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/matrixNormalize.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/run_SSC_Faces.m",
+      "sha256": "9e52f93a75681d64b4a6bd76125bf6664f5b390e8b9ec2b89a9728b70fd08071",
+      "size": 1403,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/run_SSC_Faces.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/run_SSC_MS.m",
+      "sha256": "3ab8beaa9e9c55685c8b64cbffae3ed04ef2c3a63dfbfcb706285992e9868365",
+      "size": 2944,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/run_SSC_MS.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/SpectralClustering.m",
+      "sha256": "37cef5314da8b4986389a8a9575766f6dfb681af11bc78cc68862b4cad4d91c8",
+      "size": 1292,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/SpectralClustering.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/SSC.m",
+      "sha256": "7d0fbf057fa171404d6ff1362fd9955e830f150a531c0603c45a9246244d07f1",
+      "size": 1265,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/SSC.m"
+    },
+    {
+      "path": "GC-OT/vendor/SSC-using-ADMM/thrC.m",
+      "sha256": "464ae81746badfdc5218d5f0b1df99adaa088ada33fe52e0df3fb9c6d4b54a46",
+      "size": 709,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/vendor/SSC-using-ADMM/thrC.m"
+    },
+    {
+      "path": "GC-OT/visualization/__init__.py",
+      "sha256": "a3025a4a0298f8db7df3f1d50d5ab2948c7e5a1143b61f66984665953ed1fdfb",
+      "size": 38,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/visualization/__init__.py"
+    },
+    {
+      "path": "GC-OT/visualization/neural.py",
+      "sha256": "c06dbf47c25172810dd965435c3e588205cfb1ad88d25399db52c25c2c1acab9",
+      "size": 3177,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/visualization/neural.py"
+    },
+    {
+      "path": "GC-OT/visualization/synthetic.py",
+      "sha256": "948dba027b3b5c377dce070a661edd0fe2398d74287098ecd71bccd815b07e50",
+      "size": 5612,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/GC-OT/visualization/synthetic.py"
+    },
+    {
+      "path": "reference/GCOT-copy-PyHiWA/src/hiwa.py",
+      "sha256": "4419e19004b06c7840d187ddb12a19b2ad97974dd28ad1dc9510d8ead741da6a",
+      "size": 11122,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/PyHiWA/src/hiwa.py"
+    },
+    {
+      "path": "reference/GCOT-copy-PyHiWA/src/utils.py",
+      "sha256": "e30b7a2afe51e0c54568d648c0bff8c14faf53ff7e48bc6674516225477e31b5",
+      "size": 2510,
+      "archive_path": "GCOT-share/GCOT-author-reproduction/GCOT-author-reproduction/PyHiWA/src/utils.py"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/demo.m",
+      "sha256": "6a0df66c875d8bc3d28f028bdf05d19bd2cb0110a6e83c957b5b5b1244f4f27d",
+      "size": 1426,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/demo.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/figure1ab.m",
+      "sha256": "0166a7871dcd1ccc208dc518601c0d39fba95a976c346c322d3d9966a3b092c8",
+      "size": 6170,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/figure1ab.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/figure1cd.m",
+      "sha256": "fcbf0cb37575ef2f13a92a9fef3ad4258cef0ac9b8a1c84ae5a7860b60e58fa8",
+      "size": 6178,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/figure1cd.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/figure1e.m",
+      "sha256": "5b2df79be1b732bf85731181a9dac761825ae0cd90a8717a080164877410d592",
+      "size": 6000,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/figure1e.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/figure1f.m",
+      "sha256": "c48e033da6b22f926b17a9370fd8a75a049bf65f801aa8f6189beee442fe2c35",
+      "size": 6028,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/figure1f.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/figure_parallelism_comparisons.m",
+      "sha256": "b88c1da2f1b5a449457d74bc3f55b2b1433ee5bea3eec37e5495ca6006e868db",
+      "size": 3096,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/figure_parallelism_comparisons.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/third party tools/CORAL.m",
+      "sha256": "aa065e5ca8edb5c123c092e775529f7e5a044db2d3abd5943c47a7eb6df124ca",
+      "size": 355,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/third party tools/CORAL.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/third party tools/ICP.m",
+      "sha256": "484f5cf5f409e301fd2793134b95c21a386fad9eb99e0b24320249bd617cf95f",
+      "size": 8513,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/third party tools/ICP.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/third party tools/mseb.m",
+      "sha256": "8f9bbf3f3450c133833c78943beebfe443feadff05c9f7fdd4105fa297a675b5",
+      "size": 8854,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/third party tools/mseb.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/third party tools/SA.m",
+      "sha256": "86b2c441ef9b538605e0a9bc0f0a4682efeaae4669d9fa0a608bf9ba40674750",
+      "size": 731,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/third party tools/SA.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/toolbox/GenerateSyntheticSubspaceData.m",
+      "sha256": "d6cf223ea3acd967dbb331bc1f1efb9b7521739db2a6ddc40a75c034b60a74b2",
+      "size": 2175,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/toolbox/GenerateSyntheticSubspaceData.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/toolbox/HiWA.m",
+      "sha256": "b93cf12e5cb35a273f0df550fdd15641f6cf67e24724e51631a7978c7ba23175",
+      "size": 7837,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/toolbox/HiWA.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/toolbox/HiWA_noparallelism.m",
+      "sha256": "245f9314b0acd5201174fdb51d00326f7a72498b97862dc2c8b17174cf4d213e",
+      "size": 7851,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/toolbox/HiWA_noparallelism.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/toolbox/HiWASSC.m",
+      "sha256": "b9ec55885c3d30b5790a9e4a79625c72653f9f8eca3ab9ddfe3ad6029e59797a",
+      "size": 5665,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/toolbox/HiWASSC.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/toolbox/PlotLabelledData.m",
+      "sha256": "08b9b2f743bd6f6745a82049d2c77c4c92ce3c85f551976e7317e03ad3f5f81b",
+      "size": 746,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/toolbox/PlotLabelledData.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/toolbox/vec.m",
+      "sha256": "0999de19e053cb9963e92e580a8f6b44d88288912c1603fbe5008ca151d07dcd",
+      "size": 46,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/toolbox/vec.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/code/toolbox/WA.m",
+      "sha256": "a159196fdc1c562a6ef02e108bfba54559555d20fee4eec369a8a140b95016a8",
+      "size": 2722,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/code/toolbox/WA.m"
+    },
+    {
+      "path": "reference/HiWA/hiwa-matlab/README.md",
+      "sha256": "d2221972cf0e2539ac09850ec5b178e7d25d8d5cde9062abfa025bfc016f7dc9",
+      "size": 846,
+      "archive_path": "GCOT-share/HiWA/hiwa-matlab/README.md"
+    },
+    {
+      "path": "reference/HiWA/PyHiWA/README.md",
+      "sha256": "cb3e11179e911ba216ccb7a37d390c7de17b00eae8df1c7d851a21e2a7efd597",
+      "size": 1935,
+      "archive_path": "GCOT-share/HiWA/PyHiWA/README.md"
+    },
+    {
+      "path": "reference/HiWA/PyHiWA/src/hiwa.py",
+      "sha256": "4419e19004b06c7840d187ddb12a19b2ad97974dd28ad1dc9510d8ead741da6a",
+      "size": 11122,
+      "archive_path": "GCOT-share/HiWA/PyHiWA/src/hiwa.py"
+    },
+    {
+      "path": "reference/HiWA/PyHiWA/src/utils.py",
+      "sha256": "e30b7a2afe51e0c54568d648c0bff8c14faf53ff7e48bc6674516225477e31b5",
+      "size": 2510,
+      "archive_path": "GCOT-share/HiWA/PyHiWA/src/utils.py"
+    },
+    {
+      "path": "README_原始复现说明.md",
+      "sha256": "434bd748410a88fa86d3830c058410c4865ece97e38c23331b8afdcc1ad8e20e",
+      "size": 3429,
+      "archive_path": "GCOT-share/README_复现说明.md"
+    }
+  ]
+}

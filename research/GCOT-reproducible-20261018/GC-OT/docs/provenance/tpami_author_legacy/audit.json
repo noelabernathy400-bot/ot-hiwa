@@ -1,0 +1,98 @@
+{
+  "synthetic_trials": 100,
+  "baseline_source_reconstruction_max_error": 9.769962616701378e-15,
+  "baseline_archive_sha256": {
+    "figure1e_WA.mat": "2de7340b61463fafe21fdab9d8eb17127a615fc6a1efcbef223eae4b5f8df6a0",
+    "figure1e_SA.mat": "bf4406a601718c0baa63cbac7c063ce6e8e7da7d6923616fe317b48e566ce971",
+    "figure1e_ICP.mat": "109ae05c8f66ed4b2dfffbbe070da4c005cbb55e872b52f69e654a21a76d630d",
+    "figure1e_CORAL.mat": "a796d4c771291d04545c770caf219783a0b715c79f1298bc0af9a46006c7220a",
+    "figure1f_WA.mat": "948f1b5ad8ff662ea199c3ebed21a11b2ad4676276c5ebf0d72d801714e74402",
+    "figure1f_SA.mat": "6cab5731304c44ff39cd2b6c8fd06b35de32ae33c56a32419e31bdc51c4e15ee",
+    "figure1f_ICP.mat": "9be503453ce95fe95120b0f6a751790f06d01803c130b5ece699d2f4b30b91eb",
+    "figure1f_CORAL.mat": "bab27f0719c684df511c1c95217066cc870d66faef0c9e4f9a1b8ed6f35a1e13"
+  },
+  "maximum_orthogonality_error": 4.8890191035203345e-15,
+  "maximum_recorded_sample_marginal_error": 0.0013073302144003852,
+  "trials_reaching_300_iterations": 29,
+  "prototype_optimization_failures": [],
+  "median_consensus_residual_by_author_script": {
+    "e": 0.3602360180225962,
+    "f": 4.1025986272795825
+  },
+  "neural": {
+    "consensus_residual": 0.6328412595904143,
+    "rotation_delta": 0.09694381871672278,
+    "stop_reason": "rotation_tolerance",
+    "iterations": 10,
+    "orthogonality_error": 1.8359575828750505e-15,
+    "max_marginal_error": 1.1886166003706455e-08
+  },
+  "retained_coupling_checks": {
+    "figure1e_seed01": {
+      "final_max_marginal_error": 0.00013132239656911057,
+      "strict_tolerance": 1e-08,
+      "strict_feasibility_pass": false
+    },
+    "figure1f_seed01": {
+      "final_max_marginal_error": 6.725470926699506e-09,
+      "strict_tolerance": 1e-08,
+      "strict_feasibility_pass": true
+    },
+    "neural": {
+      "final_max_marginal_error": 1.4439070460114944e-09,
+      "strict_tolerance": 1e-08,
+      "strict_feasibility_pass": true
+    }
+  },
+  "group_couplings_failing_1e_minus8_tolerance": [
+    {
+      "trial": "figure1f_seed01",
+      "group_marginal_error": 1.7473188979044707e-08
+    },
+    {
+      "trial": "figure1f_seed06",
+      "group_marginal_error": 2.0214767856296945e-06
+    },
+    {
+      "trial": "figure1f_seed10",
+      "group_marginal_error": 8.00475774831444e-08
+    },
+    {
+      "trial": "figure1f_seed13",
+      "group_marginal_error": 6.543962278449111e-07
+    },
+    {
+      "trial": "figure1f_seed14",
+      "group_marginal_error": 3.858045095395113e-06
+    },
+    {
+      "trial": "figure1f_seed16",
+      "group_marginal_error": 3.327444472733809e-08
+    },
+    {
+      "trial": "figure1f_seed21",
+      "group_marginal_error": 2.563622820139777e-07
+    },
+    {
+      "trial": "figure1f_seed27",
+      "group_marginal_error": 5.011343927607825e-07
+    },
+    {
+      "trial": "figure1f_seed35",
+      "group_marginal_error": 2.4680010989042156e-06
+    },
+    {
+      "trial": "figure1f_seed37",
+      "group_marginal_error": 3.1495407254444885e-08
+    },
+    {
+      "trial": "figure1f_seed42",
+      "group_marginal_error": 7.094429697773741e-05
+    },
+    {
+      "trial": "figure1f_seed46",
+      "group_marginal_error": 1.4572275548158098e-05
+    }
+  ],
+  "note": "Passing data/numerical checks is not proof of global optimality or ADMM convergence."
+}

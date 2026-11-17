@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.mplconfig/
+.cache/
+*.egg-info/
+data/raw/
+data/dandi_000688/raw/
+data/panoptic/
