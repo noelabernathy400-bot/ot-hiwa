@@ -1,3 +1,14 @@
+# 指标修订 v2 · 2026-11-17
+
+**优先适用：** 在原有数据与求解器参数不变的条件下，本项目以后统一使用 **HiWA rMSE（真实数据必须标注代理值）** 和 **标准 held-out (R^2)**，旧版 NRMSE 只保存用于历史追溯。
+
+- rMSE 来源：压缩包原版 `hiwa_original.py::_rMSE`。真实 DANDI 无已知的 `R_gt`，因此只有以训练同步配对 Procrustes 作为 `R_ref` 的**代理值**；这是明确受限的旋转参考误差，绝非真实旋转误差。
+- (R^2=1-\\sum_{i\in test}\\|Y_i-\\hat R X_i\\|^2/\\sum_{i\in test}\\|Y_i-\\bar Y_{test}\\|^2)。修正原版 `_eval_R2` 未平方残差的实现缺陷，其他求解代码完全不动。
+- 固定所有 seed、四维表示、trial-disjoint holdout、归一化及已保存的 `R`；使用 `code/evaluate_hiwa_two_metrics.py` 重新评价即可。校准的有监督 `R_ref` **不进入无监督训练**。
+- 依旧检查 ADMM global/local 共识等数值可靠性，但它们是求解器审计，而不是预测效果的第三/第四指标。
+
+---
+
 # 冻结协议 v1 · 2026-11-17
 
 ## 数据处理
