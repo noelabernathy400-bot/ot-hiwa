@@ -68,3 +68,10 @@ Soft K-means的平均值稍好，但仅在**3/5**个共同种子下优于Hard；
 ## 共同外部W₂²主指标已经完成计算（2026-11-17）
 
 此前的R²优先叙述已不再符合用户确认的主研究目标。现以全部原始等权点云的无熵经验W₂²作为Hard/Soft共同比较目标（所有seed使用相同的对齐前0.241479）。已有15个无监督模型R的外部评分：Hard对齐后均值**0.199080±0.009326**；Soft-Kmeans **0.207529±0.023983**；Soft原型**0.231263±0.029425**。相应平均改善17.56%、14.06%、4.23%。Soft-Kmeans 4/5个seed略有优势，但seed44退化严重，平均Hard仍领先。详细全部15项请参见 [COMMON_W2_RESULTS.md](COMMON_W2_RESULTS.md)、[CSV](common_w2_unpaired_5seed.csv)、[已保存R](fitted_R_15runs.csv)与[评价代码](evaluate_common_w2.py)。同步配对R²只作为次要验证，原层级OT指标并不是公平跨算法排序目标。这一轮是在原先训练的R上进行的新评价，而非重新训练。
+
+
+## 2026-11-17：新训练的完全无监督Soft K-means温度消融
+
+在前述统一W₂²主指标确定后，进一步**新运行10次独立两域软分组训练**：τ=0.25和τ=1.0，各seed40–44；其余条件固定（K=4、μ=.05、εs=.1、εg=.2、三维白化、自由P、ADMM/OT共同残差阈值）。加上此前已存在的τ=0.5五次训练得到：Hard平均W₂² **0.19907977**（改善17.56%）、Soft τ=.25 **0.19907906**（17.56%）、Soft τ=.5 **0.20752896**（14.06%）、Soft τ=1 **0.20093204**（16.79%）。全部新增10/10次通过本轮数值残差检查；τ=.25与Hard平均差只有约7×10^-7，不能视作实质性改进。τ=.5种子44退化、τ=1种子40退化，说明软温度与初始化的相互作用仍待研究。
+
+已保存 [完整温度试验报告](unsupervised_control/SOFT_TEMPERATURE_SWEEP.md)、[10条逐seed数值](unsupervised_control/temperature_sweep_unpaired_10new.csv)、[10个R矩阵](unsupervised_control/temperature_sweep_R_10new.csv)、[10个簇级P矩阵](unsupervised_control/temperature_sweep_P_10new.csv) 与 [可运行新训练程序](unsupervised_control/run_temperature_sweep.py)。另外重复τ=.5、seed42结果与历史W₂²=0.18870520630894314**完全相同**。训练与共同W₂²均未使用真实同步配对，R²仍只是辅助评价。这些是同一试次的拟合内数据，不提供跨试次泛化证明；依赖本地数值移植的代码来源限制仍在。
