@@ -89,3 +89,12 @@ PhysioNet Hyser 2.0.0，subject01/session1，random sample1；256通道EMG 2048H
 已保存事实：监督诊断 Hard固定P的R²=-0.153907、Soft原型R²=-0.142562；独立无监督五种子配对R²平均 Hard=-0.92003、Soft K-means=-0.86820、Soft原型=-1.04793；独立Hard的seed42内部层级OT成本2.36079→0.39606。但 Hard/Soft内部P、Q和概率组测度不同，**它们的OT绝对成本不可以直接用于跨方法排名**。
 
 下一轮主指标改为完全相同的250点、同一白化与1/√3尺度、原始样本等权的无熵经验 W₂²，由模型最终 R 变换后求精确250×250最优匹配；不使用任何簇隶属或真同步标签。当前GitHub摘要缺少全部15个R，**尚未获得新的统一W₂²数值**。研究目标、误差定义、历史结果归类与复现限制参见 [研究目标及统一评价规范](RESEARCH_OBJECTIVE_AND_EVALUATION.md)。
+
+
+## 2026-11-17：真正无监督统一W₂² 主指标的数值实验完成
+
+取既有两域独立分组的15个已拟合全局正交旋转R（seed 40–44、Hard/Soft-Kmeans/Soft原型）；在原全精度250×3两域白化点云上新运行一次**共用的无熵精确经验W₂²评价**，忽略标签、隶属矩阵、P/Q和同步配对，仅用同尺度等权点云与R执行250×250 Hungarian线性分配。
+
+对齐前全部共同基线0.241479354259；五种子均值±样本SD：Hard 0.19907977±0.00932565（平均降低17.56%）；Soft-Kmeans 0.20752896±0.02398257（14.06%）；Soft原型0.23126251±0.02942518（4.23%）。Soft-Kmeans seed40–43四次都非常接近并略优于Hard，但seed44 0.24741366劣于Hard0.20481031；Soft原型仅1/5次胜Hard。此前“Hard内部层级OT成本2.3608→0.3961”仍保留，但不是共享主指标，与本轮0.24148→0.19908不可混用。
+
+检验：所有R最大正交误差1.805e-15；任意独立打乱X/Y行序后结果保持不变。研究目标仍是分布对齐，不因较低同步R²否定分布对齐的改善；也不能因个别seed优势认定Soft全面更好。研究下步：稳健初始化、软隶属设计、跨试次验证。完整报告：[COMMON_W2_RESULTS](unsupervised_control/COMMON_W2_RESULTS.md)，[数据CSV](unsupervised_control/common_w2_unpaired_5seed.csv)，[R CSV](unsupervised_control/fitted_R_15runs.csv)，[脚本](unsupervised_control/evaluate_common_w2.py)。
