@@ -1,0 +1,70 @@
+{
+  "dataset": "DANDI:000138",
+  "data_version": "0.220113.0407",
+  "ground_truth_rotation_known": false,
+  "solver_retrained": false,
+  "source": "projects/dandi-000138-hiwa-4d/results/hard_hiwa/hard_hiwa_results.json",
+  "data_sha256": "adb71e375cffae2105a0aa37fb26ee6f7be4c331b72b132c8b1c1ea067615fd7",
+  "hiwa_results_sha256": "f35198e1b487323c13226a8c2d0911d89d96d4306072bd53c67260843df7a92e",
+  "original_solver_sha256": "4419e19004b06c7840d187ddb12a19b2ad97974dd28ad1dc9510d8ead741da6a",
+  "metric_1": {
+    "name": "rMSE_proxy",
+    "definition": "original PyHiWA _rMSE with R_ref=train-only supervised Procrustes, NOT unknown R_gt",
+    "is_true_ground_truth_rmse": false
+  },
+  "metric_2": {
+    "name": "R2",
+    "definition": "standard multivariate held-out R² = 1-SSE/SST using test-set target mean; corrected from buggy _eval_R2"
+  },
+  "before_identity": {
+    "rMSE_proxy": 1.964698422594094,
+    "R2": -0.7964864342687017
+  },
+  "train_supervised_reference_diagnostic": {
+    "rMSE_proxy": 0,
+    "R2": -0.06044107870381965
+  },
+  "seeds": [
+    {
+      "seed": 42,
+      "converged": true,
+      "rMSE_proxy": 2.1182402473121096,
+      "R2": -0.8047848546546481
+    },
+    {
+      "seed": 43,
+      "converged": true,
+      "rMSE_proxy": 1.2630838534464575,
+      "R2": -0.5486206314348314
+    },
+    {
+      "seed": 44,
+      "converged": true,
+      "rMSE_proxy": 2.0988740769546643,
+      "R2": -1.0993311995029749
+    },
+    {
+      "seed": 45,
+      "converged": true,
+      "rMSE_proxy": 1.9716253034534863,
+      "R2": -0.9550493783561991
+    },
+    {
+      "seed": 46,
+      "converged": true,
+      "rMSE_proxy": 2.129245047460884,
+      "R2": -1.0658175708758506
+    }
+  ],
+  "statistics": {
+    "rMSE_proxy": {
+      "mean": 1.9162137057255204,
+      "sample_sd": 0.37054383559351395
+    },
+    "R2": {
+      "mean": -0.8947207269649009,
+      "sample_sd": 0.22508490559195873
+    }
+  },
+  "interpretation": "These are the only primary evaluation metrics. Numerically converged 5/5; negative R2 on all five seeds. Historical NRMSE artifacts are archival only."
+}
