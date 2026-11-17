@@ -423,7 +423,7 @@ def main():
       "## 严格区分内部验证与外部测试",
       "",
       f"在原400训练试次内部按试次划分 {400-args.val_trials}/{args.val_trials} "
-      "训练/验证；温度候选 {args.taus}、h 基于内部训练 Voronoi 间隔分位数"
+      f"训练/验证；温度候选 {args.taus}、h 基于内部训练 Voronoi 间隔分位数"
       f" {args.h_quantiles}，真实 h={h_values.tolist()}。",
       "选参指标**仅**为内部验证集的固定同编号组精确 W2²，而非最终测试集的任何数值。",
       f"选中：{selected['name']}（h={selected['h']:.6f},τ={selected['tau']:.3f}），"
