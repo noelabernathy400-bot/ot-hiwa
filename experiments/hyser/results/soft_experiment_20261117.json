@@ -1,0 +1,419 @@
+{
+  "date": "2026-11-17",
+  "scope": "Real Hyser 250 paired 3D whitened data, no holdout; one source-side KMeans; target memberships inherited by known time pairs",
+  "source_only": true,
+  "project": "experimental continuation of user-requested SOURCE ONLY clustering, not unsupervised two-domain GCOT",
+  "params": {
+    "K": 4,
+    "seed": 42,
+    "mu_fixed_group": 0.05,
+    "mu_freeP": 0.005,
+    "epsilon_sample": 0.1,
+    "epsilon_group": 0.2,
+    "inner_iterations": 100,
+    "sinkhorn_iterations": 150,
+    "group_sinkhorn_iterations": 1000,
+    "groupP_fixed": "diag(0.25)",
+    "max_outer_fixed": 160,
+    "stop": {
+      "primal": 0.01,
+      "delta_R": 0.01,
+      "marginal": 0.000001
+    }
+  },
+  "ot_cost_units": "squared Euclidean in scaled X/sqrt(3),Y/sqrt(3), group/Sinkhorn weighted, NO entropy added, before/after same membership and P",
+  "comparison_note": "Absolute OT costs differ with soft group probability measures. Compare paired errors directly or within-method before/after OT; do not claim 0.83598->0.75269 is same fixed objective.",
+  "prior_hard_costs": {
+    "data": "Hyser real 250 paired 3D covariance-whitened windows, only source KMeans labels; target inherits",
+    "definition": "Mean group-weighted squared Euclidean transport on X/sqrt(3),Y/sqrt(3), Sinkhorn sample epsilon=0.1/P_kl; entropy term excluded. P held fixed to final learned coupling in each before/after comparison.",
+    "fixed_known_P": {
+      "P": "I4/4",
+      "before": 1.3843909690499219,
+      "after": 0.8359815266392534,
+      "reduction_pct": 39.6138,
+      "group_exact_unregularized_W2_before": 1.1644502194073554,
+      "group_exact_unregularized_W2_after": 0.6128370246812163,
+      "R2_after": -0.15390665810472481,
+      "relative_squared_error_after": 1.1539066581047248
+    },
+    "learned_free_P": {
+      "before": 1.3858201335209794,
+      "after": 0.8436771227824651,
+      "reduction_pct": 39.1207,
+      "group_exact_unregularized_W2_before": 1.1644502194073554,
+      "group_exact_unregularized_W2_after_under_known_group_correspondence": 0.6177211074806388,
+      "R2_after": -0.169050649462692,
+      "relative_squared_error_after": 1.169050649462692,
+      "note": "This is global R transport; archived local-block optimization log was 0.759006 and must not be treated as global R cost."
+    },
+    "assumptions": [
+      "All 250 points of one trial used",
+      "P fixed for cost comparison before vs after",
+      "Soft/Hard group masses differ: their absolute costs have different underlying weighted measures",
+      "No train/test split",
+      "Known pairing used to inherit target source labels"
+    ]
+  },
+  "fixed_P_seed42": [
+    {
+      "name": "hard_fixed_seed42",
+      "kind": "hard one-hot",
+      "before_ot": 1.3843909690499219,
+      "after_ot": 0.8359815266392534,
+      "r2": -0.15390665823308192,
+      "relerr": 1.153906658233082,
+      "mean_distance": 1.6880007554288634,
+      "iters": 60,
+      "primal": 0.005505397389321488,
+      "dr": 0.003388652660983763,
+      "converged": true,
+      "mean_assignment_entropy": 0
+    },
+    {
+      "name": "soft_kmeans_tau0.25",
+      "kind": "softmax fixed source KMeans squared distances",
+      "tau": 0.25,
+      "before_ot": 1.3740148,
+      "after_ot": 0.836482,
+      "r2": -0.1527007,
+      "relerr": 1.1527007,
+      "mean_distance": 1.68751,
+      "iters": 60,
+      "primal": 0.008301,
+      "dr": 0.005258,
+      "converged": true,
+      "mean_assignment_entropy": 0.051
+    },
+    {
+      "name": "soft_kmeans_tau0.5",
+      "kind": "softmax fixed source KMeans squared distances",
+      "tau": 0.5,
+      "before_ot": 1.3572158,
+      "after_ot": 0.833887,
+      "r2": -0.1509566495695165,
+      "relerr": 1.1509566495695165,
+      "mean_distance": 1.6867379724487965,
+      "iters": 137,
+      "primal": 0.009718227007346243,
+      "dr": 0.005810274785329618,
+      "converged": true,
+      "mean_assignment_entropy": 0.11010055757997737,
+      "R": [
+        [
+          -0.23686314032490446,
+          0.463332059917407,
+          -0.853943355854542
+        ],
+        [
+          -0.3048614936558481,
+          0.79911544787236,
+          0.5181447391006522
+        ],
+        [
+          0.9224723965742011,
+          0.38306383700951185,
+          -0.048028890620128085
+        ]
+      ]
+    },
+    {
+      "name": "soft_kmeans_tau1",
+      "kind": "softmax fixed source KMeans squared distances",
+      "tau": 1,
+      "before_ot": 1.30298,
+      "after_ot": 0.808475,
+      "r2": -0.14629240978665736,
+      "relerr": 1.1462924097866574,
+      "mean_distance": 1.6844838621782074,
+      "iters": 160,
+      "primal": 0.050178,
+      "dr": 0.016801,
+      "converged": false,
+      "mean_assignment_entropy": 0.26336511979826194,
+      "note": "Reached max iteration, not a valid converged baseline."
+    },
+    {
+      "name": "soft_TPAMI_prototype_source_only_lambda1",
+      "kind": "Eq2 source-only optimized prototypes, target inherits A",
+      "entropy_weight": 1,
+      "before_ot": 1.1422667580423211,
+      "after_ot": 0.7526896661148317,
+      "ot_reduction_pct": 34.10561405071157,
+      "r2": -0.14256180632405013,
+      "relerr": 1.1425618063240501,
+      "mean_distance": 1.685375226633342,
+      "iters": 32,
+      "primal": 0.008919624536689591,
+      "dr": 0.00021670257233817047,
+      "converged": true,
+      "mean_assignment_entropy": 0.5002720159817384,
+      "mean_max_membership": 0.8148397821168273,
+      "prototype_optimizer_success": true,
+      "prototype_optimizer_iterations": 11,
+      "R": [
+        [
+          -0.2384313889815832,
+          0.37226211056402914,
+          -0.8969790375403026
+        ],
+        [
+          -0.3222137306656682,
+          0.8409760806638296,
+          0.43466946467610984
+        ],
+        [
+          0.9161488877463234,
+          0.3926578062253672,
+          -0.0805671315826534
+        ]
+      ],
+      "prototypes": [
+        [
+          0.18364772514432381,
+          -1.5252974914389605,
+          0.9690589339409872
+        ],
+        [
+          0.29840053333240557,
+          1.576939492705655,
+          1.161324721204093
+        ],
+        [
+          1.3002680902370105,
+          0.11019344617144147,
+          -1.385750742371259
+        ],
+        [
+          -1.863953938927484,
+          0.14415388849911745,
+          -0.7384724082261367
+        ]
+      ]
+    }
+  ],
+  "free_P_seed42": [
+    {
+      "name": "soft_kmeans_tau0.5_freeP",
+      "r2": -0.1634813313995882,
+      "paired_relerr": 1.1634813313995882,
+      "mean_distance": 1.6941399096063632,
+      "before_ot": 1.358884785526839,
+      "after_ot": 0.8418499938236498,
+      "iters": 68,
+      "dr": 0.08075973457583456,
+      "primal": 1.096068998539995,
+      "author_legacy_stopped": true,
+      "strict_consensus": false
+    },
+    {
+      "name": "soft_TPAMI_prototype_lambda1_freeP",
+      "r2": -0.6443496238771118,
+      "paired_relerr": 1.6443496238771118,
+      "mean_distance": 2.0472342666220738,
+      "before_ot": 1.1656806687751808,
+      "after_ot": 0.7483993808456193,
+      "iters": 75,
+      "dr": 0.09984684703760627,
+      "primal": 0.4371177473955797,
+      "author_legacy_stopped": true,
+      "strict_consensus": false,
+      "group_mismatch": "Approximate swap 0↔3 under free group P"
+    }
+  ],
+  "oracle": {
+    "r2": -0.13692797684174352,
+    "relative_squared_error": 1.1369279768417435,
+    "mean_distance": 1.688373348601135
+  },
+  "multiseed": [
+    {
+      "seed": 40,
+      "method": "hard_fixed",
+      "r2": -0.15396627900865623,
+      "relative_squared_error": 1.1539662790086562,
+      "mean_distance": 1.6880240745248132,
+      "iterations": 53,
+      "primal": 0.008004523139928773,
+      "rotation_change": 0.006609841459558803,
+      "passed_checks": true
+    },
+    {
+      "seed": 40,
+      "method": "soft_kmeans_tau0.5",
+      "r2": -0.15135534075136592,
+      "relative_squared_error": 1.151355340751366,
+      "mean_distance": 1.6868772466822994,
+      "iterations": 52,
+      "primal": 0.008469852427576216,
+      "rotation_change": 0.0005779781075079,
+      "passed_checks": true
+    },
+    {
+      "seed": 40,
+      "method": "soft_TPAMI_prototypes",
+      "r2": -0.14250193221518348,
+      "relative_squared_error": 1.1425019322151835,
+      "mean_distance": 1.6853521238582194,
+      "iterations": 31,
+      "primal": 0.008755853983288113,
+      "rotation_change": 0.00025442581438604457,
+      "passed_checks": true
+    },
+    {
+      "seed": 41,
+      "method": "hard_fixed",
+      "r2": -0.15386081852128664,
+      "relative_squared_error": 1.1538608185212866,
+      "mean_distance": 1.687980501643358,
+      "iterations": 57,
+      "primal": 0.009109701598774033,
+      "rotation_change": 0.006788350951194237,
+      "passed_checks": true
+    },
+    {
+      "seed": 41,
+      "method": "soft_kmeans_tau0.5",
+      "r2": -0.1510226693093637,
+      "relative_squared_error": 1.1510226693093637,
+      "mean_distance": 1.6867202939806438,
+      "iterations": 52,
+      "primal": 0.006134934585118878,
+      "rotation_change": 0.004274954536912177,
+      "passed_checks": true
+    },
+    {
+      "seed": 41,
+      "method": "soft_TPAMI_prototypes",
+      "r2": -0.14255014867222493,
+      "relative_squared_error": 1.142550148672225,
+      "mean_distance": 1.6853655200908606,
+      "iterations": 30,
+      "primal": 0.009945456200151625,
+      "rotation_change": 0.0002820818298390735,
+      "passed_checks": true
+    },
+    {
+      "seed": 42,
+      "method": "hard_fixed",
+      "r2": -0.15390665823308192,
+      "relative_squared_error": 1.153906658233082,
+      "mean_distance": 1.6880007554288634,
+      "iterations": 60,
+      "primal": 0.005505397389321488,
+      "rotation_change": 0.003388652660983763,
+      "passed_checks": true
+    },
+    {
+      "seed": 42,
+      "method": "soft_kmeans_tau0.5",
+      "r2": -0.1509566495695165,
+      "relative_squared_error": 1.1509566495695165,
+      "mean_distance": 1.6867379724487965,
+      "iterations": 137,
+      "primal": 0.009718227007346243,
+      "rotation_change": 0.005810274785329618,
+      "passed_checks": true
+    },
+    {
+      "seed": 42,
+      "method": "soft_TPAMI_prototypes",
+      "r2": -0.14256180632405013,
+      "relative_squared_error": 1.1425618063240501,
+      "mean_distance": 1.685375226633342,
+      "iterations": 32,
+      "primal": 0.008919624536689591,
+      "rotation_change": 0.00021670257233817047,
+      "passed_checks": true
+    },
+    {
+      "seed": 43,
+      "method": "hard_fixed",
+      "r2": -0.15420962076306877,
+      "relative_squared_error": 1.1542096207630688,
+      "mean_distance": 1.6881372689071013,
+      "iterations": 61,
+      "primal": 0.009636023884030651,
+      "rotation_change": 0.006271191924244602,
+      "passed_checks": true
+    },
+    {
+      "seed": 43,
+      "method": "soft_kmeans_tau0.5",
+      "r2": -0.1510082115093827,
+      "relative_squared_error": 1.1510082115093827,
+      "mean_distance": 1.6867140074196176,
+      "iterations": 52,
+      "primal": 0.006901605876392274,
+      "rotation_change": 0.004867213100314877,
+      "passed_checks": true
+    },
+    {
+      "seed": 43,
+      "method": "soft_TPAMI_prototypes",
+      "r2": -0.14252466291936527,
+      "relative_squared_error": 1.1425246629193653,
+      "mean_distance": 1.6853583798336607,
+      "iterations": 30,
+      "primal": 0.00999841070531837,
+      "rotation_change": 0.000285748022360265,
+      "passed_checks": true
+    },
+    {
+      "seed": 44,
+      "method": "hard_fixed",
+      "r2": -0.15417359630646255,
+      "relative_squared_error": 1.1541735963064625,
+      "mean_distance": 1.6881150872171309,
+      "iterations": 68,
+      "primal": 0.009823027114505849,
+      "rotation_change": 0.006282337897585426,
+      "passed_checks": true
+    },
+    {
+      "seed": 44,
+      "method": "soft_kmeans_tau0.5",
+      "r2": -0.150847254899652,
+      "relative_squared_error": 1.150847254899652,
+      "mean_distance": 1.6866468051534143,
+      "iterations": 44,
+      "primal": 0.00923274362003417,
+      "rotation_change": 0.004366077713704318,
+      "passed_checks": true
+    },
+    {
+      "seed": 44,
+      "method": "soft_TPAMI_prototypes",
+      "r2": -0.14259968917289,
+      "relative_squared_error": 1.14259968917289,
+      "mean_distance": 1.685390397134475,
+      "iterations": 30,
+      "primal": 0.008657514451532665,
+      "rotation_change": 0.00028712652229977587,
+      "passed_checks": true
+    }
+  ],
+  "multiseed_summary": {
+    "hard_fixed": {
+      "mean_r2": -0.1540233945665112,
+      "sd_r2": 0.00015855699916841147,
+      "converged": "5/5"
+    },
+    "soft_kmeans_tau05": {
+      "mean_r2": -0.15103802520785617,
+      "sd_r2": 0.0001902821059608388,
+      "converged": "5/5"
+    },
+    "soft_prototype_lambda1": {
+      "mean_r2": -0.14254764786074275,
+      "sd_r2": 0.00003719288268718628,
+      "converged": "5/5"
+    }
+  },
+  "fidelity": "Local solver numerical port of user-uploaded GC-OT/gcot/ Eq2 and nested OT/Procrustes/ADMM, not exact-byte execution of repository source",
+  "limits": [
+    "Target group membership is passed using real synchronized pairs: group-supervised",
+    "Soft prototype free P legacy stop does not satisfy strict ADMM residual",
+    "All 250 data points used for fitting and evaluation",
+    "Hard and soft prototype memberships define different transport measures, so compare absolute costs cautiously"
+  ]
+}
