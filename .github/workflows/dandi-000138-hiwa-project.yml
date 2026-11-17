@@ -1,0 +1,92 @@
+name: DANDI 000138 HiWA 4D complete project experiment
+on:
+  push:
+    branches: [experiments/dandi-000138-4d-hard-clustering-20261117]
+    paths: [.github/workflows/dandi-000138-hiwa-project.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  reproduce-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      PROJECT: projects/dandi-000138-hiwa-4d
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned scientific packages and official DANDI client
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install dandi h5py "numpy==2.4.6" "scipy==1.17.1" "scikit-learn==1.9.1" "matplotlib==3.11.2"
+      - name: Download official training NWB
+        run: |
+          mkdir -p raw_dandi_000138
+          dandi download "DANDI:000138/0.220113.0407" -o raw_dandi_000138
+          test "$(find raw_dandi_000138 -type f -name '*desc-train_behavior+ecephys.nwb' | wc -l)" -eq 1
+      - name: Four-dimensional K-means clustering, train-only
+        run: |
+          set -euo pipefail
+          nwb="$(find raw_dandi_000138 -type f -name '*desc-train_behavior+ecephys.nwb' | head -n 1)"
+          python "$PROJECT/code/run_hard_clustering.py" --nwb "$nwb" --output "$PROJECT/results/clustering" --seed 42 --k 4
+      - name: Original PyHiWA hard alignment, five seeds
+        run: |
+          python "$PROJECT/code/run_hard_hiwa.py" \
+            --clusters "$PROJECT/results/clustering/clustered_4d.npz" \
+            --output "$PROJECT/results/hard_hiwa" \
+            --seeds 42 43 44 45 46 \
+            --fit-per-group 40 --outer 140 --stop-tol 1e-9 --audit-tol 1e-2 \
+            --mu 0.05 --group-sinkhorn 200 --group-gamma 0.2 \
+            --local 20 --local-sinkhorn 45 --local-gamma 0.1 --ot-eval-n 200
+      - name: Recompute summary figures and statistics
+        run: python "$PROJECT/code/summarize_results.py"
+      - name: Verify provenance convergence and metrics
+        run: |
+          python - <<'PY'
+          import json,hashlib,numpy as np
+          from pathlib import Path
+          root=Path('projects/dandi-000138-hiwa-4d')
+          assert hashlib.sha256((root/'code/hiwa_original.py').read_bytes()).hexdigest()=='4419e19004b06c7840d187ddb12a19b2ad97974dd28ad1dc9510d8ead741da6a'
+          c=json.loads((root/'results/clustering/clustering_report.json').read_text())
+          assert c['train_window_count']==14000 and c['test_window_count']==3500
+          assert c['feature_dim']==4 and c['group_count']==4
+          assert c['sha256']=='1188ddf5b822dd9ac49afb8916f4b42a85867613cf7f169d0b04a1d1aeecd700'
+          a=np.load(root/'results/clustering/clustered_4d.npz',allow_pickle=False)
+          assert a['neural4'].shape==(17500,4) and a['hand4'].shape==(17500,4)
+          r=json.loads((root/'results/hard_hiwa/hard_hiwa_results.json').read_text())
+          assert r['strict_converged']==5
+          for s in r['seed_results']:
+              assert s['strict_converged'] and s['primal_max']<=.01 and s['global_change']<=.01
+              assert s['marginal_max']<1e-5 and s['orthogonality_fro']<1e-7
+          assert abs(r['baseline_identity']['paired_nrmse']-1.3389)<.01
+          stats=json.loads((root/'results/hard_hiwa/summary_statistics.json').read_text())
+          assert stats['converged_seeds']==5
+          print('VERIFIED',{'trials':c['usable_trials'],'train_windows':14000,'test_windows':3500,
+              'baseline_paired_nrmse':r['baseline_identity']['paired_nrmse'],
+              'mean_OT_NRMSE':stats['ot_nrmse']['mean']})
+          PY
+      - name: Upload complete machine-readable output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dandi000138-hiwa-4d-complete
+          path: projects/dandi-000138-hiwa-4d/results/
+          if-no-files-found: warn
+      - name: Commit real outputs to dedicated project folder
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$PROJECT/results"
+          if git diff --cached --quiet; then
+            echo "No new output to commit."
+          else
+            git commit -m "Reproduce DANDI 000138 4D hard clustering and audited HiWA results"
+            git push origin "HEAD:"$GITHUB_REF_NAME
+          fi
