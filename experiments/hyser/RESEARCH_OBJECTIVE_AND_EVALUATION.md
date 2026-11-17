@@ -79,3 +79,14 @@ R²仅作为二级评价，不应用于选择主任务的模型参数。若再�
 - [Soft组级监督结果](results/SOFT_EXPERIMENT_20261117.md)
 - [独立无监督对照](unsupervised_control/RESULTS.md)
 - [独立无监督15次CSV](unsupervised_control/independent_5seed_metrics.csv)
+
+
+---
+
+## 最新进展：统一 W₂² 主指标已实际计算（2026-11-17）
+
+此前写的“需要补齐15个 R 才能计算”属于当时的计划，**目前已经完成**：在先前保存的真实无监督实验包中找到了15个完整R，并对全精度250×3点云运行了与分组无关的Hungarian精确经验 W₂²。
+
+对齐前共同基线 **0.241479354259**；五种子平均对齐后 Hard **0.19907977 ± 0.00932565**（下降17.56%），Soft K-means **0.20752896 ± 0.02398257**（下降14.06%），Soft原型 **0.23126251 ± 0.02942518**（下降4.23%）。Soft K-means 4/5 种子略优于 Hard，但 seed44 退化严重，平均表现反而 Hard 更好。没有发现 Soft 在共同分布指标上稳健优于 Hard 的证据。
+
+查看 [实际计算的完整15条W₂²结果](unsupervised_control/COMMON_W2_RESULTS.md)、[每seed的R](unsupervised_control/fitted_R_15runs.csv)、[每seed的数值](unsupervised_control/common_w2_unpaired_5seed.csv)、[直接重算脚本](unsupervised_control/evaluate_common_w2.py)。**这是基于先前已拟合矩阵的新统一评价，不是重新训练了15次**，保留之前记录的代码来源限制。
