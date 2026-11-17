@@ -1,0 +1,76 @@
+name: Recover completed DANDI138 matched hard soft full P-Q experiment
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-controlled-pq-publish.yml]
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Recover exact computed result artifact, no retraining
+        run: |
+          mkdir -p /tmp/staged-pq
+          gh run download 44089360902 \
+            --repo noelabernathy400-bot/ot-hiwa \
+            --name dandi138-controlled-soft-hard-five-seed-total-OT \
+            --dir /tmp/staged-pq
+          file="$(find /tmp/staged-pq -name CONTROLLED_ABLATION.json -type f -print -quit)"
+          test -n "$file"
+          dst=projects/dandi-000138-hiwa-4d/results/controlled_hard_vs_soft_PQ
+          mkdir -p "$dst"
+          cp -a "$(dirname "$file")"/. "$dst/"
+          test -s "$dst/CONTROLLED_ABLATION.json"
+          test -s "$dst/controlled_soft_hard_all_OT_errors.png"
+      - name: Audit exact saved data (corrected missing metadata key)
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          d=Path('projects/dandi-000138-hiwa-4d/results/controlled_hard_vs_soft_PQ')
+          x=json.loads((d/'CONTROLLED_ABLATION.json').read_text())
+          assert x['same_training_indices_per_seed'] and x['same_initialization_per_seed']
+          assert x['target_membership_copied_by_true_pairing']
+          assert x['independent_target_clustering'] is False
+          assert x['relabeled_after_transport'] is False
+          assert x['four_dimension_used'] is True
+          assert set(x['runs'])=={'hard','tau0.20','tau0.40','tau0.80'}
+          assert all(len(v)==5 for v in x['runs'].values())
+          for i in range(5):
+              rows=[v[i] for v in x['runs'].values()]
+              assert len({r['seed'] for r in rows})==1
+              assert all(r['passed'] for r in rows)
+              assert all(np.isfinite(list(r['metrics'].values())).all() for r in rows)
+              assert all(np.isfinite(r['heldout_after']['total_transport_W2sq']) for r in rows)
+              assert all(r['heldout_after']['max_Q_marginal_error']<1e-5 for r in rows)
+              assert all(r['training_total']['max_sample_Q_marginal_error']<1e-5 for r in rows)
+              assert all(np.linalg.norm(np.asarray(r['R']).T@np.asarray(r['R'])-np.eye(4),'fro')<1e-7 for r in rows)
+          assert all(v['numerical_audit_passed']==5 for v in x['summary'].values())
+          print('VERIFIED: 4 settings x 5 seeds, all numerical audits passed')
+          PY
+      - name: Commit exact computed figures and model outputs
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/controlled_hard_vs_soft_PQ
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Preserve exact 20 fits: matched GCOT hard-soft full P-Q OT and temperature sweep'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-published-controlled-PQ-OT
+          path: projects/dandi-000138-hiwa-4d/results/controlled_hard_vs_soft_PQ
+          if-no-files-found: warn
