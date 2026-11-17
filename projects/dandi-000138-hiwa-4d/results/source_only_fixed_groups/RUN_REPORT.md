@@ -1,3 +1,5 @@
+**实验类型：组级监督诊断（NOT UNSUPERVISED）**。目标训练标签或软隶属度从同步配对的源域标签传播，不能当作严格无监督 Hard HiWA / Soft-GCOT 基线；数值、图像及其他参数保留为历史诊断。见 [专项审计](https://github.com/noelabernathy400-bot/ot-hiwa/blob/main/projects/dandi-000138-hiwa-4d/GROUP_LABEL_LEAKAGE_AUDIT.md)。
+
 # DANDI 000138 — 单次源域 K-means 固定分组 Hard HiWA
 
 **当前正式版本；之前两域独立 K-means 的结果仅作历史归档。**
