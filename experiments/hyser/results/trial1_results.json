@@ -1,0 +1,96 @@
+{
+  "source": "Hyser PhysioNet hd-semg v2.0.0; random_dataset/subject01_session1/sample1",
+  "date": "2026-11-17",
+  "real_data": true,
+  "split": "one 25 s trial, first 200 train and last 50 exploratory holdout windows; not independent trials",
+  "windows_total": 250,
+  "window_s": 0.1,
+  "train": 200,
+  "holdout": 50,
+  "source_dim": 3,
+  "target_dim": 3,
+  "original_sampling": {
+    "emg_channels": 256,
+    "emg_fs": 2048,
+    "emg_frames": 51200,
+    "force_channels": 5,
+    "force_fs": 100,
+    "force_frames": 2500
+  },
+  "emg_pca_explained_variance": [
+    0.8389806359405069,
+    0.06779178555249828,
+    0.026690832147075676
+  ],
+  "force_selected_fingers": [
+    "thumb",
+    "middle",
+    "index"
+  ],
+  "clustering": {
+    "method": "KMeans",
+    "k": 4,
+    "n_init": 30,
+    "seed": 42,
+    "emg_sizes": [
+      17,
+      62,
+      79,
+      42
+    ],
+    "force_sizes": [
+      63,
+      32,
+      33,
+      72
+    ],
+    "emg_silhouette": 0.4249122427596997,
+    "force_silhouette": 0.3605827983373811,
+    "oracle_best_label_perm_train": 0.42,
+    "oracle_best_label_perm_holdout": 0.5
+  },
+  "old_hiwa_reimplementation": {
+    "implementation": "hard_hiwa_adapted.py, NOT original repository class",
+    "mu": 2,
+    "outer_iterations": 110,
+    "primal": 0.013163265188634398,
+    "rotation_change": 0.022413307478818575,
+    "converged": false,
+    "train_cluster_agreement": 0.18,
+    "holdout_cluster_agreement": 0.18,
+    "holdout_top1": 0.02,
+    "holdout_top5": 0.08,
+    "holdout_paired_mean_distance": 1.6116841949016583,
+    "holdout_shuffled_mean_distance": 1.4289132702733898
+  },
+  "reference_style_reimplementation": {
+    "implementation": "hyser_hiwa_audited_solver.py, NOT a direct run of src/hiwa/hiwa.py",
+    "mu": 0.05,
+    "max_outer": 150,
+    "iterations": 60,
+    "primal": 0.009475729083465332,
+    "rotation_change": 0.00016161889743065522,
+    "dual": 0.000032323779486131046,
+    "meets_double_residual_0_01": true,
+    "cluster_P_max_marginal_error": 0.000332,
+    "train_cluster_agreement": 0.165,
+    "holdout_cluster_agreement": 0.2,
+    "holdout_top1": 0.02,
+    "holdout_top5": 0.1
+  },
+  "geometry_diagnostics": {
+    "oracle_train_relative_error": 1.0522904241628055,
+    "oracle_holdout_relative_error": 1.7171717581443886,
+    "train_pairwise_distance_correlation": 0.23373918406125127,
+    "best_train_lag_s": 0.1,
+    "oracle_train_error_at_best_lag": 0.9627
+  },
+  "missing": [
+    "direct original src/hiwa/hiwa.py execution on Hyser",
+    "independent trial holdout",
+    "validated physiological lag",
+    "high precision cluster transport convergence",
+    "Soft-GCOT run"
+  ],
+  "interpretation": "Numerical ADMM consensus reached in adapted reference-style run, but corresponding clusters and synchronized windows were not recovered reliably."
+}
