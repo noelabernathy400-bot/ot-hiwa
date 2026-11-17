@@ -1,4 +1,4 @@
-name: DANDI 000138 fixed source-only KMeans and HiWA
+name: DIAGNOSTIC ONLY - paired source labels supplied to target groups
 on:
   push:
     branches: [main]
@@ -42,7 +42,7 @@ jobs:
           python projects/dandi-000138-hiwa-4d/code/run_hard_hiwa.py \
             --clusters projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz \
             --output projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups \
-            --seeds 42 43 44 45 46
+            --seeds 42 43 44 45 46 --allow-group-supervised-diagnostic
       - name: Recompute held-out 1NN MAE rMSE and R2 and draw alignment panels
         run: |
           python projects/dandi-000138-hiwa-4d/code/evaluate_fixed_group_alignment.py \

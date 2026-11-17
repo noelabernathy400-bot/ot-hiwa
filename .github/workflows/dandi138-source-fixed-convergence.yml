@@ -1,4 +1,4 @@
-name: DANDI 000138 fixed-label HiWA convergence extension
+name: DIAGNOSTIC ONLY - paired source labels supplied to target groups
 on:
   push:
     branches: [main]
@@ -41,7 +41,7 @@ jobs:
           python projects/dandi-000138-hiwa-4d/code/run_hard_hiwa.py \
             --clusters projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz \
             --output projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500 \
-            --seeds 42 43 44 45 46 --outer 500
+            --seeds 42 43 44 45 46 --outer 500 --allow-group-supervised-diagnostic
       - name: Evaluate fixed-label held-out results (five seeds)
         run: |
           python projects/dandi-000138-hiwa-4d/code/evaluate_fixed_group_alignment.py \
