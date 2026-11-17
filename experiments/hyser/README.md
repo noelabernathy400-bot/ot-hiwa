@@ -1,76 +1,32 @@
-# Hyser：高密度肌电与手指力量的跨模态 HiWA 对齐实验
+# Hyser：源域唯一 K-means → 目标继承标签 → Hard HiWA
 
-> 状态：真实数据已预处理并画图；Hard HiWA 参考风格复测的 ADMM 达到 0.01 双残差标准，但跨模态对齐未成功；**原项目 `src/hiwa/hiwa.py` 的直接复跑待完成**。软分组尚未实验。
+**版本：2026-11-17。此目录取代原先 Hyser 的各域独立聚类实验及其图片。**
 
-## 研究问题
+真实 PhysioNet Hyser 受试者01、session1 的 Random Task sample1。256通道肌电2048Hz、五指力量100Hz，同步25秒。以0.1秒切窗获得250对样本。肌电做窗口RMS、log1p、通道标准化、PCA3；力量选thumb/middle/index三指窗口均值。两域分别协方差白化成3D，均值约0、协方差为单位阵。
 
-在同步采集的高密度肌电（HD-sEMG）和手指力量数据中，是否存在足以支持**无监督分组最优传输**的共同低维几何结构？Hard HiWA 的失败原因是数值优化、样本聚类不一致，还是跨模态非等距？在控制其他条件后，Soft-GCOT 能否利用真实过渡/混合状态改善对应？
+**只在X上做一次K-means**（K=4，seed=42，n_init=30），组大小46、53、91、60。目标域Y的第i个点继承X第i个点的标签，绝不再在Y上聚类。因此使用了真实同步对应关系，**是组级监督诊断，不是完全无监督HiWA。**
 
-## 目录
+## 最新结果：全部250对点
 
-- [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md)：从数据来源、处理、分组、绘图、参数排查到全部阶段性结果的连续笔记。
-- [DATA.md](DATA.md)：数据目录、版权/来源、下载与预处理说明。
-- [figures/](figures/)：**由本次真实数据的 200 个训练点生成**的 SVG 二维 PCA 投影和三维视角投影（同域颜色代表 K-means 簇，不代表跨域配对）。
-- [results/trial1_results.json](results/trial1_results.json)：真实试次的聚类、旧版本运行、修正风格复测、oracle 诊断结果，包含出处和限制。
-- [scripts/prepare.py](scripts/prepare.py)：WFDB 文件 → 窗口特征 → 训练/留出数据 → K-means → 本地 PNG 绘图。
-- [scripts/run_hard_original.py](scripts/run_hard_original.py)：**直接调用本仓库的** `src.hiwa.hiwa.HiWA` 复跑入口（提供但尚未产生可核验的新结果）。
-- [requirements.txt](requirements.txt)：环境依赖。
-- [NEXT_STEPS.md](NEXT_STEPS.md)：正式对照与软分组计划。
+| 方案 | R² ↑ | 相对平方误差 ↓ | 同步配对平均欧氏距离 ↓ |
+|---|---:|---:|---:|
+| 对齐前 | -0.674071 | 1.674071 | 1.977467 |
+| Hard HiWA：自由簇级 OT | -0.169051 | 1.169051 | 1.697697 |
+| Hard HiWA：固定已知组对应 | -0.153907 | 1.153907 | 1.688001 |
+| 配对最佳正交Oracle | -0.136928 | 1.136928 | 1.688373 |
 
-## 快速复现
+自由OT使用 μ=0.005，75次迭代满足原作者的全局旋转变化准则，但局部共识残差仍约0.99。固定组对应是P=I4/4的**修改版算法**，μ=0.05，60次迭代后的旋转变化0.00339、局部共识残差0.00551。二者并非同一μ的严格消融。
 
-从仓库根目录执行：
+## 实验文件与图（所有旧图已替换）
 
-```bash
-pip install -r experiments/hyser/requirements.txt
-mkdir -p experiments/hyser/data
-# 放入 subject01/session1/random 的 preprocess 与 force 的 .hea/.dat
-python experiments/hyser/scripts/prepare.py --data-dir experiments/hyser/data --out-dir experiments/hyser/output --trials 1
-python experiments/hyser/scripts/run_hard_original.py --out-dir experiments/hyser/output --seed 42
-```
+- [中文LaTeX PDF](Hyser_HardHiWA_最新实验.pdf) · [源文件](Hyser_HardHiWA_最新实验.tex)
+- [完整过程笔记](EXPERIMENT_LOG.md) · [数值结果、旋转矩阵、P矩阵](results/latest.json)
+- [对齐前源域/目标域3D及2D](figures/01_before_hiwa.png)
+- [自由组级OT对齐后的3D及2D](figures/02_after_hiwa_free.png)
+- [固定已知组对应的3D及2D](figures/03_after_hiwa_fixed.png)
+- [并排总览](figures/00_complete_comparison.png) · [自由组P矩阵](figures/04_free_group_transport.png)
+- [图像生成代码](scripts/render_figures.py) · [本地HiWA数值移植与有约束版本](scripts/solver.py) · [WFDB原始数据预处理说明](scripts/prepare_from_wfdb.py)
 
-注意：上传到对话的力量数据文件曾命名 `random_force_sample1(1).dat`，请将其重命名为 `random_force_sample1.dat`。原始 `.dat` 未上传仓库，避免大型二进制记录进入 Git 历史。
+工作流会从保存在data中的**真实250点可视化量化坐标**生成图片并编译PDF。该图像用点云的有限精度近似仅用于绘图；数值表来自以前真实点云**原始全精度**运行，不能以量化数据重新拟合冒充原实验。
 
-**所有当前已记录的数值结果均来自 2026-11-17 的真实 Hyser trial1，本目录中的直接调用原类脚本为后续标准化复跑入口，不能把它的存在当作已经完成的结果。**
-
-主要源码：[本仓库 Hard HiWA](../../src/hiwa/hiwa.py) · [SoftHiWA](../../src/cc_hiwa/soft_hiwa.py) · [原基线](../hiwa/run_taco_faithful_baseline.py)。
-
-
-## 2026-11-17 PCA 后标准化审计与正式报告
-
-**本目录根部已经保存 XeLaTeX 编译的四页实验报告：**
-
-- [Hyser_Hard_HiWA_实验报告.pdf](Hyser_Hard_HiWA_实验报告.pdf)：真实数据介绍、完整预处理、全 250 点 K-means / GMM 三维簇状图、HiWA 参数与 R²/相对平方误差
-- [LaTeX 源码](Hyser_Hard_HiWA_实验报告.tex)：可在仓库 GitHub Actions 中重新编译
-- [标准化与对齐详细结果](results/POST_PCA_NORMALIZATION_AUDIT.md)
-- [完整数值 JSON](results/POST_PCA_NORMALIZATION_AUDIT.json)
-- [直接调用用户新 GCOT 分支的复现脚本](scripts/run_hiwa_postpca_normalized.py)
-
-关键结论：之前 PCA 后的全量点云已经进行协方差白化；进一步检查逐维 Z-score 并按新 GCOT 源码结构复算后，当前零时延三维表示上的 Hard HiWA 配对 R² 仍为负。当前运行仅满足作者旋转变化停止条件，尚未满足严格 ADMM 共识。请参阅本次详细报告，不要将源码移植版的数字标成远程原版字节级执行结果。
-
-## 2026-11-17：硬分组后点云与 PDF 排版修订
-
-已重新编译仓库根部 [Hyser_Hard_HiWA_实验报告.pdf](Hyser_Hard_HiWA_实验报告.pdf)。
-实验报告图像现为：早期200点真实硬聚类四联图（基于记录的200点重建原图布局）、正式250点完整白化独立硬簇、
-[Hard HiWA 对齐后三维叠加](figures/all250_after_hard_hiwa_3D_overlay.png) 与
-[二维叠加](figures/all250_after_hard_hiwa_2D_overlay.png)。
-
-图片由 [render_report_figures.py](scripts/render_report_figures.py) 从已保存的真实实验绘图点重建，属于**仅用于展示的坐标量化版**；
-评估误差不在这些量化数据上计算，仍以原始全精度数值为准。
-PDF 中的早期图与当前250点实验在数据量及缩放上不同。用户上传的原始PNG直接用于对话中交付的 PDF，
-仓库自动构建则采用相同原始200点的可复现绘图数据重建四联布局。
-
-## 中文 XeLaTeX 编译说明（2026-11-17 修复）
-
-报告源文件 [Hyser_Hard_HiWA_实验报告.tex](Hyser_Hard_HiWA_实验报告.tex) 使用 UTF-8 编码和 `ctexart`，请**选择 XeLaTeX**，不要用 pdfLaTeX：
-
-```bash
-cd experiments/hyser
-python3 scripts/expand_clouds.py
-python3 scripts/render_report_figures.py
-latexmk -xelatex -interaction=nonstopmode -halt-on-error Hyser_Hard_HiWA_实验报告.tex
-```
-
-环境需要 Python `numpy`、`matplotlib` 用于绘图；XeLaTeX 需已安装 `ctex`、`fontspec`、`pgfplots` 等常见宏包。中文字体优先使用 **Noto Serif CJK SC / Noto Sans CJK SC**，Windows 可回退到 SimSun，最后可回退到 TeX Live 自带的 Fandol。GitHub Actions 在 Debian 编译环境中安装 `fonts-noto-cjk`，并使用 `pdffonts` 与 `pdftotext` 检查中文字体与可复制的中文字符，编译后的六页 PDF 自动提交到实验主目录。
-
-如果是 Overleaf：在 Menu → Compiler 里选择 **XeLaTeX**；如果是本地 TeXstudio / VS Code，请将默认编译器改为 XeLaTeX 并确保以 UTF-8 保存源文件。**不要向仓库上传或分发字体文件。**
+本轮求解是按用户上传GCOT项目更新公式的本地移植执行，并**非远程原文件直接导入**。两种HiWA的结果仅限同一25秒试次的拟合内诊断。

@@ -1,35 +1,32 @@
-name: Build Hyser LaTeX report PDF
+name: Build latest Hyser known-group Hard HiWA report
 on:
   push:
     branches: [main]
     paths:
-      - "experiments/hyser/Hyser_Hard_HiWA_实验报告.tex"
-      - "experiments/hyser/figures/clouds_base36.txt"
-      - "experiments/hyser/scripts/expand_clouds.py"
-      - "experiments/hyser/scripts/render_report_figures.py"
-      - "experiments/hyser/figures/original200_base36.txt"
+      - "experiments/hyser/data/visual_points_base36.txt"
+      - "experiments/hyser/results/latest.json"
+      - "experiments/hyser/scripts/render_figures.py"
+      - "experiments/hyser/Hyser_HardHiWA_最新实验.tex"
       - ".github/workflows/hyser-latex-report.yml"
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
-  compile-pdf:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-      - name: Expand documented 250-point figure data
-        run: python3 experiments/hyser/scripts/expand_clouds.py
-      - name: Install plotting dependencies and generate source-based images
+      - uses: actions/checkout@v4
+      - name: Render latest authentic Hyser paired groups
         run: |
           python3 -m pip install --quiet numpy matplotlib
-          python3 experiments/hyser/scripts/render_report_figures.py
-      - name: Compile XeLaTeX PDF
+          python3 experiments/hyser/scripts/render_figures.py
+          test -s experiments/hyser/figures/01_before_hiwa.png
+          test -s experiments/hyser/figures/02_after_hiwa_free.png
+          test -s experiments/hyser/figures/03_after_hiwa_fixed.png
+      - name: XeLaTeX with explicit Chinese font
         uses: xu-cheng/latex-action@v4
         with:
-          root_file: Hyser_Hard_HiWA_实验报告.tex
+          root_file: Hyser_HardHiWA_最新实验.tex
           working_directory: experiments/hyser
           os: debian
           latexmk_use_xelatex: true
@@ -38,19 +35,20 @@ jobs:
             fc-cache -f
             fc-list -f '%{family}\n' | grep -F 'Noto Serif CJK SC'
           post_compile: |
-            pdffonts "Hyser_Hard_HiWA_实验报告.pdf" | grep -F 'NotoSerifCJK'
-            pdftotext "Hyser_Hard_HiWA_实验报告.pdf" - | grep -F '肌电'
-      - name: Commit compiled report into experiment root
+            pdffonts "Hyser_HardHiWA_最新实验.pdf" | grep -F 'NotoSerifCJK'
+            pdftotext "Hyser_HardHiWA_最新实验.pdf" - | grep -F '肌电'
+      - name: Save ONLY new PDF and new figures
         run: |
-          test -s experiments/hyser/Hyser_Hard_HiWA_实验报告.pdf
+          test -s experiments/hyser/Hyser_HardHiWA_最新实验.pdf
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f experiments/hyser/Hyser_Hard_HiWA_实验报告.pdf
-          git add -f experiments/hyser/figures/initial200_hard_clusters_fourpanel.png
-          git add -f experiments/hyser/figures/all250_whitened_hard_clusters_3D.png
-          git add -f experiments/hyser/figures/all250_after_hard_hiwa_3D_overlay.png
-          git add -f experiments/hyser/figures/all250_after_hard_hiwa_2D_overlay.png
+          git add -f experiments/hyser/Hyser_HardHiWA_最新实验.pdf
+          git add -f experiments/hyser/figures/00_complete_comparison.png
+          git add -f experiments/hyser/figures/01_before_hiwa.png
+          git add -f experiments/hyser/figures/02_after_hiwa_free.png
+          git add -f experiments/hyser/figures/03_after_hiwa_fixed.png
+          git add -f experiments/hyser/figures/04_free_group_transport.png
           if ! git diff --cached --quiet; then
-            git commit -m "Compile Hyser experiment PDF from LaTeX"
+            git commit -m "Publish latest source-only Hyser Hard HiWA PDF and plots"
             git push
           fi

@@ -1,0 +1,150 @@
+{
+  "date": "2026-11-17",
+  "dataset": "Hyser PhysioNet 2.0.0 random_dataset/subject01_session1/sample1",
+  "n": 250,
+  "dimension": 3,
+  "groups": 4,
+  "source_group_sizes": [
+    46,
+    53,
+    91,
+    60
+  ],
+  "target_groups": "inherited pointwise from source labels via synchronized sample pairs; no target k-means",
+  "standardization": "separate full 3x3 covariance whitening, Cov(X)≈Cov(Y)≈I3",
+  "before": {
+    "R2": -0.6740712078099416,
+    "relative_squared_error": 1.6740712078099416,
+    "mean_euclidean": 1.97746714759756
+  },
+  "oracle": {
+    "R2": -0.13692797684174352,
+    "relative_squared_error": 1.1369279768417435,
+    "mean_euclidean": 1.688373348601135,
+    "definition": "paired orthogonal Procrustes, exact SVD solution to min squared error"
+  },
+  "free": {
+    "mu": 0.005,
+    "seed": 42,
+    "iterations": 75,
+    "delta_R": 0.08021465282190722,
+    "primal": 0.9898536304548128,
+    "legacy_stop": true,
+    "strict_converged": false,
+    "R2": -0.169050649462692,
+    "relative_squared_error": 1.169050649462692,
+    "mean_euclidean": 1.6976970073391031,
+    "R": [
+      [
+        -0.0773940868088721,
+        0.5218080824913863,
+        -0.8495448666042796
+      ],
+      [
+        -0.36647803108483695,
+        0.7775571926177747,
+        0.5109781452670418
+      ],
+      [
+        0.9272022476564658,
+        0.35088621696360095,
+        0.13105286981127431
+      ]
+    ],
+    "P": [
+      [
+        0.2487177213862627,
+        0.000707979139735493,
+        0.0004186453632285592,
+        0.0001483827879543133
+      ],
+      [
+        0.0006957750923197618,
+        0.24926383470563634,
+        0.000006077735245420668,
+        0.000017653186425913134
+      ],
+      [
+        0.000312418716340734,
+        0.000022398487514442408,
+        0.24941885873911412,
+        0.00025021313833721576
+      ],
+      [
+        0.00027408480507681214,
+        0.000005787667113704724,
+        0.00015641816241185612,
+        0.24958375088728257
+      ]
+    ]
+  },
+  "fixed": {
+    "mu": 0.05,
+    "seed": 42,
+    "iterations": 60,
+    "delta_R": 0.0033886608920707184,
+    "primal": 0.005505411365133749,
+    "marginal": 1.02762711534643e-9,
+    "R2": -0.15390665810472481,
+    "relative_squared_error": 1.1539066581047248,
+    "mean_euclidean": 1.6880007553786913,
+    "R": [
+      [
+        -0.24051749901492334,
+        0.48293864511701745,
+        -0.8419748201223997
+      ],
+      [
+        -0.3106283739692407,
+        0.7835234440065314,
+        0.538145915135821
+      ],
+      [
+        0.9195984699600327,
+        0.3909747789112294,
+        -0.038436653112403095
+      ]
+    ],
+    "P": [
+      [
+        0.25,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0.25,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0.25,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0.25
+      ]
+    ]
+  },
+  "shared": {
+    "epsilon_sample": 0.1,
+    "epsilon_group": 0.2,
+    "sample_sinkhorn_maxiter": 150,
+    "group_sinkhorn_maxiter": 1000,
+    "inner_maxiter": 100,
+    "outer_maxiter": 300
+  },
+  "limitations": [
+    "manual local numerical port, not direct byte-execution of user's original GitHub code",
+    "sample pairing used to assign target labels, thus group-supervised",
+    "different mu for free/fixed",
+    "same-trial in-sample only",
+    "oracle minimises squared sum not average L2"
+  ]
+}

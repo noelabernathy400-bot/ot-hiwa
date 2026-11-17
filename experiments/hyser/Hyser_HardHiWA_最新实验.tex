@@ -1,0 +1,82 @@
+% !TeX program = xelatex
+\documentclass[UTF8,fontset=none,11pt,a4paper]{ctexart}
+\usepackage{fontspec}
+\setmainfont{TeXGyreTermes}
+\setCJKmainfont[BoldFont={Noto Serif CJK SC Bold}]{Noto Serif CJK SC}
+\setCJKsansfont{Noto Sans CJK SC}
+\usepackage{geometry,graphicx,amsmath,amssymb,booktabs,xcolor,fancyhdr,hyperref}
+\geometry{left=22mm,right=22mm,top=22mm,bottom=21mm,headheight=15pt}
+\definecolor{deep}{HTML}{164960}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small Hyser / Hard HiWA 实验}\fancyhead[R]{\small 2026.11.17}\fancyfoot[C]{\thepage}
+\setlength{\parindent}{2em}\setlength{\parskip}{6pt}
+\newcommand{\plotpage}[3]{\clearpage\section{#1}
+\begin{center}\includegraphics[width=.98\textwidth,height=.72\textheight,keepaspectratio]{figures/#2}\end{center}
+\noindent\small #3\normalsize}
+\begin{document}
+\begin{center}
+{\huge\bfseries\color{deep}真实 Hyser 数据的 Hard HiWA 对齐实验}\\[5pt]
+{\large 仅源域 K-means，目标域继承同步组标签}\\[6pt]
+250 对同步窗口；三维白化；二维/三维散点对比
+\end{center}
+\section{数据、预处理与唯一分组}
+PhysioNet Hyser Random Task，subject01/session1/sample1，长25秒。
+肌电 256 通道、2048Hz；手指力量5通道、100Hz。
+每0.1秒取一个同步窗口（共250对）。肌电经通道RMS、log1p、Z-score、PCA降至三维；
+力量取拇指、中指、食指的三维窗口平均值。两域分别做协方差白化：
+\[
+\widetilde X=(X-\bar X)\Sigma_X^{-1/2},\quad
+\widetilde Y=(Y-\bar Y)\Sigma_Y^{-1/2},\quad
+\operatorname{Cov}(\widetilde X)\simeq\operatorname{Cov}(\widetilde Y)\simeq I_3.
+\]
+只在源域做一次K-means（$K=4$、seed42、n_init30），组大小为46、53、91、60；
+目标域按照同步窗口一一继承相同组标签，绝不单独聚类。传递组标签使用了真实配对，
+因此它是\textbf{已知组对应的诊断实验，而不是完全无监督HiWA}。
+
+\section{全量对齐误差}
+令$E=\widetilde XR^\top-\widetilde Y$，平方误差$SSE=\|E\|_F^2$。
+\[
+R^2=1-\frac{SSE}{\|\widetilde Y-\overline{\widetilde Y}\|_F^2},\quad
+\mathrm{rSE}=\frac{SSE}{\|\widetilde Y\|_F^2},\quad
+\overline{d}=\frac1{250}\sum_{i=1}^{250}\|E_i\|_2.
+\]
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+方法 & $R^2\uparrow$ & $\mathrm{rSE}\downarrow$ & $\overline d\downarrow$\\
+\midrule
+对齐前 & $-0.6741$ & 1.6741 & 1.9775\\
+自由簇级OT的Hard HiWA & $-0.1691$ & 1.1691 & 1.6977\\
+固定已知簇对应的HiWA变体 & $-0.1539$ & 1.1539 & 1.6880\\
+使用真实配对的最佳正交Oracle & $-0.1369$ & 1.1369 & 1.6884\\
+\bottomrule
+\end{tabular}
+\end{center}
+这里两个域均已白化，尺度处理已经统一。Oracle使用真实逐点配对计算，因此只作为正交模型的理论参照。
+
+\plotpage{对齐前：源域唯一K-means，目标域继承标签}{01_before_hiwa.png}{
+上排为三维，下排为二维；左列为目标域，右列为源域。两边同色代表同一组真实同步窗口，不存在目标域独立聚类。}
+
+\plotpage{自由簇级OT：Hard HiWA对齐后}{02_after_hiwa_free.png}{
+使用原版允许自由簇匹配的HiWA结构，μ=0.005；第75轮停止，旋转变化0.0802，但局部共识残差0.9899，不能认为严格ADMM收敛。}
+
+\plotpage{固定已知组对应：Hard HiWA变体对齐后}{03_after_hiwa_fixed.png}{
+将组级传输强制为$P=I_4/4$，仅优化对应簇对，μ=0.05。
+60轮后旋转变化0.003389、局部共识残差0.005505，均低于0.01。
+本方法额外使用组级监督约束，不是原版自由组HiWA。}
+
+\clearpage
+\section{Oracle、数值限制和结论}
+最佳正交矩阵使用真实配对计算：
+\[
+R_*=\mathop{\arg\min}_{R^\top R=I_3}\|\widetilde XR^\top-\widetilde Y\|_F^2,
+\quad \widetilde Y^\top\widetilde X=U\Sigma V^\top,\quad R_*=UV^\top.
+\]
+Oracle最小化总平方误差，而不一定最小化平均欧氏距离，
+故固定组方法的平均距离可以略低于Oracle的平均距离。
+尽管白化使均值、协方差一致，生理时滞、噪声、非线性等仍可能造成样本几何不相容。
+自由簇和固定簇版本还使用不同$\mu$，不能将结果差别归因于固定$P$本身。
+\begin{center}\includegraphics[width=.7\textwidth,height=.30\textheight,keepaspectratio]{figures/04_free_group_transport.png}\end{center}
+\noindent\small 数值来自真实Hyser点云上按用户上传的GCOT/HiWA核心更新公式手工移植的本地求解器，
+而非直接导入远程源文件。全部250点用于拟合内评价，
+且同步关系被用于传递组标签，因此不是无监督算法的严格性能对比。\normalsize
+\end{document}
