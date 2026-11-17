@@ -5,7 +5,7 @@
 **本节取代下文 2026-11-17 旧记录中两类 NRMSE 的性能判定。** 使用原有 400/100 trial 分割、相同四维表示和固定归一化、seed 42–46，**没有重新训练 HiWA**。原始 `code/hiwa_original.py` 保持不变。
 
 - 原版 `_rMSE(X,R,Rgt)=||Rgt Xᵀ-R Xᵀ||²_F/||Rgt Xᵀ||²_F` 需要实际的真值旋转 `Rgt`。DANDI 000138 不提供 `Rgt`，因此仅报告**rMSE 代理值**：用训练试次已知同步配对拟合的有监督正交 Procrustes 作为参照 `R_ref`；这个参照**不参与 HiWA 无监督拟合**，且**不能等同真实 rMSE**。
-- 原版 `_eval_R2` 存在公式实现问题（用了有符号平均误差而非平方残差）。不修改原版求解器，但按标准多元 (R^2=1-\\sum_{test}||y_i-Rx_i||^2/\\sum_{test}||y_i-\\bar y_{test}||^2) 在留出测试集评分。
+- 原版 `_eval_R2` 存在公式实现问题（用了有符号平均误差而非平方残差）。不修改原版求解器，但按标准多元 **R² = 1 − SSE/SST**（`SSE=sum_test ||y_i−R x_i||²`，`SST=sum_test ||y_i−mean_test(y)||²`）在留出测试集评分。
 - ADMM 共识/正交性/OT 边缘检查保留为**数值合格性检验**，不再作为额外的“预测评价指标”。
 
 | 参照方法 | rMSE（代理，越低越好） | 标准测试 R²（越高越好） |
@@ -22,7 +22,7 @@
 | 45 | 1.97163 | -0.95505 |
 | 46 | 2.12925 | -1.06582 |
 
-**结论：** rMSE 代理值五次平均稍微降低，但随机性很大；真正可解释为测试集运动预测的 (R^2) 五次都是负的，平均比未对齐还差。监督训练参照的测试 (R^2) 也稍低于 0，提示四维全局正交假设值得优先检验。不能断言找到真实旋转，也不能从这次实验得出 Soft 优于 Hard。
+**结论：** rMSE 代理值五次平均稍微降低，但随机性很大；真正可解释为测试集运动预测的 R² 五次都是负的，平均比未对齐还差。监督训练参照的测试 R² 也稍低于 0，提示四维全局正交假设值得优先检验。不能断言找到真实旋转，也不能从这次实验得出 Soft 优于 Hard。
 
 **复现**：`python code/evaluate_hiwa_two_metrics.py --clusters results/clustering/clustered_4d.npz --alignment results/hard_hiwa/hard_hiwa_results.json --output results/hard_hiwa/hiwa_rmse_r2_evaluation.json`。新实验推荐 `code/run_hard_hiwa_2metric.py`，从原版 runner 的保存结果自动计算这两项。旧的 NRMSE JSON/图仅作为历史记录保留，**不用于以后的主结论**。
 
