@@ -34,9 +34,6 @@ jobs:
           os: debian
           latexmk_use_xelatex: true
           extra_system_packages: "fonts-noto-cjk poppler-utils"
-          pre_compile: |
-            fc-cache -f
-            fc-list -f '%{family}\n' | grep -F 'Noto Serif CJK SC'
           post_compile: |
             pdffonts "Hyser_HardHiWA_最新实验.pdf" | grep -F 'NotoSerifCJK'
             pdftotext "Hyser_HardHiWA_最新实验.pdf" - | grep -F '肌电'
