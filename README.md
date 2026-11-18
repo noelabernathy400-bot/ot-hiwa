@@ -66,3 +66,10 @@ Successful mainline runs automatically commit and push only their generated JSON
 | Soft-GCOT HiWA + ROCA | Soft-GCOT HiWA over both determinant components; unlabeled representative orientation selects the branch and emits a warning. |
 
 Key paths: `src/hiwa/` (reference HiWA), `src/cc_hiwa/` (soft and exploratory extensions), `experiments/hiwa/` (runners), `docs/taco/` and `docs/hiwa/` (paper notes). See `docs/research/TACO-faithful_Soft-GCOT_HiWA_audit_2026-07-11.md` and `experiments/results/taco_faithful_baseline_20260711_minimal.md`.
+
+
+## Hyser：46次真实无监督层级OT与SA/WA/DAD/HiWA对照
+
+[Hyser两层OT项目规范](experiments/hyser/README.md) · [最终实验报告](experiments/hyser/final_benchmark_20261118/README.md) · [完整46条两层运输/熵/W₂²数值](experiments/hyser/final_benchmark_20261118/results_all_46.csv) · [二维散点图](experiments/hyser/final_benchmark_20261118/figures/scatter_all_methods_2D.svg) · [三维散点图](experiments/hyser/final_benchmark_20261118/figures/scatter_all_methods_3D.svg)。
+
+新增SA、WA、DAD-3D改编、HiWA-SSC、HiWA-GMM，与已有Hard/Soft合计46条评价。使用三种两域独立分组共享参考对最终R重新求两层层级OT完整目标J，保留整体W₂²作为辅助。**参考分组不同会改变算法排名**，且DAD不是原作者MATLAB直接运行。严格禁止可视化同步配对标签进入训练；当前仅一个试次，不能视为跨试次验证。
