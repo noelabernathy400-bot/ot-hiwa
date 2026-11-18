@@ -40,6 +40,18 @@ python experiments/synthetic/run_gc_hiwa_boundary_benchmark.py --seeds 2201 2202
 
 The synthetic runner uses no labels, true rotation, pairing, or deformation during fitting; these quantities are evaluation-only. In the isospectral nonorthogonal condition, the source and target covariance spectra are deliberately identical, yet the method must abstain through the combined fit, convergence, and ROCA checks. The Panoptic protocol and its exact commands are recorded in the canonical mathematical contract above because the underlying data are not bundled.
 
+## Hyser 实验：无监督 Hard HiWA 与 Soft-GCOT 的双层层级 OT
+
+本仓库的 Hyser（肌电–手指力量）实验与上面的 GC-HiWA v2 / Panoptic 研究主线**分别管理，不能把两者的成果或验证范围混为一谈**。
+
+**后续所有实验者与 AI 协作者必须先阅读 [Hyser 实验规范 README](experiments/hyser/README.md) 及 [评价合同](experiments/hyser/RESEARCH_OBJECTIVE_AND_EVALUATION.md)。**
+
+核心研究对象是含 **簇级传输 P、簇内传输 Q 的两层层级 OT**。必须同时报告：每簇对运输成本及 P/Q、层级加权运输代价、**含两层熵项的完整目标函数**、统一无监督参考下的层级评价、整体等权经验 W₂²（重要辅助）及训练后配对诊断。**普通 W₂² 不能代替两层 OT 作为唯一排名依据。**
+
+**严格禁止数据泄漏：**目标训练分组和软隶属必须从目标域**独立**学习，簇级 P 自主学习；采集得到的真实同步配对不得用于训练、初始化、选种子、固定 P，也不得将源域训练标签复制给目标域。仅在模型训练完成后，为了两边图上相同颜色代表同一批同步样本，才可将源域**可视化标签**按真实同步索引复制给目标域着色。旧的此类泄漏实验只保留为**组级监督诊断**，不能混入无监督对照。
+
+历史 Hyser 数值主要来自对提供的 GCOT/HiWA 公式的本地移植，而非直接执行原始远程包。目前已有部分两层运输项、整体 W₂² 和温度消融，但**全部簇内 Q、完整层级正则目标与共享层级参考指标尚未全部补齐**；不得以整体 W₂² 补写缺失的层级指标。
+
 ## Historical TACO / MiHiA line
 
 The remaining runner description and method table describe an earlier neural--movement development line. They remain useful as historical code and negative applicability evidence, but they are not the current primary claim and must not be cited as independent validation of GC-HiWA v2.
