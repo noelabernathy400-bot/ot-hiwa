@@ -20,6 +20,36 @@
 **完整图像与数据审计：** [7张全量散点图图库](results/full_scatter_gallery/FULL_SCATTER_GALLERY.md) · [两域独立训练Hard分组（14000点）](results/full_scatter_gallery/TRAIN_14000_all_4D_projections_independent_HARD_Kmeans.png) · [两域独立测试Hard分组（3500点）](results/full_scatter_gallery/TEST_3500_all_4D_projections_independent_HARD_Kmeans.png) · [两域独立Soft原型分组（3500点）](results/full_scatter_gallery/TEST_3500_all_4D_projections_independent_SOFT_prototype.png) · [17500全部时间窗（6投影）](results/full_scatter_gallery/ALL_17500_all_4D_projections_independent_HARD_Kmeans.png) · [逐行原始索引/样本计数/处理参数](results/full_scatter_gallery/FULL_SCATTER_DATA_AUDIT.json)
 
 ---
+## 目标域几何处理实验（2026-11-18）
+
+**研究问题：仅在目标手部运动域做训练数据拟合的尺度/相关性/可逆非线性边际处理，能否改善与神经域的无配对四维对齐？** 保持 Source 完全不变、原17500/14000/3500/160数据层级、两域独立分组、组级 P 自由最优传输。测试同步关系仅用于所有训练之后的评价与着色。
+
+四种**预先约定**的目标域处理：identity、位置/速度各2D的正则化白化 block_zca、四维整体正则化白化 full_zca、逐维可逆 arcsinh 长尾压缩。所有处理参数仅从目标域14000个训练样本学习；改变目标处理后仅在目标域重新学习 Hard KMeans 和 Soft 原型，绝不从源标签继承。
+
+**五种随机种子（42–46）完整 GCOT 结果**。每种方法学习的对齐结果先按对应目标变换的逆映射返回**同一原始标准化手部坐标系**，再比较原始目标全域自由OT与同步 R²；两域独立抽样的200+200测试点和原来的500外循环预算不变。
+
+| 目标域方法 | 训练协方差谱L₂差↓ | Hard 原始空间全域 OT↓ | Soft 原始空间全域 OT↓ | Hard 原始空间 R²↑ | Soft 原始空间 R²↑ |
+|---|---:|---:|---:|---:|---:|
+| identity | 0.02223 | 0.37935 | **0.38006** | -1.02398 | -1.45981 |
+| 位置/速度 block_zca | **0.01513** | 0.37321 | 0.37681 | -1.02563 | -1.45878 |
+| 四维 full_zca | 0.11980 | **0.35244** | 0.38218 | **-0.98558** | **-1.29953** |
+| 单维 arcsinh | 0.03990 | 0.48984 | 0.59019 | -1.60107 | -1.78388 |
+
+**结论：**四维正则化白化对Hard全域OT有约7%数值改善，也使Soft同步 R² 较负值有所缓和，但没有任何一种方案在原始目标空间恢复可靠同步点对应；即使未变换原始点对的恒等R²约−0.7965，仍好于这次训练所得的全部均值。单侧 arcsinh 非线性压缩明显恶化表现。协方差谱看起来像不等于配对准确。Hard严格ADMM 5/5，Soft全部0/5；绝不声称Soft已经充分收敛。
+
+![Hard模型：四种目标变换后的完整3500点源目标重叠六投影](results/target_only_geometry_full/HELDOUT_SOURCE_TARGET_OVERLAY_HARD_six_projections.png)
+
+![Soft模型：四种目标变换后的完整3500点源目标重叠六投影](results/target_only_geometry_full/HELDOUT_SOURCE_TARGET_OVERLAY_SOFT_six_projections.png)
+
+![源域目标域协方差谱与内在距离分布差异](results/target_only_geometry_full/TRAIN_ONLY_COVARIANCE_SPECTRA_AND_DISTANCE_QUANTILES.png)
+
+![目标域原始4D与各变换六组二维投影](results/target_only_geometry_full/TARGET_TRANSFORMS_TEST_3500_six_projections.png)
+
+[完整试验报告、全部数值、完整训练/测试可视化](results/target_only_geometry_full/TARGET_TRANSFORM_REPORT.md) · [逐种子JSON与训练处理参数](results/target_only_geometry_full/TARGET_TRANSFORM_RESULTS.json) · [可复现源码](code/run_target_only_geometry_ablation.py)
+
+**设计局限：**目标域变换后独立目标KMeans也重新拟合，160个目标训练抽样点随变换改变，因此不完全是固定点集的纯变换消融；5个初始化不是独立受试者重复。没有按测试R²选择任何目标变换参数，不应仅凭这次探索结果声称方案优于原始基线。对于真正非线性跨模态关系，单侧变换加正交R并不保证能够恢复。
+
+---
 ## 数据、方法与严格隔离
 
 - **数据保持不变：**DANDI:000138、4D 神经 PCA / 4D 手部位置速度、500 trials × 35 = 17,500 窗口、原400/100个试次独立划分（14,000训练、3,500测试）。每域按原实验训练集统计作 RMS 归一化；未另行抽取250对样本。
