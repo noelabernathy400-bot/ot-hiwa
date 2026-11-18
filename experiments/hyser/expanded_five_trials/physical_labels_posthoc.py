@@ -125,6 +125,22 @@ def main():
     # unsupervised source membership initialization: report only.
     xres=one_domain("source_EMG",lx,Y,proxy,z,trial,out)
     yres=one_domain("target_force",ly,Y,proxy,z,trial,out)
+    # Create explicit per-window reality-derived proxy labels.
+    # These labels are POSTHOC descriptive metadata only, NOT ground-truth
+    # actions and NEVER model fitting, tuning, or classifier supervision.
+    names=["low_relative_force","thumb_deviation_dominant",
+           "index_deviation_dominant","middle_deviation_dominant"]
+    with (out/"physical_force_labels_POSTHOC_ONLY.csv").open("w",newline="",encoding="utf-8") as f:
+        writer=csv.writer(f)
+        writer.writerow(["trial_id","window_start_seconds","force_thumb","force_index",
+                         "force_middle","force_proxy_state","force_proxy_code",
+                         "source_kmeans_cluster_POSTHOC","target_kmeans_cluster_POSTHOC",
+                         "REAL_ACTION_GROUND_TRUTH"])
+        for i in range(len(Y)):
+            writer.writerow([int(trial[i]),round((i%250)*.1,6),
+                             *[float(v) for v in Y[i]],names[int(proxy[i])],
+                             int(proxy[i]),int(lx[i])+1,int(ly[i])+1,"NO"])
+
     result={"status":"post_hoc_only","n":1250,"physics_label_is_ground_truth":False,
             "dataset_known_semantics":"Random contractions of arbitrary finger combinations; no prescribed four directions",
             "force_channel_order":"thumb,index,middle (from official Hyser five-channel thumb,index,middle,ring,little)",
