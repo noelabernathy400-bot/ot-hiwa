@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - ".github/workflows/hyser-physical-label-audit.yml"
+      - "experiments/hyser/expanded_five_trials/physical_labels_posthoc.py"
   workflow_dispatch:
 
 permissions:
