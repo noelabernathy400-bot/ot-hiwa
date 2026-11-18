@@ -1,0 +1,48 @@
+name: Hyser heldout Hard-vs-Soft scatter and P figures
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-hard-soft-figures.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Fetch verified released fold features
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_src"
+          gh release download hyser-s01-s1-random-5trials-v1 --pattern hyser_s01_s1_random_5trials_features_cv.zip --dir "$RUNNER_TEMP/hyser_src"
+          unzip -q "$RUNNER_TEMP/hyser_src/hyser_s01_s1_random_5trials_features_cv.zip" -d "$RUNNER_TEMP/hyser_src"
+      - name: Render separate source/target actual heldout points and two methods' P
+        run: |
+          python experiments/hyser/expanded_five_trials/render_hard_soft_pilot.py \
+            --data-dir "$RUNNER_TEMP/hyser_src/derived" \
+            --results experiments/hyser/expanded_five_trials/results_hard_soft_pilot/results_all.json \
+            --out experiments/hyser/expanded_five_trials/results_hard_soft_pilot/figures
+      - name: Verify plots
+        run: |
+          test -f experiments/hyser/expanded_five_trials/results_hard_soft_pilot/figures/heldout_example_2D_separate.png
+          test -f experiments/hyser/expanded_five_trials/results_hard_soft_pilot/figures/paired_difference_by_fold.png
+          test -f experiments/hyser/expanded_five_trials/results_hard_soft_pilot/figures/trained_P_comparison.png
+      - name: Commit plots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_hard_soft_pilot/figures
+          if ! git diff --cached --quiet; then
+            git commit -m "Add independent heldout point clouds and Hard vs Soft P/metric visualizations"
+            git push origin HEAD:main
+          fi
