@@ -1,0 +1,63 @@
+name: DANDI 000138 target-only geometry pilot with unpaired Hard/Soft
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-target-only-geometry-pilot.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Train-only 4 target transformations with 1 seed, pilot solver budget
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/run_target_only_geometry_ablation.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --baseline projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_RESULTS.json \
+            --output projects/dandi-000138-hiwa-4d/results/target_only_geometry_pilot \
+            --seeds 42 --outer 4 --inner 3 --sample-sinkhorn 15 \
+            --group-sinkhorn 50 --eval-Q-iters 80 --prototype-iters 70 --pilot
+      - name: Audit source immutability target-only fitting inverse and full plot sizes
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/target_only_geometry_pilot')
+          a=json.loads((p/'TARGET_TRANSFORM_RESULTS.json').read_text())
+          assert a['same_original_source'] and a['hard_X_groups_fixed']
+          assert a['soft_target_prototypes_independently_fitted']
+          assert a['target_groups_refit_from_TARGET_FEATURES_only']
+          assert a['true_synchronous_pairing_is_postfit_evaluation_only']
+          assert a['no_test_hyperparameter_selection']
+          assert set(a['variants'])=={'identity','block_zca','full_zca','arcsinh'}
+          for v in a['variants'].values():
+              for method in ('hard','soft'):
+                  assert len(v['runs'][method])==1
+                  s=v['runs'][method][0]
+                  assert np.isfinite(s['shared_original_eval']['original_target_sync_R2'])
+                  assert s['transport']['max_Q_marginal_error']<1e-5
+          for f in ['TARGET_TRANSFORMS_TEST_3500_six_projections.png',
+            'TARGET_TRANSFORMS_TRAIN_14000_six_projections.png',
+            'TARGET_TRANSFORMS_train_test_overview.png',
+            'TRANSFORMS_HARD_SOFT_OT_AND_ORIGINAL_SPACE_ERRORS.png']:
+              assert (p/f).stat().st_size>40000
+          print('PASS: inversion, target independence, 4 methods, real full-data visualizations')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-target-geometry-pilot
+          path: projects/dandi-000138-hiwa-4d/results/target_only_geometry_pilot
+          if-no-files-found: warn
