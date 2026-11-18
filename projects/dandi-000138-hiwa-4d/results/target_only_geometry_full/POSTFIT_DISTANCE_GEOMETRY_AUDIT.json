@@ -1,0 +1,31 @@
+{
+  "postfit_evaluation_only": true,
+  "used_for_any_grouping_training_or_parameter_selection": false,
+  "num_heldout_windows": 3500,
+  "comparison": "Rotation-invariant necessary condition for original synchronized rigid map",
+  "pair_type": "randomly sampled different-trial heldout window-index pairs",
+  "pair_samples": 100000,
+  "all_four_modes": {
+    "identity": {
+      "Pearson_distance_corr": 0.06020188768166086,
+      "Spearman_distance_corr": 0.045181661646102655,
+      "relative_distance_stress": 0.5312063292764838
+    },
+    "block_zca": {
+      "Pearson_distance_corr": 0.06670295349922407,
+      "Spearman_distance_corr": 0.05161971106179588,
+      "relative_distance_stress": 0.5281102983019942
+    },
+    "full_zca": {
+      "Pearson_distance_corr": 0.06625894006274358,
+      "Spearman_distance_corr": 0.04064751540114971,
+      "relative_distance_stress": 0.520916410233675
+    },
+    "arcsinh": {
+      "Pearson_distance_corr": 0.05486611059089294,
+      "Spearman_distance_corr": 0.048230943847395416,
+      "relative_distance_stress": 0.530419334601656
+    }
+  },
+  "caution": "Overlapping samples not independent; no p-values. High distance correlation necessary but not sufficient for orthogonal pointwise mapping. Low correlation does not disprove any nonlinear correspondence."
+}
