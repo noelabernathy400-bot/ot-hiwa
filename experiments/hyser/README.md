@@ -150,3 +150,12 @@
 在前述统一W₂²主指标确定后，进一步**新运行10次独立两域软分组训练**：τ=0.25和τ=1.0，各seed40–44；其余条件固定（K=4、μ=.05、εs=.1、εg=.2、三维白化、自由P、ADMM/OT共同残差阈值）。加上此前已存在的τ=0.5五次训练得到：Hard平均W₂² **0.19907977**（改善17.56%）、Soft τ=.25 **0.19907906**（17.56%）、Soft τ=.5 **0.20752896**（14.06%）、Soft τ=1 **0.20093204**（16.79%）。全部新增10/10次通过本轮数值残差检查；τ=.25与Hard平均差只有约7×10^-7，不能视作实质性改进。τ=.5种子44退化、τ=1种子40退化，说明软温度与初始化的相互作用仍待研究。
 
 已保存 [完整温度试验报告](unsupervised_control/SOFT_TEMPERATURE_SWEEP.md)、[10条逐seed数值](unsupervised_control/temperature_sweep_unpaired_10new.csv)、[10个R矩阵](unsupervised_control/temperature_sweep_R_10new.csv)、[10个簇级P矩阵](unsupervised_control/temperature_sweep_P_10new.csv) 与 [可运行新训练程序](unsupervised_control/run_temperature_sweep.py)。另外重复τ=.5、seed42结果与历史W₂²=0.18870520630894314**完全相同**。训练与共同W₂²均未使用真实同步配对，R²仍只是辅助评价。这些是同一试次的拟合内数据，不提供跨试次泛化证明；依赖本地数值移植的代码来源限制仍在。
+
+
+## 2026-11-18：最终无监督层级 OT 与多方法基线比较（已运行）
+
+[**完整报告与方法学边界**](final_benchmark_20261118/README.md) · [46条真实层级/熵/W₂²数值](final_benchmark_20261118/results_all_46.csv) · [10方法统计](final_benchmark_20261118/summary_all_methods.csv) · [SA/WA/DAD/HiWA新增R/P](final_benchmark_20261118/baseline_fitted_R_P.csv) · [二维散点图](final_benchmark_20261118/figures/scatter_all_methods_2D.svg) · [三维散点图](final_benchmark_20261118/figures/scatter_all_methods_3D.svg)。
+
+实际对照包含：独立Hard HiWA（K-means）、Soft K-means（τ=.25/.5/1）、Soft原型、**SA、WA、DAD-3D适配、HiWA-SSC、HiWA-GMM**。对所有方法的R使用三套无真实同步对应监督的共享参考层级，重新优化评价P/Q，并记录两层运输项与完整熵正则J；也保留普通整体W₂²及原生P/Q诊断。共有46条记录；其中SA是单次确定性，DAD虽然重复记录但只有一个独立确定性解。本文保存的46条CSV包含完整两层J的熵项分解与数值约束审计；**未恢复原训练最后一轮所有局部Q**，补出的Q为最终全局R下事后重算。Github SVG使用可视化量化点云，仅用于展示，数值来源为全精度真实数据；完整Q和PNG/PDF及代码见该轮对话ZIP归档。
+
+K-means共享参考下Hard和τ=.25 Soft近乎打平（T约0.41938），而更换为GMM共享参考后HiWA-GMM与Soft原型得分更好，说明排名依赖参考簇结构；不能断言Soft总体优于Hard。DAD-3D为原作者方法的**改编而非官方MATLAB直接复现**。HiWA-GMM 3/5种子达180轮上限，不应宣称全部严格收敛。
