@@ -1,0 +1,85 @@
+name: Hyser five-trial direct PhysioNet download
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-download-five-trials.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hyser-five-trial-data-acquisition
+  cancel-in-progress: false
+
+jobs:
+  acquire-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install signal-processing dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "wfdb>=4.1,<5" "requests>=2.31,<3"
+
+      - name: Download official twenty WFDB files and prepare leave-one-trial-out features
+        run: |
+          python experiments/hyser/expanded_five_trials/fetch_prepare.py \
+            --workdir "${{ runner.temp }}/hyser_five_trials"
+
+      - name: Verify archives and dataset manifest
+        run: |
+          python - <<'PY'
+          import json, os, pathlib, zipfile
+          base = pathlib.Path(os.environ['RUNNER_TEMP']) / 'hyser_five_trials'
+          info = json.loads((base/'derived/SOURCE_AND_VALIDATION.json').read_text())
+          assert info['total_windows_per_domain'] == 1250
+          assert len(info['original_files']) == 20
+          assert len(info['trials']) == 5
+          for filename, expected in [
+            ('hyser_s01_s1_random_5trials_raw_wfdb.zip', 21),
+            ('hyser_s01_s1_random_5trials_features_cv.zip', 8),
+          ]:
+            with zipfile.ZipFile(base/filename) as zf:
+              assert len(zf.namelist()) == expected, (filename, zf.namelist())
+              assert zf.testzip() is None
+            print(filename, (base/filename).stat().st_size)
+          print('Verified: 20 original files and 1250 samples per domain')
+          PY
+
+      - name: Upload reproducible waveform and features archives as Actions artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyser-s01-s1-random-five-trials-data
+          path: |
+            ${{ runner.temp }}/hyser_five_trials/hyser_s01_s1_random_5trials_raw_wfdb.zip
+            ${{ runner.temp }}/hyser_five_trials/hyser_s01_s1_random_5trials_features_cv.zip
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
+
+      - name: Publish both original WFDB records and processed folds to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="hyser-s01-s1-random-5trials-v1"
+          BASE="${{ runner.temp }}/hyser_five_trials"
+          RAW="$BASE/hyser_s01_s1_random_5trials_raw_wfdb.zip"
+          FEAT="$BASE/hyser_s01_s1_random_5trials_features_cv.zip"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; refusing to replace existing release assets."
+            gh release view "$TAG" --json url --jq .url
+          else
+            gh release create "$TAG" "$RAW" "$FEAT" \
+              --title "Hyser Subject 01 / Session 1 — five random-task trials" \
+              --notes "Five original preprocessed-EMG and force WFDB trial records (20 files, PhysioNet Hyser v2.0.0) plus reproducible 100ms-window features and leave-one-trial-out folds. Data: https://physionet.org/content/hd-semg/2.0.0/random_dataset/subject01_session1/ . Original license: ODC-By 1.0. Cite Jiang et al. (2023), doi:10.13026/hxan-pe94. This release is data preparation, not new HiWA/Soft fitting results."
+          fi
