@@ -5,6 +5,21 @@
 > [!CAUTION]
 > 2026-11-17 曾将源域可视化标签复制给目标域参与训练，因此之前的源域唯一分组、固定 Soft、边界自适应 Soft 等结果仅属于**组级监督诊断**，不是正式无监督实验。原资料保留在 [历史 README](HISTORICAL_GROUP_SUPERVISED_README.md) 与 [专项审计](GROUP_LABEL_LEAKAGE_AUDIT.md)。
 
+## 全量数据点云图库（2026-11-18）
+
+**原始数据不缺点：500 trials×35 windows=17,500个时间窗/域；400个训练试次含14,000点，100个独立测试试次含3,500点；单个GCOT求解过程只是每个域按四个独立Hard K-means簇抽40点，共160点。**旧传输计划图只出现160个点是该次求解器抽样数量，不代表整个实验数据只有160点。
+
+本次仅从已冻结独立分组4D数据和已训练Hard/Soft seed42的R重绘，**没有重新训练模型**。神经162通道以运动开始时刻为中心取−100至+600ms、20ms窗口，sqrt放电率、40ms高斯时间平滑、训练集zscore、训练集PCA(4)；目标使用hand position x/y和velocity x/y各自训练集zscore。PCA四维累计解释标准化神经方差 **13.06%**；没有额外做PCA白化，进GCOT前两域分别按训练RMS半径归一化。
+
+![点数对照](results/full_scatter_gallery/POINT_COUNTS_14000_TRAIN_3500_TEST_160_OT.png)
+
+![3500完整测试点4栏六投影，同步物理样本只在训练后着色](results/full_scatter_gallery/TEST_3500_all_4D_projections_common_postfit_colors.png)
+
+![14000完整训练点4栏六投影，同步物理样本只在训练后着色](results/full_scatter_gallery/TRAIN_14000_all_4D_projections_common_postfit_colors.png)
+
+**完整图像与数据审计：** [7张全量散点图图库](results/full_scatter_gallery/FULL_SCATTER_GALLERY.md) · [两域独立训练Hard分组（14000点）](results/full_scatter_gallery/TRAIN_14000_all_4D_projections_independent_HARD_Kmeans.png) · [两域独立测试Hard分组（3500点）](results/full_scatter_gallery/TEST_3500_all_4D_projections_independent_HARD_Kmeans.png) · [两域独立Soft原型分组（3500点）](results/full_scatter_gallery/TEST_3500_all_4D_projections_independent_SOFT_prototype.png) · [17500全部时间窗（6投影）](results/full_scatter_gallery/ALL_17500_all_4D_projections_independent_HARD_Kmeans.png) · [逐行原始索引/样本计数/处理参数](results/full_scatter_gallery/FULL_SCATTER_DATA_AUDIT.json)
+
+---
 ## 数据、方法与严格隔离
 
 - **数据保持不变：**DANDI:000138、4D 神经 PCA / 4D 手部位置速度、500 trials × 35 = 17,500 窗口、原400/100个试次独立划分（14,000训练、3,500测试）。每域按原实验训练集统计作 RMS 归一化；未另行抽取250对样本。
