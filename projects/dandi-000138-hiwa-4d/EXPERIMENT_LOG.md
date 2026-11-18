@@ -6,6 +6,29 @@
 ---
 # 实验日志（持续更新）
 
+## 2026-11-18 · 无配对独立分组 Hard–Soft 正式对照（新基线）
+
+**训练绝不使用已知同步索引、分组匹配或目标继承标签。**原四维源域与目标域分别独立 K-means（Hard），原ZIP GCOT 的 soft_groups 在 X/Y 两域分别独立拟合软原型（Soft）。两者使用同一ZIP GCOT hierarchical_alignment，P完全自由，其他参数固定为原500外循环/20局部迭代/45样本Sinkhorn、5 seeds，原400/100 trials分割、17500窗口及同4D归一化。
+
+| 测试指标 | 独立Hard | 独立Soft |
+|---|---:|---:|
+| 完整P-Q总几何OT↓ | 1.363597±0.049492 | 1.763262±0.023317 |
+| 全域自由OT W2²↓ | 0.379350±0.037392 | 0.380061±0.027006 |
+| 同步相对MSE↓ | 2.019661±0.532772 | 2.454564±0.351690 |
+| 同步平均欧氏距离↓ | 1.328862±0.220298 | 1.508588±0.135604 |
+| MAE↓ | 0.563081±0.107866 | 0.636772±0.053375 |
+| 同步 R²↑ | -1.023976±0.533911 | -1.459808±0.352441 |
+
+严格 ADMM criteria: Hard 5/5，Soft 0/5。仅迭代达到最大次数不等于数值收敛，所有残差在 JSON 中公开。
+原组级监督结果只作为历史诊断，不与本无监督表混用。
+
+[实验报告](results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_REPORT.md) · [原始 R/P 与误差](results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_RESULTS.json)
+
+![对比误差](results/strict_unsupervised_hard_soft/unsupervised_hard_soft_errors.png)
+
+---
+
+
 ## 2026-11-17 · 实验 G：Boundary-Adaptive Soft (内部验证独立选参)
 
 **研究问题**：只在 K-means 边界附近提高软隶属度，而组内部保持接近硬分配，能否在一个求解器与相同组标签下改善完整分层 OT 和固定同组 OT？
