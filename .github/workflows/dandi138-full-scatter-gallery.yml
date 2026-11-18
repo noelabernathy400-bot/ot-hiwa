@@ -1,0 +1,72 @@
+name: DANDI138 FULL 17500 14000 3500 160 scatter gallery
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-full-scatter-gallery.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  full-original-data-gallery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original plotting dependencies
+        run: python -m pip install numpy scipy matplotlib
+      - name: Draw every 4D coordinate pair at all full sample counts
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/plot_full_dandi_scatter_gallery.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --archive projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_RESULTS.json \
+            --pq-arrays projects/dandi-000138-hiwa-4d/results/strict_unsupervised_PQ_visualizations/actual_sample_level_P_Q_and_indices.npz \
+            --clustering-report projects/dandi-000138-hiwa-4d/results/clustering/clustering_report.json \
+            --output projects/dandi-000138-hiwa-4d/results/full_scatter_gallery
+      - name: Verify figure sizes, original N, original seed42 archive, and no accidental model edits
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('projects/dandi-000138-hiwa-4d/results/full_scatter_gallery')
+          info=json.loads((root/'FULL_SCATTER_DATA_AUDIT.json').read_text())
+          assert info['trials']==500 and info['neurons']==162
+          assert info['all_points_per_domain']==17500 and info['train_points_per_domain']==14000
+          assert info['test_points_per_domain']==3500 and info['ot_train_sample_per_domain']==160
+          assert info['no_training_refit'] and info['no_paired_labels_used_for_fit']
+          assert info['paired_colors_applied_only_postfit']
+          assert sum(info['source_hard_train_counts'])==14000
+          assert sum(info['target_hard_train_counts'])==14000
+          assert sum(info['source_hard_test_counts'])==3500
+          assert sum(info['target_hard_test_counts'])==3500
+          assert len(info['source_ot_original_indices'])==len(info['target_ot_original_indices'])==160
+          assert len(info['figures'])==7
+          for f in info['figures']:
+              assert (root/f).stat().st_size>35000,(f,(root/f).stat().st_size)
+          print('PASS: 7 actual full-data scatter images, immutable seed42 models, sample counts and group identity')
+          PY
+      - name: Commit full-data picture collection and numerical audit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/full_scatter_gallery
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish complete DANDI 4D scatter gallery all 17500, train 14000, test 3500, and solver 160'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-original-full-scatter-gallery
+          path: projects/dandi-000138-hiwa-4d/results/full_scatter_gallery
+          if-no-files-found: warn
