@@ -47,6 +47,11 @@
 
 [完整试验报告、全部数值、完整训练/测试可视化](results/target_only_geometry_full/TARGET_TRANSFORM_REPORT.md) · [逐种子JSON与训练处理参数](results/target_only_geometry_full/TARGET_TRANSFORM_RESULTS.json) · [可复现源码](code/run_target_only_geometry_ablation.py)
 
+**更直接的后验检验（不参与训练）**：在原3500测试点中抽取100,000对来自不同试次的真实同步点对，比较源/目标之间的点内欧氏距离是否相互对应。由于任何全局正交R都保留Source两两距离，距离一致性是刚性同步对齐的必要条件。实测 Pearson 相关：原目标 **0.0602**，位置/速度分块白化 **0.0667**，全四维白化 **0.0663**，arcsinh **0.0549**；均极弱。这比只看点云外形更直接地提示：**当前四维神经与手部运动表示没有可由正交R恢复的强同步刚性几何对应**。但不能排除非线性、时滞、噪声或更高维潜在关系。该诊断严格在训练后评价，不用于超参选择。
+
+![真实同步样本的域内距离关系，目标四种变换均不具有显著强刚性结构](results/target_only_geometry_full/POSTFIT_ONLY_PAIRED_DISTANCE_PRESERVATION.png)
+
+[后验距离相关性和样本审计](results/target_only_geometry_full/POSTFIT_DISTANCE_GEOMETRY_AUDIT.json)
 **设计局限：**目标域变换后独立目标KMeans也重新拟合，160个目标训练抽样点随变换改变，因此不完全是固定点集的纯变换消融；5个初始化不是独立受试者重复。没有按测试R²选择任何目标变换参数，不应仅凭这次探索结果声称方案优于原始基线。对于真正非线性跨模态关系，单侧变换加正交R并不保证能够恢复。
 
 ---
