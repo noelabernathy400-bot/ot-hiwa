@@ -1,0 +1,79 @@
+name: Hyser 1250-point structural diagnostic
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-diagnose-1250.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  analyze-and-archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install numerical plotting dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Get existing verified five-trial features from release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/hyser_input"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_s01_s1_random_5trials_features_cv.zip \
+            --dir "$RUNNER_TEMP/hyser_input"
+          unzip -q "$RUNNER_TEMP/hyser_input/hyser_s01_s1_random_5trials_features_cv.zip" \
+            -d "$RUNNER_TEMP/hyser_input"
+          test -f "$RUNNER_TEMP/hyser_input/derived/all_five_trials_UNSCALED_windows.npz"
+      - name: Independently analyze all 1250 points and plot trial/cluster colors
+        run: |
+          python experiments/hyser/expanded_five_trials/diagnose_five_trials.py \
+            --data "$RUNNER_TEMP/hyser_input/derived/all_five_trials_UNSCALED_windows.npz" \
+            --out experiments/hyser/expanded_five_trials/results_1250
+      - name: Validate generated evidence
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path("experiments/hyser/expanded_five_trials/results_1250")
+          s=json.loads((p/"diagnostic_summary.json").read_text())
+          assert s["sample_count_per_domain"] == 1250
+          assert s["trials"] == 5
+          for k in ("source", "target"):
+            x=s[k]
+            assert x["n_samples"] == 1250
+            assert len(x["cluster_sizes"]) == 4
+            assert sum(x["cluster_sizes"]) == 1250
+            assert len(x["trials_by_clusters"]) == 5
+            assert len(x["membership_mixing"]) == 3
+          assert len(list(p.glob("*.png"))) >= 17
+          print("Validated 1250 samples per domain, 5 trials, 4 groups and", len(list(p.glob("*.png"))), "figures")
+          PY
+      - name: Commit reports and images into repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_1250
+          if git diff --cached --quiet; then
+            echo "No results changed."
+          else
+            git commit -m "Record real 1250-window Hyser trial and cluster structure check"
+            git push origin HEAD:main
+          fi
+      - name: Also retain independent reports in GitHub Actions artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyser-1250-point-data-structure-plots
+          path: experiments/hyser/expanded_five_trials/results_1250/
+          if-no-files-found: error
+          retention-days: 90
