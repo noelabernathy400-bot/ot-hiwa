@@ -1,0 +1,61 @@
+name: Strict UNSUPERVISED independently grouped 4D Hard-vs-Soft PILOT
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-strict-unsupervised-pilot.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install unchanged original ZIP GCOT dependencies
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Fit independent source and target prototype groups and pilot Hard Soft
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/run_strict_unsupervised_hard_soft.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --output projects/dandi-000138-hiwa-4d/results/strict_unsupervised_pilot \
+            --seeds 42 --outer 4 --inner 3 --sample-sinkhorn 15 \
+            --group-sinkhorn 50 --eval-Q-iters 80 --prototype-iters 80 --pilot
+      - name: Audit unpaired input, independent memberships, learned P, and complete error outputs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,numpy as np
+          p=Path('projects/dandi-000138-hiwa-4d/results/strict_unsupervised_pilot')
+          j=json.loads((p/'STRICT_UNSUPERVISED_RESULTS.json').read_text())
+          assert j['source_and_target_hard_kmeans_independent']
+          assert j['source_and_target_soft_prototypes_independent']
+          assert j['no_synchronized_pair_ids_used_in_fitting']
+          assert j['no_shared_labels_field_used'] and j['no_target_membership_copy']
+          assert j['P_freely_optimized'] and j['true_pairing_used_only_postfit']
+          assert set(j['runs'])=={'hard','soft'}
+          assert all(len(v)==1 for v in j['runs'].values())
+          for method in j['runs']:
+              r=j['runs'][method][0]
+              assert np.isfinite(list(r['metrics'].values())).all()
+              assert r['Q_train_max_marginal']<1e-5
+              assert r['Q_test_max_marginal']<1e-5
+              assert r['P_marginal_error']<1e-5
+              assert abs(np.asarray(r['P']).sum()-1)<1e-8
+          for f in ['unsupervised_hard_soft_errors.png','unsupervised_hard_soft_target_xy.png']:
+              assert (p/f).stat().st_size>20000
+          print('STRICT INDEPENDENT-GROUP SOFT/HARD PILOT VERIFIED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-strict-unsupervised-pilot
+          path: projects/dandi-000138-hiwa-4d/results/strict_unsupervised_pilot
+          if-no-files-found: warn
