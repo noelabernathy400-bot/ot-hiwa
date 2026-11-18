@@ -88,7 +88,6 @@ def main():
     e = min(args.ot_eval_n, len(xt))
     ix = eval_rng.choice(len(xt), size=e, replace=False)
     iy = eval_rng.choice(len(xt), size=e, replace=False)
-    baseline = scores(xt, yt, np.eye(4), ix, iy, ref)
     # No true neural/hand correspondence is used until ALL fits are complete.
     tridx = np.flatnonzero(tr)
     all_seeds = []
@@ -136,6 +135,8 @@ def main():
               f'converged={qual}, paired_NRMSE={m["paired_nrmse"]:.5f}, '
               f'OT_NRMSE={m["ot_nrmse"]:.5f}', flush=True)
 
+    # POSTFIT ONLY: baseline and paired oracle are evaluation diagnostics.
+    baseline = scores(xt, yt, np.eye(4), ix, iy, ref)
     # POSTFIT ONLY: supervised oracle retained as a clearly labeled diagnostic;
     # never enters model selection, initialization, grouping, P, Q or R fitting.
     u, _, vt = np.linalg.svd(y[tr].T @ x[tr])
