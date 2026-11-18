@@ -342,7 +342,7 @@ def main():
     fields=[("P_Q_total_OT_W2sq","Total hierarchical P-Q geometry"),
             ("global_free_W2sq","Global free exact W2²"),
             ("sync_R2","Synchronized R² (postfit only)"),
-            ("sync_mean_Euclidean","Synchronized average distance (postfit only)")]
+            ("mean_sync_euclidean","Synchronized average distance (postfit only)")]
     for ax,(k,title) in zip(axes.flat,fields):
         for i,method in enumerate(("hard","soft")):
             v=np.array([r["heldout_after"]["total_transport_W2sq"]
