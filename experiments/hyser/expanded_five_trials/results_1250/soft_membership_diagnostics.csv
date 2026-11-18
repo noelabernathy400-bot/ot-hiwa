@@ -1,0 +1,7 @@
+domain,temperature,ambiguous_max_lt_0p8_fraction,ambiguous_max_lt_0p6_fraction,mean_normalized_membership_entropy
+source_EMG,0.25,0.1376,0.0496,0.12932383556019122
+source_EMG,0.5,0.328,0.1144,0.3065710723424718
+source_EMG,1.0,0.8024,0.3736,0.6261319072983756
+target_force,0.25,0.1304,0.0448,0.1321061799346095
+target_force,0.5,0.3184,0.1128,0.33780250386017324
+target_force,1.0,0.8064,0.3656,0.6521442064297294

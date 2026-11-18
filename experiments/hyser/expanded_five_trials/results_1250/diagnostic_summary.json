@@ -1,0 +1,267 @@
+{
+  "provenance": "Original Hyser s01/s1 five official random-task trials",
+  "sample_count_per_domain": 1250,
+  "trials": 5,
+  "num_samples_per_trial": 250,
+  "note": "pooled transform is EDA-only; held-out OT must use trial-specific transforms",
+  "pca3_explained_variance": [
+    0.7786102768278043,
+    0.0887273879518249,
+    0.032685868511861706
+  ],
+  "common_axis_extent": 3.6,
+  "source": {
+    "domain": "source_EMG",
+    "n_samples": 1250,
+    "K": 4,
+    "cluster_sizes": [
+      682,
+      192,
+      164,
+      212
+    ],
+    "silhouette_mean": 0.4738643636396441,
+    "silhouette_median": 0.5086535658652613,
+    "silhouette_p10": 0.14656668239390325,
+    "silhouette_p90": 0.7435501343405991,
+    "fraction_silhouette_lt_0p2": 0.14,
+    "fraction_silhouette_negative": 0.036,
+    "fraction_near_boundary_margin_lt_0p15": 0.0376,
+    "ARI_10_KMeans_seeds_mean": 1.0,
+    "ARI_10_KMeans_seeds_min": 1.0,
+    "NMI_trial_vs_cluster": 0.03885795588455023,
+    "Cramers_V_trial_vs_cluster": 0.18200567781106836,
+    "trials_by_clusters": [
+      [
+        160,
+        36,
+        8,
+        46
+      ],
+      [
+        145,
+        41,
+        30,
+        34
+      ],
+      [
+        144,
+        45,
+        31,
+        30
+      ],
+      [
+        160,
+        17,
+        45,
+        28
+      ],
+      [
+        73,
+        53,
+        50,
+        74
+      ]
+    ],
+    "k_scan": [
+      {
+        "domain": "source_EMG",
+        "K": 2,
+        "silhouette": 0.4019010036113798,
+        "davies_bouldin": 0.9575867031077056,
+        "calinski_harabasz": 435.9656203702119,
+        "cluster_sizes": "1051,199"
+      },
+      {
+        "domain": "source_EMG",
+        "K": 3,
+        "silhouette": 0.43443305623930417,
+        "davies_bouldin": 1.035129154653392,
+        "calinski_harabasz": 595.3304296815093,
+        "cluster_sizes": "197,251,802"
+      },
+      {
+        "domain": "source_EMG",
+        "K": 4,
+        "silhouette": 0.4738643636396441,
+        "davies_bouldin": 0.8300648934339596,
+        "calinski_harabasz": 823.7836981004606,
+        "cluster_sizes": "682,192,164,212"
+      },
+      {
+        "domain": "source_EMG",
+        "K": 5,
+        "silhouette": 0.42226733018454427,
+        "davies_bouldin": 0.8395944108983592,
+        "calinski_harabasz": 793.3051066899587,
+        "cluster_sizes": "188,592,190,64,216"
+      },
+      {
+        "domain": "source_EMG",
+        "K": 6,
+        "silhouette": 0.4362889632574821,
+        "davies_bouldin": 0.8175598007427697,
+        "calinski_harabasz": 821.9993595952922,
+        "cluster_sizes": "215,190,64,44,185,552"
+      },
+      {
+        "domain": "source_EMG",
+        "K": 7,
+        "silhouette": 0.4266633367933814,
+        "davies_bouldin": 0.8704249668819898,
+        "calinski_harabasz": 835.1036186525771,
+        "cluster_sizes": "65,486,202,76,63,140,218"
+      }
+    ],
+    "membership_mixing": [
+      {
+        "domain": "source_EMG",
+        "temperature": 0.25,
+        "ambiguous_max_lt_0p8_fraction": 0.1376,
+        "ambiguous_max_lt_0p6_fraction": 0.0496,
+        "mean_normalized_membership_entropy": 0.12932383556019122
+      },
+      {
+        "domain": "source_EMG",
+        "temperature": 0.5,
+        "ambiguous_max_lt_0p8_fraction": 0.328,
+        "ambiguous_max_lt_0p6_fraction": 0.1144,
+        "mean_normalized_membership_entropy": 0.3065710723424718
+      },
+      {
+        "domain": "source_EMG",
+        "temperature": 1.0,
+        "ambiguous_max_lt_0p8_fraction": 0.8024,
+        "ambiguous_max_lt_0p6_fraction": 0.3736,
+        "mean_normalized_membership_entropy": 0.6261319072983756
+      }
+    ]
+  },
+  "target": {
+    "domain": "target_force",
+    "n_samples": 1250,
+    "K": 4,
+    "cluster_sizes": [
+      182,
+      232,
+      688,
+      148
+    ],
+    "silhouette_mean": 0.4494250865284901,
+    "silhouette_median": 0.4929642557050162,
+    "silhouette_p10": 0.1440829022440245,
+    "silhouette_p90": 0.707069931555364,
+    "fraction_silhouette_lt_0p2": 0.1688,
+    "fraction_silhouette_negative": 0.0288,
+    "fraction_near_boundary_margin_lt_0p15": 0.0304,
+    "ARI_10_KMeans_seeds_mean": 0.9991039391955582,
+    "ARI_10_KMeans_seeds_min": 0.9974798289875069,
+    "NMI_trial_vs_cluster": 0.06619237606494736,
+    "Cramers_V_trial_vs_cluster": 0.2560061007408014,
+    "trials_by_clusters": [
+      [
+        21,
+        57,
+        145,
+        27
+      ],
+      [
+        15,
+        90,
+        112,
+        33
+      ],
+      [
+        18,
+        38,
+        180,
+        14
+      ],
+      [
+        43,
+        24,
+        166,
+        17
+      ],
+      [
+        85,
+        23,
+        85,
+        57
+      ]
+    ],
+    "k_scan": [
+      {
+        "domain": "target_force",
+        "K": 2,
+        "silhouette": 0.3417386808839091,
+        "davies_bouldin": 1.521981697191789,
+        "calinski_harabasz": 411.59806964953,
+        "cluster_sizes": "819,431"
+      },
+      {
+        "domain": "target_force",
+        "K": 3,
+        "silhouette": 0.4019102524547802,
+        "davies_bouldin": 1.1480555775226378,
+        "calinski_harabasz": 527.6771172299538,
+        "cluster_sizes": "300,772,178"
+      },
+      {
+        "domain": "target_force",
+        "K": 4,
+        "silhouette": 0.4494250865284901,
+        "davies_bouldin": 0.8705656229696416,
+        "calinski_harabasz": 685.6921733295158,
+        "cluster_sizes": "182,232,688,148"
+      },
+      {
+        "domain": "target_force",
+        "K": 5,
+        "silhouette": 0.4251648377181491,
+        "davies_bouldin": 0.9134627352559317,
+        "calinski_harabasz": 669.8708743558118,
+        "cluster_sizes": "154,178,139,146,633"
+      },
+      {
+        "domain": "target_force",
+        "K": 6,
+        "silhouette": 0.43893991265330096,
+        "davies_bouldin": 0.8716831393605659,
+        "calinski_harabasz": 683.1019405684915,
+        "cluster_sizes": "64,162,600,140,144,140"
+      },
+      {
+        "domain": "target_force",
+        "K": 7,
+        "silhouette": 0.4197122118695358,
+        "davies_bouldin": 0.8660941258020215,
+        "calinski_harabasz": 667.8571317240758,
+        "cluster_sizes": "121,560,145,142,59,71,152"
+      }
+    ],
+    "membership_mixing": [
+      {
+        "domain": "target_force",
+        "temperature": 0.25,
+        "ambiguous_max_lt_0p8_fraction": 0.1304,
+        "ambiguous_max_lt_0p6_fraction": 0.0448,
+        "mean_normalized_membership_entropy": 0.1321061799346095
+      },
+      {
+        "domain": "target_force",
+        "temperature": 0.5,
+        "ambiguous_max_lt_0p8_fraction": 0.3184,
+        "ambiguous_max_lt_0p6_fraction": 0.1128,
+        "mean_normalized_membership_entropy": 0.33780250386017324
+      },
+      {
+        "domain": "target_force",
+        "temperature": 1.0,
+        "ambiguous_max_lt_0p8_fraction": 0.8064,
+        "ambiguous_max_lt_0p6_fraction": 0.3656,
+        "mean_normalized_membership_entropy": 0.6521442064297294
+      }
+    ]
+  }
+}
