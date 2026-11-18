@@ -38,6 +38,22 @@
 
 ![所有同求解器Hard/Soft模型测试误差](TRANSFORMS_HARD_SOFT_OT_AND_ORIGINAL_SPACE_ERRORS.png)
 
+## 原始 Source 与各变换 Target 的实际重叠图：全部3500测试点
+
+使用五次模型中的 seed42 已保存正交 R，在所有六种二维坐标投影中同时绘制**蓝色 X@Rᵀ、橙色 T(Y)**。为了避免只挑单一‘好看’投影，六组投影全部提供，Hard 和 Soft 分开显示。每种变换的 3500 个 Target 测试点均是原样本的训练拟合变换，没有利用同步索引训练。
+
+![Hard 训练后 Source vs 目标变换的六投影](HELDOUT_SOURCE_TARGET_OVERLAY_HARD_six_projections.png)
+
+![Soft 训练后 Source vs 目标变换的六投影](HELDOUT_SOURCE_TARGET_OVERLAY_SOFT_six_projections.png)
+
+## 无配对的内在距离结构检查
+
+![源/目标协方差特征值谱和域内距离分位数](TRAIN_ONLY_COVARIANCE_SPECTRA_AND_DISTANCE_QUANTILES.png)
+
+请注意：两域特征值谱原本就相近。全4维白化把目标协方差趋近球形，反而使它与源 PCA 4D 的协方差谱距离增加；但原始目标坐标下的测试 Hard 全域 OT 有小幅改善。这证明外观形状、原始分布距离和真实物理点的准确对应是三个不同问题。
+
+**统计局限：**每种方案各5次不同数值初始化，不是5个独立神经记录个体；目标 Hard KMeans 重拟合以后160个抽样目标点也会改变，因此变换效应与重新分组/训练子样本效应没有完全剥离。不能仅凭这次测试集排名选参，下一轮需用训练内部验证后再最终独立测试。
+
 ## 阅读注意
 
 - 协方差谱/分位数只看单模态自身样本，与另一个域的单点真实对应关系无关；形状接近不等于存在准确点对映射。
