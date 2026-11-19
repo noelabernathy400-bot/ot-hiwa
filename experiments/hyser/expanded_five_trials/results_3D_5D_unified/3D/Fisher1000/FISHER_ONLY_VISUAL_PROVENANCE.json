@@ -1,0 +1,96 @@
+{
+  "all_configurations": [
+    {
+      "feature": "PCA3_PCA3",
+      "d": 3,
+      "fold": 1,
+      "train_n_source": 1000,
+      "train_n_target": 1000,
+      "test_n_source": 250,
+      "test_n_target": 250,
+      "source_train_Fisher_silhouette_2D": 0.3322565762399727,
+      "source_train_silhouette_full_d": 0.46615016261738373,
+      "target_train_Fisher_silhouette_2D": 0.45740803050893564,
+      "target_train_silhouette_full_d": 0.44464857006757175,
+      "source_train_basis": [
+        [
+          -0.5466088135764692,
+          -0.9653954133867253
+        ],
+        [
+          3.4482315854959977,
+          -1.1270134725672718
+        ],
+        [
+          -1.4352347939265127,
+          -2.340042079564073
+        ]
+      ],
+      "target_train_basis": [
+        [
+          1.766871384209475,
+          2.0217043183780508
+        ],
+        [
+          2.388413787474436,
+          -2.162313694786958
+        ],
+        [
+          -1.6759064994753066,
+          -0.9501773126947204
+        ]
+      ],
+      "training_cluster_labels_NOT_physical_finger_classes": true,
+      "no_test_data_used_for_Fisher_selection": true,
+      "model_2D_test_plot_from_frozen_full_d_R": true
+    },
+    {
+      "feature": "FA3_FA3",
+      "d": 3,
+      "fold": 1,
+      "train_n_source": 1000,
+      "train_n_target": 1000,
+      "test_n_source": 250,
+      "test_n_target": 250,
+      "source_train_Fisher_silhouette_2D": 0.3871577349414537,
+      "source_train_silhouette_full_d": 0.45386918657247216,
+      "target_train_Fisher_silhouette_2D": 0.3833409476383781,
+      "target_train_silhouette_full_d": 0.46388508296819686,
+      "source_train_basis": [
+        [
+          -1.0361644906120138,
+          0.5285633428157882
+        ],
+        [
+          -2.387354094069976,
+          2.0355507962700776
+        ],
+        [
+          2.2908865477888147,
+          2.360334735583838
+        ]
+      ],
+      "target_train_basis": [
+        [
+          -3.500253002159173,
+          -1.2579188544487856
+        ],
+        [
+          -1.5047865158034945,
+          2.7836922606726517
+        ],
+        [
+          0.35412679244815337,
+          -0.604788096573049
+        ]
+      ],
+      "training_cluster_labels_NOT_physical_finger_classes": true,
+      "no_test_data_used_for_Fisher_selection": true,
+      "model_2D_test_plot_from_frozen_full_d_R": true
+    }
+  ],
+  "note": "Two-dimensional Fisher charts are visual-only and chosen using 1000 training points, never evaluate accuracy in 2D.",
+  "training_points_rendered_each_domain": 1000,
+  "test_points_rendered_each_domain": 250,
+  "test_alignment_status": "frozen existing full local-ADMM R used iff runs-dir provided"
+}
