@@ -152,16 +152,32 @@ def main():
             for dim in dims:
                 for typ in ("PCA","FA"):
                     ztr,zte,re,desc=fits(typ,dim,*src)
-                    wt,we,winfo=whiter(ztr,zte)
-                    km=KMeans(n_clusters=4,n_init=20,random_state=42).fit(wt/np.sqrt(dim))
-                    lab=km.predict(we/np.sqrt(dim))
-                    sil=float(silhouette_score(wt/np.sqrt(dim),km.labels_))
+                    # A saturated 5-factor FA fit to five physical forces
+                    # may have rank-deficient factor scores. Never arbitrarily
+                    # whiten a zero eigenvalue or make up clusters for it.
+                    whiten_error=None
+                    try:
+                        wt,we,winfo=whiter(ztr,zte)
+                        km=KMeans(n_clusters=4,n_init=20,random_state=42).fit(wt/np.sqrt(dim))
+                        lab=km.predict(we/np.sqrt(dim))
+                        sil=float(silhouette_score(wt/np.sqrt(dim),km.labels_))
+                    except ValueError as exc:
+                        if (domain=="target_fivefinger" and typ=="FA" and dim==5) or (domain=="source_EMG" and typ=="FA" and dim==10):
+                            whiten_error=str(exc)
+                            wt=we=None
+                            winfo={"condition":None,"eig_min":None}
+                            lab=None
+                            sil=None
+                        else:
+                            raise
                     reconMSE=np.mean((src[1]-re)**2,axis=0)
                     reconstructR2=1-np.sum((src[1]-re)**2,axis=0)/np.maximum(np.sum(src[1]**2,axis=0),1e-10)
                     info={"fold":holdout,"domain":domain,"method":typ,"d":dim,
                           "train_n":int(len(ztr)),"test_n":int(len(zte)),
                           "K4_train_silhouette":sil,
-                          "test_K4_cluster_sizes":np.bincount(lab,minlength=4).tolist(),
+                          "test_K4_cluster_sizes":np.bincount(lab,minlength=4).tolist() if lab is not None else None,
+                          "embedding_whitening_status":"ok" if whiten_error is None else "SINGULAR_ABSTAIN",
+                          "embedding_whitening_error":whiten_error,
                           "embedding_train_white_eig_condition":winfo["condition"],
                           "embedding_train_white_eig_min":winfo["eig_min"],
                           "heldout_sensor_R2_each_input_channel":reconstructR2.tolist(),
@@ -211,12 +227,14 @@ def main():
             lF=KMeans(4,n_init=20,random_state=42).fit_predict(aF)
             embeds.append({"fold":holdout,"domain":"source_EMG","d":dim,
                 "K4_PCA_vs_FA_train_ARI":float(adjusted_rand_score(lP,lF))})
-            pP=ym["PCA",dim]["trwhite"]/np.sqrt(dim)
-            pF=ym["FA",dim]["trwhite"]/np.sqrt(dim)
-            lP=KMeans(4,n_init=20,random_state=42).fit_predict(pP)
-            lF=KMeans(4,n_init=20,random_state=42).fit_predict(pF)
-            embeds.append({"fold":holdout,"domain":"target_fivefinger","d":dim,
-                "K4_PCA_vs_FA_train_ARI":float(adjusted_rand_score(lP,lF))})
+            # FA5 target scores may have rank < 5: no artificial white geometry.
+            if ym["FA",dim]["trwhite"] is not None:
+                pP=ym["PCA",dim]["trwhite"]/np.sqrt(dim)
+                pF=ym["FA",dim]["trwhite"]/np.sqrt(dim)
+                lP=KMeans(4,n_init=20,random_state=42).fit_predict(pP)
+                lF=KMeans(4,n_init=20,random_state=42).fit_predict(pF)
+                embeds.append({"fold":holdout,"domain":"target_fivefinger","d":dim,
+                    "K4_PCA_vs_FA_train_ARI":float(adjusted_rand_score(lP,lF))})
         print("PREPARED heldout",holdout,"PCA/FA both domains (3,5,10 X; 3,4,5 Y)",
               "OT configs",list(OT_SETTINGS),flush=True)
     # Detail all heldout validation values; files are metadata, not OT inputs
@@ -231,6 +249,7 @@ def main():
       "OT_configs":{k:{"source_method":v[0],"d":v[1],
                        "target_method":v[2],"target_d":v[3]} for k,v in OT_SETTINGS.items()},
       "warnings":["PCA explained variance ratio is not an FA explained variance ratio.",
+                  "FA5 of a 5-channel target can produce singular posterior factor covariance; record SINGULAR_ABSTAIN and keep lossless full5 target for OT.",
                   "FA factor scores are posterior estimates and can shrink common-signal reconstruction.",
                   "Y full 5D is directly whitened; after full-rank whitening PCA5 vs FA5 of Y can differ by an orthogonal basis if invertible; do not advertise 5D FA as recovering more data.",
                   "Ridge probes use paired timestamps on TRAINING trials ONLY; they are supervised diagnostics separate from HiWA OT and hyperparameter selection.",
@@ -302,8 +321,10 @@ def main():
     for ax,domain in zip(axs,["source_EMG","target_fivefinger"]):
         dims=SOURCE_D if domain=="source_EMG" else TARGET_D
         for typ,mark in [("PCA","o"),("FA","s")]:
-            vals=[np.mean([r["K4_train_silhouette"] for r in diagnostics
-                  if r["domain"]==domain and r["method"]==typ and r["d"]==d]) for d in dims]
+            vals=[(float(np.mean(v)) if len(v)>0 else float("nan")) for d in dims
+                  for v in [[r["K4_train_silhouette"] for r in diagnostics
+                              if r["domain"]==domain and r["method"]==typ and r["d"]==d
+                              and r["K4_train_silhouette"] is not None]]]
             ax.plot(dims,vals,marker=mark,label=typ)
         ax.set(title=domain,xticks=dims,xlabel="latent dimension",
                ylabel="K4 train silhouette in whitened features")
