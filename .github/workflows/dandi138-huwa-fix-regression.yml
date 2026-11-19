@@ -1,0 +1,74 @@
+name: DANDI138 actual HiWA optional projection repair bitwise legacy regression and PQR warm initialization control
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-huwa-fix-regression.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  audit-repaired-huwa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Compare with archived pre-edit solver BITWISE, test repaired projected GCOT code, then test exact PQR warm variants
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/test_and_evaluate_corrected_hiwa.py \
+            --output projects/dandi-000138-hiwa-4d/results/hiwa_source_code_repair \
+            --seeds 42 43 44 --outer 300
+      - name: Verify actual old-version exact regression and physical truth absent from algorithm
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/hiwa_source_code_repair')
+          d=json.loads((p/'HIWA_CORRECTED_INITIALIZATION_CONTROL.json').read_text())
+          reg=d['regression']
+          assert reg['exact_regression'] and reg['all_r_p_q_history_elementwise_difference_max']==0
+          assert reg['projection_path_fixed_and_fitted']
+          assert reg['independent_rank2_projection_verified']
+          assert reg['invalid_warm_start_rejected']
+          assert d['all_old_default_behavior_preserved']
+          assert d['true_R_and_group_labels_never_used_in_initialization_or_fitting']
+          assert d['full_P_Q_R_admm_optimized']
+          assert len(d['regimes'])==2
+          for name,v in d['regimes'].items():
+              assert len(v['experiments'])==2
+              for method,rs in v['experiments'].items():
+                  assert len(rs)==3
+                  for s in rs:
+                      assert np.isfinite(s['true_group_matching_mass'])
+                      assert 0<=s['true_group_matching_mass']<=1
+                      assert np.max(np.abs(np.array(s['P']).sum(0)-.25))<1e-6
+                      assert np.linalg.norm(np.array(s['global_R']).T@np.array(s['global_R'])-np.eye(4))<1e-7
+          assert (p/'HIWA_CORRECTED_INITIALIZATION_REPORT.md').stat().st_size>1500
+          print('PASS: exact old solver P/Q/R unchanged by optional code repair and fully verified new experimental warm-start variant')
+          PY
+      - name: Commit report without overwriting existing archived results
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/hiwa_source_code_repair
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish bytewise old/new PQR regression and projected GCOT code fix with independently selected warm rotations'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-HiWA-source-repair-bitwise-regression-and-warmstart
+          path: projects/dandi-000138-hiwa-4d/results/hiwa_source_code_repair
+          if-no-files-found: warn
