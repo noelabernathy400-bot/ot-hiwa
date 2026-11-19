@@ -6,145 +6,163 @@
     {
       "month": "202604",
       "network": "citi-bike-nyc",
-      "url": "https://data.citybik.es/202604-citi-bike-nyc-stats.parquet",
-      "status": 404
+      "url": "https://data.citybik.es/dumps/by-network/2026/202604-citi-bike-nyc-stats.parquet",
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "content_length": "80560872",
+      "last_modified": "Wed, 13 May 2026 09:07:56 GMT"
     },
     {
       "month": "202604",
       "network": "citi-bike",
-      "url": "https://data.citybik.es/202604-citi-bike-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202604-citi-bike-stats.parquet",
       "status": 404
     },
     {
       "month": "202604",
       "network": "citibike-nyc",
-      "url": "https://data.citybik.es/202604-citibike-nyc-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202604-citibike-nyc-stats.parquet",
       "status": 404
     },
     {
       "month": "202604",
       "network": "nyc",
-      "url": "https://data.citybik.es/202604-nyc-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202604-nyc-stats.parquet",
       "status": 404
     },
     {
       "month": "202605",
       "network": "citi-bike-nyc",
-      "url": "https://data.citybik.es/202605-citi-bike-nyc-stats.parquet",
-      "status": 404
+      "url": "https://data.citybik.es/dumps/by-network/2026/202605-citi-bike-nyc-stats.parquet",
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "content_length": "93978191",
+      "last_modified": "Thu, 18 Jun 2026 17:58:04 GMT"
     },
     {
       "month": "202605",
       "network": "citi-bike",
-      "url": "https://data.citybik.es/202605-citi-bike-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202605-citi-bike-stats.parquet",
       "status": 404
     },
     {
       "month": "202605",
       "network": "citibike-nyc",
-      "url": "https://data.citybik.es/202605-citibike-nyc-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202605-citibike-nyc-stats.parquet",
       "status": 404
     },
     {
       "month": "202605",
       "network": "nyc",
-      "url": "https://data.citybik.es/202605-nyc-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202605-nyc-stats.parquet",
       "status": 404
     },
     {
       "month": "202606",
       "network": "citi-bike-nyc",
-      "url": "https://data.citybik.es/202606-citi-bike-nyc-stats.parquet",
-      "status": 404
+      "url": "https://data.citybik.es/dumps/by-network/2026/202606-citi-bike-nyc-stats.parquet",
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "content_length": "109289362",
+      "last_modified": "Thu, 09 Jul 2026 13:03:40 GMT"
     },
     {
       "month": "202606",
       "network": "citi-bike",
-      "url": "https://data.citybik.es/202606-citi-bike-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202606-citi-bike-stats.parquet",
       "status": 404
     },
     {
       "month": "202606",
       "network": "citibike-nyc",
-      "url": "https://data.citybik.es/202606-citibike-nyc-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202606-citibike-nyc-stats.parquet",
       "status": 404
     },
     {
       "month": "202606",
       "network": "nyc",
-      "url": "https://data.citybik.es/202606-nyc-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202606-nyc-stats.parquet",
       "status": 404
     },
     {
       "month": "202607",
       "network": "citi-bike-nyc",
-      "url": "https://data.citybik.es/202607-citi-bike-nyc-stats.parquet",
-      "status": 404
+      "url": "https://data.citybik.es/dumps/by-network/2026/202607-citi-bike-nyc-stats.parquet",
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "content_length": "104722170",
+      "last_modified": "Thu, 13 Aug 2026 09:38:28 GMT"
     },
     {
       "month": "202607",
       "network": "citi-bike",
-      "url": "https://data.citybik.es/202607-citi-bike-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202607-citi-bike-stats.parquet",
       "status": 404
     },
     {
       "month": "202607",
       "network": "citibike-nyc",
-      "url": "https://data.citybik.es/202607-citibike-nyc-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202607-citibike-nyc-stats.parquet",
       "status": 404
     },
     {
       "month": "202607",
       "network": "nyc",
-      "url": "https://data.citybik.es/202607-nyc-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202607-nyc-stats.parquet",
       "status": 404
     },
     {
       "month": "202608",
       "network": "citi-bike-nyc",
-      "url": "https://data.citybik.es/202608-citi-bike-nyc-stats.parquet",
-      "status": 404
+      "url": "https://data.citybik.es/dumps/by-network/2026/202608-citi-bike-nyc-stats.parquet",
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "content_length": "102204689",
+      "last_modified": "Mon, 14 Sep 2026 07:24:18 GMT"
     },
     {
       "month": "202608",
       "network": "citi-bike",
-      "url": "https://data.citybik.es/202608-citi-bike-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202608-citi-bike-stats.parquet",
       "status": 404
     },
     {
       "month": "202608",
       "network": "citibike-nyc",
-      "url": "https://data.citybik.es/202608-citibike-nyc-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202608-citibike-nyc-stats.parquet",
       "status": 404
     },
     {
       "month": "202608",
       "network": "nyc",
-      "url": "https://data.citybik.es/202608-nyc-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202608-nyc-stats.parquet",
       "status": 404
     },
     {
       "month": "202609",
       "network": "citi-bike-nyc",
-      "url": "https://data.citybik.es/202609-citi-bike-nyc-stats.parquet",
-      "status": 404
+      "url": "https://data.citybik.es/dumps/by-network/2026/202609-citi-bike-nyc-stats.parquet",
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "content_length": "99739835",
+      "last_modified": "Wed, 21 Oct 2026 19:25:35 GMT"
     },
     {
       "month": "202609",
       "network": "citi-bike",
-      "url": "https://data.citybik.es/202609-citi-bike-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202609-citi-bike-stats.parquet",
       "status": 404
     },
     {
       "month": "202609",
       "network": "citibike-nyc",
-      "url": "https://data.citybik.es/202609-citibike-nyc-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202609-citibike-nyc-stats.parquet",
       "status": 404
     },
     {
       "month": "202609",
       "network": "nyc",
-      "url": "https://data.citybik.es/202609-nyc-stats.parquet",
+      "url": "https://data.citybik.es/dumps/by-network/2026/202609-nyc-stats.parquet",
       "status": 404
     }
   ]
