@@ -22,6 +22,8 @@ from scipy.ndimage import gaussian_filter1d
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA, FactorAnalysis
 from sklearn.preprocessing import StandardScaler
+from scipy.special import softmax
+from zip_gcot.grouping import soft_groups
 
 from run_hard_clustering import load_trial_windows
 
@@ -98,11 +100,19 @@ def scatter3d(ax,v,labels,subtitle):
     ax.set_title(subtitle,pad=13)
 
 
-def scatter_overlay_3d(ax,x,y,subtitle):
-    ax.scatter(y[:,0],y[:,1],y[:,2],s=3,alpha=.25,c=C_TGT,
-               label="Hand target",rasterized=True)
-    ax.scatter(x[:,0],x[:,1],x[:,2],s=3,alpha=.21,c=C_SRC,
-               label="Aligned neural",rasterized=True)
+def scatter_overlay_3d(ax,x,y,group_labels,subtitle):
+    """Gray target background + FOUR SOURCE cluster colors after fixed R.
+
+    Source cluster IDs are independent of target cluster IDs. For Soft, the
+    argmax of train-fitted source membership is a visualization-only label.
+    """
+    ax.scatter(y[:,0],y[:,1],y[:,2],s=2.2,alpha=.18,c="#60666e",
+               label="Hand target (gray)",rasterized=True)
+    for idx in range(4):
+        mask=group_labels==idx
+        ax.scatter(x[mask,0],x[mask,1],x[mask,2],s=4.3,alpha=.43,
+                   color=PAL[idx],label=f"Neural group {idx+1}",
+                   rasterized=True)
     axes_equal_3d(ax,np.concatenate([x,y]))
     ax.set_xlabel("z1");ax.set_ylabel("z2");ax.set_zlabel("z3")
     ax.set_title(subtitle,pad=13)
@@ -118,49 +128,78 @@ def scatter2d(ax,v,labels,subtitle):
     ax.set_title(subtitle)
 
 
-def scatter_overlay_2d(ax,x,y,subtitle):
-    ax.scatter(y[:,0],y[:,1],s=4,alpha=.27,c=C_TGT,
-               label="Hand target",rasterized=True)
-    ax.scatter(x[:,0],x[:,1],s=4,alpha=.24,c=C_SRC,
-               label="Aligned neural",rasterized=True)
+def scatter_overlay_2d(ax,x,y,group_labels,subtitle):
+    ax.scatter(y[:,0],y[:,1],s=2.6,alpha=.14,c="#60666e",
+               label="Hand target (gray)",rasterized=True)
+    for idx in range(4):
+        mask=group_labels==idx
+        ax.scatter(x[mask,0],x[mask,1],s=4.5,alpha=.38,
+                   color=PAL[idx],label=f"Neural group {idx+1}",
+                   rasterized=True)
     pad_lims_2d(ax,np.concatenate([x,y]))
     ax.set_xlabel("Target Fisher 1");ax.set_ylabel("Target Fisher 2")
     ax.set_title(subtitle)
 
 
-def make_panels(src,tr_x,va_x,tr_y,va_y,lx,ly,Rhard,Rsoft,Wxs,Mxs,Wyt,Myt,dout,
-                use_3d,output):
+def make_panels(src,tr_x,va_x,tr_y,va_y,lx,ly,sx,sy,
+                Rhard,Rsoft,Wxs,Mxs,Wyt,Myt,dout,use_3d,output):
+    """2x3: Hard row and Soft row, each 4 group colors throughout.
+
+    Top left: source hard-KMeans; top middle: independent target hard-KMeans;
+    top right: aligned source HARD labels in four colors + target gray.
+    Bottom: analogous SOFT source/target hard argmax of soft membership,
+    and aligned soft source four colors + target gray.
+    Soft colors are visualization argmax only; the actual OT fit used all
+    soft membership weights. Fisher itself is fit on train Hard KMeans,
+    so both methods share a fixed unsupervised reference subspace.
+    """
     if use_3d:
-        fig=plt.figure(figsize=(19,5.7),layout="constrained")
-        axs=[fig.add_subplot(1,4,j+1,projection="3d") for j in range(4)]
+        fig=plt.figure(figsize=(18,11),layout="constrained")
+        axs=[fig.add_subplot(2,3,j+1,projection="3d") for j in range(6)]
     else:
-        fig,axs=plt.subplots(1,4,figsize=(19,5),layout="constrained")
+        fig,axes=plt.subplots(2,3,figsize=(18,10),layout="constrained")
+        axs=list(axes.flat)
     if Wxs is None:
-        s=va_x;t=va_y
-        ha=va_x@Rhard.T;so=va_x@Rsoft.T
+        source=va_x;target=va_y
+        aligned_hard=va_x@Rhard.T
+        aligned_soft=va_x@Rsoft.T
     else:
-        s=(va_x-Mxs)@Wxs
-        t=(va_y-Myt)@Wyt
-        ha=(va_x@Rhard.T-Myt)@Wyt
-        so=(va_x@Rsoft.T-Myt)@Wyt
+        source=(va_x-Mxs)@Wxs
+        target=(va_y-Myt)@Wyt
+        aligned_hard=(va_x@Rhard.T-Myt)@Wyt
+        aligned_soft=(va_x@Rsoft.T-Myt)@Wyt
     if use_3d:
-        scatter3d(axs[0],s,lx,"Neural source: independent groups")
-        scatter3d(axs[1],t,ly,"Hand target: independent groups")
-        scatter_overlay_3d(axs[2],ha,t,"Hard-HiWA vs target")
-        scatter_overlay_3d(axs[3],so,t,"Soft-GCOT vs target")
+        scatter3d(axs[0],source,lx,"Hard source: 4 KMeans groups")
+        scatter3d(axs[1],target,ly,"Hard target: independent groups")
+        scatter_overlay_3d(axs[2],aligned_hard,target,lx,
+                           "Hard aligned SOURCE groups + gray target")
+        scatter3d(axs[3],source,sx,"Soft source: 4 membership argmax groups")
+        scatter3d(axs[4],target,sy,"Soft target: independent argmax groups")
+        scatter_overlay_3d(axs[5],aligned_soft,target,sx,
+                           "Soft aligned SOURCE argmax + gray target")
     else:
-        scatter2d(axs[0],s,lx,"Neural: source Fisher basis")
-        scatter2d(axs[1],t,ly,"Hand: target Fisher basis")
-        scatter_overlay_2d(axs[2],ha,t,"Hard: common TARGET Fisher basis")
-        scatter_overlay_2d(axs[3],so,t,"Soft: common TARGET Fisher basis")
-    axs[2].legend(loc="upper left",fontsize=7)
-    fig.suptitle(f"REAL DANDI:000138 | {src}, validation 80 trials (2800 windows) | "+
-                 ("native 3D / Fisher3" if use_3d else "train-only Fisher2"),
-                 fontsize=15)
-    fig.text(.5,.015,
-             "Independent source/target group numbers and their colors DO NOT represent true matches. "
-             "The two overlaid clouds share the target coordinate basis. Fixed archived seed42, descriptive only.",
-             ha="center",va="bottom",fontsize=8)
+        scatter2d(axs[0],source,lx,"Hard source: 4 KMeans groups")
+        scatter2d(axs[1],target,ly,"Hard target: independent groups")
+        scatter_overlay_2d(axs[2],aligned_hard,target,lx,
+                           "Hard aligned SOURCE groups + gray target")
+        scatter2d(axs[3],source,sx,"Soft source: 4 argmax groups")
+        scatter2d(axs[4],target,sy,"Soft target: independent argmax groups")
+        scatter_overlay_2d(axs[5],aligned_soft,target,sx,
+                           "Soft aligned SOURCE argmax + gray target")
+    for idx in (2,5):
+        axs[idx].legend(loc="upper left",fontsize=7,
+                        markerscale=2.2,framealpha=.9)
+    fig.suptitle(
+        f"REAL DANDI:000138 | {src}, 80 validation trials (2800 windows) | "+
+        ("native 3D / Fisher3" if use_3d else "train-only Fisher2")+
+        " | FOUR cluster colors in all panels",
+        fontsize=15)
+    fig.text(.5,.007,
+        "Top row HARD, bottom row SOFT. All four source group colors are retained AFTER alignment; "
+        "GRAY is target background in overlays. Source/target cluster ID colors are independent "
+        "(not known matches). Soft labels are argmax for display ONLY; training remains weighted. "
+        "Overlay uses TARGET Fisher basis, fixed seed42.",
+        ha="center",va="bottom",fontsize=8,wrap=True)
     fig.savefig(output,dpi=185,bbox_inches="tight",facecolor="white")
     plt.close(fig)
     return output
@@ -229,6 +268,9 @@ def main():
         "R_seed":42,"R_selection":"fixed for illustration only, no physical matching cherry-pick",
         "no_old_test_used":True,
         "separate_source_target_cluster_colors_not_same_labels":True,
+        "all_postfit_overlays_preserve_four_source_colors":True,
+        "postfit_target_overlay_gray_background_only":True,
+        "soft_argmax_colors_visual_only_full_probabilities_train":True,
         "plots":{},
         "fisher_diagnostics":{}
     }
@@ -272,6 +314,16 @@ def main():
         kx=KMeans(n_clusters=4,n_init=20,random_state=42).fit(X[trmask])
         ky=KMeans(n_clusters=4,n_init=20,random_state=42).fit(Y[trmask])
         lx=kx.predict(X[vamask]);ly=ky.predict(Y[vamask])
+        # Actual independently fitted soft KMeans/prototype memberships.
+        # Visualization uses argmax only; OT has already been trained using
+        # original continuous weights, no cross-domain matching labels.
+        _,prototype_x,_=soft_groups(X[trmask],4,seed=42,
+                                    entropy_weight=1.,maxiter=300)
+        _,prototype_y,_=soft_groups(Y[trmask],4,seed=43,
+                                    entropy_weight=1.,maxiter=300)
+        sx=softmax(X[vamask]@prototype_x.T,axis=1).argmax(1)
+        sy=softmax(Y[vamask]@prototype_y.T,axis=1).argmax(1)
+        assert set(sx)==set(sy)=={0,1,2,3}
         tr_x=X[trmask];tr_y=Y[trmask]
         va_x=X[vamask];va_y=Y[vamask]
         hard=np.asarray([r for r in arch["Hard"] if r["seed"]==42][0]["R"])
@@ -284,8 +336,8 @@ def main():
             wt,mt,evt=fisher(tr_y,ky.labels_,fisher_dim)
             stem=f"{feature}_FISHER{fisher_dim}"
             outfile=out/f"{stem}_SPLIT_AND_ALIGNED.png"
-            make_panels(feature,tr_x,va_x,tr_y,va_y,lx,ly,hard,soft,
-                       ws,ms,wt,mt,fisher_dim,fisher_dim==3,outfile)
+            make_panels(feature,tr_x,va_x,tr_y,va_y,lx,ly,sx,sy,
+                       hard,soft,ws,ms,wt,mt,fisher_dim,fisher_dim==3,outfile)
             recon["plots"][stem]=outfile.name
             recon["fisher_diagnostics"][stem]={
                 "source_train_fisher_eigenvalues":evs.tolist(),
@@ -295,8 +347,8 @@ def main():
             }
         if dim==3:
             outfile=out/f"{feature}_NATIVE3D_SPLIT_AND_ALIGNED.png"
-            make_panels(feature,tr_x,va_x,tr_y,va_y,lx,ly,hard,soft,
-                       None,None,None,None,3,True,outfile)
+            make_panels(feature,tr_x,va_x,tr_y,va_y,lx,ly,sx,sy,
+                       hard,soft,None,None,None,None,3,True,outfile)
             recon["plots"][f"{feature}_NATIVE3D"]=outfile.name
         print("PLOT_DONE",feature,"base",va_x.shape,flush=True)
     (out/"PHYSICAL_SEMANTICS_AND_FISHER.json").write_text(
@@ -324,12 +376,14 @@ def main():
     rows+=["","## Figure directory",""]
     for name,file in recon["plots"].items():
         rows.append(f"- [{name}]({file}) — Real 2800 validation points, "
-                    "separate-domain KMeans pseudocolors; overlay in target domain basis")
+                    "HARD row KMeans four colors; SOFT row membership argmax four colors; "
+                    "aligned source stays four-color over gray target background in target Fisher basis")
     rows+=["",
            "Do not use plot-enhanced Fisher separation as a model scoring metric. "
-           "The Fisher basis is fitted to KMeans pseudo-labels by maximizing "
+           "The Fisher basis is fitted to train HARD KMeans pseudo-labels by maximizing "
            "between/within scatter, so it is explicitly biased towards "
            "making the discovered clusters look separable. "
+           "Soft four-color figures use argmax of independent source/target memberships FOR VISUALIZATION ONLY, not hard groups in fitting. "
            "Neural-source Fisher axes and target-hand Fisher axes differ. "
            "Only third and fourth panels overlay on the same target Fisher axes.",
            "Absolute latent OT scores are not comparable across 3D and 4D; "
