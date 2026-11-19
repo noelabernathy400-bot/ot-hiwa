@@ -1,0 +1,82 @@
+name: DANDI138 corrected original-compatible PQR FULL 4D Hard Soft train-only warmstart and local subspaces
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-full-pqr-author-correction.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  corrected-real-PQR:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install scientific computing dependencies
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Complete full PQR and original physical movement evaluation under original 500/20/45/200
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/compare_corrected_original_hiwa_on_dandi.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --archive projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_RESULTS.json \
+            --clustering-report projects/dandi-000138-hiwa-4d/results/clustering/clustering_report.json \
+            --preflight projects/dandi-000138-hiwa-4d/results/phase1_preflight/PREFLIGHT_DATA_AND_EVALUATION_AUDIT.json \
+            --output projects/dandi-000138-hiwa-4d/results/hiwa_repaired_full_pqr_dandi \
+            --seeds 42 43 44 --outer 500 --inner 20
+      - name: Enforce original 17500 14000 3500 160 and full P Q R no pairing and true physical scoring
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/hiwa_repaired_full_pqr_dandi')
+          r=json.loads((p/'HIWA_DANDI_REAL_SOURCE_CODE_CORRECTION_RESULTS.json').read_text())
+          assert not r['source_target_true_point_pairs_used_in_training']
+          assert not r['source_target_behavior_labels_used_in_training']
+          assert r['train_only_initial_R_selected_by_unpaired_W2']
+          assert r['existing_baseline_unchanged'] and r['all_original_training_rotations_unmodified']
+          assert r['data_levels']=={'all':17500,'train':14000,'test':3500,'solver':160}
+          assert set(r['methods'])=={'hard_warm_full','hard_warm_subspace2','hard_warm_subspace3','soft_warm_full'}
+          assert len(r['training_spectral_candidate_selection']['all_train_costs'])==16
+          for name,rs in r['methods'].items():
+              assert [q['seed'] for q in rs]==[42,43,44]
+              for q in rs:
+                  assert np.max(abs(np.sum(np.array(q['model_P']),axis=0)-.25))<1e-5
+                  assert np.linalg.norm(np.array(q['model_R']).T@np.array(q['model_R'])-np.eye(4))<1e-7
+                  assert np.isfinite(q['original_unpaired_test_free_W2sq'])
+                  assert q['P_Q_nested_heldout_test']['max_Q_marginal_error']<1e-5
+          for name in r['methods']:
+              fn=p/f'{name}_seed42_COMPLETE_P_Q_R.npz'
+              assert fn.stat().st_size>10000,(name,fn)
+              with np.load(fn) as d:
+                  assert 'P' in d.files and 'R' in d.files and all(f'Q_{i}_{j}' in d.files for i in range(4) for j in range(4))
+                  assert len(d['source_indices'])==len(d['target_indices'])==160
+          assert (p/'HIWA_DANDI_REAL_SOURCE_CODE_CORRECTION_REPORT.md').stat().st_size>1000
+          assert (p/'DANDI_FULL_PQR_TRAIN_ONLY_WARMSTART_GEOMETRY.png').stat().st_size>60000
+          print('PASS: full 160-sample P/Q/R old-budget Hard/Soft, original vs projected rank2/3, no paired labels, all physical tests')
+          PY
+      - name: Commit audit while preserving original baseline
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/hiwa_repaired_full_pqr_dandi
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish real DANDI strict unpaired full PQR corrected geometric warmstart and author local subspace ablation'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-full-pqr-original-compatible-repair
+          path: projects/dandi-000138-hiwa-4d/results/hiwa_repaired_full_pqr_dandi
+          if-no-files-found: warn
