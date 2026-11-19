@@ -240,7 +240,7 @@ def main():
     w=.34
     for i,(meth,offset) in enumerate([("hard",-w/2),("soft05",w/2)]):
         means=[next(r for r in summary if r["representation"]==conf and r["method"]==meth)["paired_physical_force_R2_EVAL_ONLY"]["mean"]
-               for conf,d in CONFS]
+               for conf,d in selected]
         ax.bar(pos+offset,means,width=w,label=meth)
     ax.set(xticks=pos,xticklabels=labels,ylabel="R² vs training-mean force baseline",
            title="POSTHOC only: R(Xtest) -> train-only target decoder -> five physical forces")
