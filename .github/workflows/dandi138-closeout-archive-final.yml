@@ -1,0 +1,145 @@
+name: DANDI138 final archive curves snapshots and safety audit ONLY
+on:
+  push:
+    branches:
+      - experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119
+    paths:
+      - .github/workflows/dandi138-closeout-archive-final.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  archive-dandi-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      NUMEXPR_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install figures-only analysis requirements (no new model fit)
+        run: python -m pip install "numpy>=1.26" "matplotlib>=3.8"
+      - name: Build DANDI closeout plots and CSV strictly from existing real archived JSON
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/build_dandi_closeout_figures.py \
+            --three-d projects/dandi-000138-hiwa-4d/results/PCA3_FA3_vs_PCA4_FA4_inner_validation/DANDI_3D_VS_4D_RESULTS.json \
+            --four-d projects/dandi-000138-hiwa-4d/results/PCA4_FA4_inner_validation/DANDI_PCA4_FA4_INNER_VALIDATION_RESULTS.json \
+            --baselines projects/dandi-000138-hiwa-4d/results/closeout_baselines_real_DANDI/DANDI_SA_WA_DAD_ADAPTED_RESULTS.json \
+            --transforms projects/dandi-000138-hiwa-4d/results/target_only_geometry_full/TARGET_TRANSFORM_RESULTS.json \
+            --historical-tau projects/dandi-000138-hiwa-4d/results/controlled_hard_vs_soft_PQ/CONTROLLED_ABLATION.json \
+            --output projects/dandi-000138-hiwa-4d/archive
+      - name: Snapshot ONLY DANDI-specific GitHub workflows into the DANDI subdirectory
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import shutil
+          dst=Path('projects/dandi-000138-hiwa-4d/archive/workflows_snapshot')
+          dst.mkdir(parents=True,exist_ok=True)
+          src=Path('.github/workflows')
+          names=sorted(src.glob('dandi138*.yml'))
+          assert len(names)>=30,len(names)
+          for p in names:
+              shutil.copy2(p,dst/p.name)
+          assert not any('hyser' in p.name.lower() for p in dst.glob('*.yml'))
+          print('SNAPSHOTTED_DANDI_WORKFLOWS_ONLY',len(names))
+          PY
+      - name: Incorporate readonly Phase1C DANDI-only audit branch delta into DANDI project archive
+        run: |
+          git fetch origin refs/heads/experiment/dandi-phase1-multiinstance-pilot-20261119:refs/remotes/origin/experiment/dandi-phase1-multiinstance-pilot-20261119
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          base='origin/experiment/dandi-phase1-multiinstance-pilot-20261119'
+          root=Path('projects/dandi-000138-hiwa-4d/archive/phase1c_readonly_snapshot')
+          docs=[
+              'PHASE1C_GENUINE_OVERLAP_RESULT_AUDIT_20261119.md',
+              'PHASE1_PILOT_AUDIT_20261119.md',
+              'PHASE1_REPRODUCIBILITY_FREEZE_20261119.md'
+          ]
+          scripts=[
+              'phase1_multiinstance_hard_pilot.py',
+              'phase1c_overlap_and_recovery.py',
+              'phase1c_spectral_identifiability_audit.py'
+          ]
+          workflows=[
+              'dandi138-phase1-multiinstance-pilot.yml',
+              'dandi138-phase1-outer500-convergence.yml',
+              'dandi138-phase1c-genuine-overlap-hard-full.yml',
+              'dandi138-phase1c-overlap-preflight.yml',
+              'dandi138-phase1c-spectral-identifiability-audit.yml'
+          ]
+          for sub,names in [('reports',docs),('code',scripts),('workflows',workflows)]:
+              for name in names:
+                  path=('.github/workflows/'+name) if sub=='workflows' else (
+                      'projects/dandi-000138-hiwa-4d/'+('code/' if sub=='code' else '')+name)
+                  b=subprocess.run(['git','show',base+':'+path],
+                                     capture_output=True,check=True).stdout
+                  target=root/sub/name
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  target.write_bytes(b)
+          (root/'SOURCE_BRANCH_AND_SCOPE.md').write_text(
+              '# Read-only DANDI Phase1C audit snapshot\n\n'
+              'Source branch: experiment/dandi-phase1-multiinstance-pilot-20261119.\n'
+              'Snapshot 3 DANDI MD audit reports, 3 DANDI python scripts, 5 DANDI workflow definitions.\n'
+              'These are numerical/synthetic audits, not direct real DANDI matched-kinematics results.\n'
+              'Copied to preserve all DANDI work without merging unrelated or historical experiments.\n')
+          assert len(list(root.rglob('*.md')))==4
+          assert len(list(root.rglob('*.py')))==3
+          assert len(list(root.rglob('*.yml')))==5
+          print('PHASE1C_SNAPSHOT_COMPLETE 3 reports 3 code 5 workflow')
+          PY
+      - name: Verify all DANDI closeout documents, curves, provenance, no Hyser writes
+        run: |
+          python - <<'PY'
+          import json,csv
+          from pathlib import Path
+          root=Path('projects/dandi-000138-hiwa-4d/archive')
+          docs=['FINAL_EXPERIMENT_SUMMARY_ZH.md','NEXT_EXPERIMENT_WORKFLOW_ZH.md',
+                'METHODS_AND_PARAMETERS_ZH.md','ARCHIVE_AND_PROVENANCE_INDEX_ZH.md']
+          for doc in docs:
+              p=root/doc;assert p.is_file() and p.stat().st_size>4500,doc
+          manifest=json.loads((root/'FIGURES_EVIDENCE_MANIFEST.json').read_text())
+          assert len(manifest['plots'])==6,manifest['plots']
+          assert len(manifest['tables'])==4,manifest['tables']
+          assert manifest['requested_overlap_rate_vs_matching_curve_status'].startswith('NOT RUN')
+          assert 'leakage' in manifest['tau_curve_status'].lower()
+          for f in manifest['plots']:
+              assert (root/'figures'/f).stat().st_size>20000,f
+          for f in manifest['tables']:
+              with (root/'tables'/f).open() as p:
+                  assert len(list(csv.reader(p)))>3
+          x=(root/'tables/DANDI_SAME_VALIDATION_METHOD_COMPARISON.csv').read_text()
+          assert 'DAD_like_3D' in x and 'SA' in x and 'WA' in x
+          assert 'FA3' in x and 'FA4' in x
+          assert len(list((root/'workflows_snapshot').glob('*.yml')))>=30
+          assert len(list((root/'phase1c_readonly_snapshot').rglob('*.py')))==3
+          docs_all=(root/'FINAL_EXPERIMENT_SUMMARY_ZH.md').read_text()
+          assert 'Soft-GCOT' in docs_all and 'Hard-HiWA' in docs_all
+          print('PASS final DANDI-only archive documents 6 real figures 4 CSVs, DAD status and historical leakage disclosure')
+          PY
+          if git status --short | grep 'experiments/hyser/'; then
+              echo 'FORBIDDEN HYser changes detected' && exit 1
+          fi
+      - name: Commit all DANDI snapshots charts and evidence ONLY under DANDI folder
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/archive
+          if ! git diff --cached --quiet; then
+            git commit -m 'Finalize DANDI-only evidence archive with actual curves, all workflows and Phase1C snapshots'
+            git pull --rebase origin experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119
+            git push origin HEAD:experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-FINAL-RESEARCH-ARCHIVE
+          path: projects/dandi-000138-hiwa-4d/archive
+          if-no-files-found: warn
