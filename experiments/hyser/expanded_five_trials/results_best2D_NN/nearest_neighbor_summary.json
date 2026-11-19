@@ -1,0 +1,58 @@
+[
+  {
+    "config": "PCA5_RAW5",
+    "method": "hard",
+    "n_runs": 10,
+    "target_nn_coverage_fraction": 0.39879999999999993,
+    "nn_retrieval_physical_neighbor_fraction": 0.0996,
+    "nn_retrieval_exact_time_index_fraction": 0.004,
+    "nn_retrieval_top5_time_index_fraction": 0.027600000000000003,
+    "nn_retrieval_physical_neighbor_error_mean": 1.1498730191971522,
+    "paired_aligned_distance_lt_r_fraction": 0.038,
+    "identity_nn_retrieval_physical_neighbor_fraction": 0.0336,
+    "random_target_assignment_hit_mean": 0.0934096,
+    "mean_threshold": 0.3788071766843385
+  },
+  {
+    "config": "PCA5_RAW5",
+    "method": "soft05",
+    "n_runs": 10,
+    "target_nn_coverage_fraction": 0.40759999999999996,
+    "nn_retrieval_physical_neighbor_fraction": 0.12000000000000002,
+    "nn_retrieval_exact_time_index_fraction": 0.0036000000000000003,
+    "nn_retrieval_top5_time_index_fraction": 0.027600000000000003,
+    "nn_retrieval_physical_neighbor_error_mean": 1.1269555559441846,
+    "paired_aligned_distance_lt_r_fraction": 0.0748,
+    "identity_nn_retrieval_physical_neighbor_fraction": 0.0336,
+    "random_target_assignment_hit_mean": 0.0934096,
+    "mean_threshold": 0.3788071766843385
+  },
+  {
+    "config": "FA5_RAW5",
+    "method": "hard",
+    "n_runs": 10,
+    "target_nn_coverage_fraction": 0.45599999999999996,
+    "nn_retrieval_physical_neighbor_fraction": 0.12079999999999999,
+    "nn_retrieval_exact_time_index_fraction": 0.007600000000000001,
+    "nn_retrieval_top5_time_index_fraction": 0.0332,
+    "nn_retrieval_physical_neighbor_error_mean": 1.0580168843522952,
+    "paired_aligned_distance_lt_r_fraction": 0.0632,
+    "identity_nn_retrieval_physical_neighbor_fraction": 0.040799999999999996,
+    "random_target_assignment_hit_mean": 0.0934096,
+    "mean_threshold": 0.3788071766843385
+  },
+  {
+    "config": "FA5_RAW5",
+    "method": "soft05",
+    "n_runs": 10,
+    "target_nn_coverage_fraction": 0.48999999999999994,
+    "nn_retrieval_physical_neighbor_fraction": 0.13599999999999998,
+    "nn_retrieval_exact_time_index_fraction": 0.007600000000000001,
+    "nn_retrieval_top5_time_index_fraction": 0.036000000000000004,
+    "nn_retrieval_physical_neighbor_error_mean": 1.023093881502668,
+    "paired_aligned_distance_lt_r_fraction": 0.06920000000000001,
+    "identity_nn_retrieval_physical_neighbor_fraction": 0.040799999999999996,
+    "random_target_assignment_hit_mean": 0.0934096,
+    "mean_threshold": 0.3788071766843385
+  }
+]
