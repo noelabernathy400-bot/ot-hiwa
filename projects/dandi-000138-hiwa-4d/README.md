@@ -1,5 +1,19 @@
 # DANDI 000138 · 四维 HiWA / Soft-GCOT 严格无监督实验
 
+## 2026-11-19 · 原作者源码审计、实际代码修复、合成与真实数据再验证
+
+**关键结论：**独立转写 MATLAB 的一整轮HiWA更新，与我们的R/P/Q/ADMM计算在浮点精度内一致；从Git历史读取修复前求解器，与修复后默认模式比较所有R/P/16组Q和迭代历史**差异为0**。没有发现导致原失败的核心公式转置错误。真正的代码缺失是原GCOT可选projections接口调用不存在的zip_gcot.preprocessing模块，现已补全，新增源/目标各自组子空间投影及训练边际的无配对旋转初值，**不改变归档默认求解**。
+
+**正向对照：**在原作者式D6环境维、d2簇内在维度、S5的三组合成数据中，12次作者预算和当前预算/投影对比均恢复≥99.8%真实组P质量。以前失败的D4/K4合成数据在TRAIN协方差谱旋转暖启动后，完整原Hard P/Q/R求解达到清晰簇100%、重叠簇约99%真实类迁移。
+
+**真实DANDI上仍未恢复：**新Hard/Soft的完整P/Q/R训练及rank2/rank3本地子空间投影没有让运动位置/方向跨试次匹配优于恒等旋转，说明纯初始化改变尚无法解决当前表示的物理对齐。原100测试trial此前已反复观察，后续表示选择要在训练trial内部验证。
+
+[完整审计、算法修复证据和数值结论](CODE_AUDIT_AND_FIX_2026-11-19.md) · [独立MATLAB公式检查](results/author_matlab_code_audit/HIWA_AUTHOR_SOURCE_AUDIT_REPORT.md) · [修复前后完全一致的回归及暖启动正向对照](results/hiwa_source_code_repair/HIWA_CORRECTED_INITIALIZATION_REPORT.md) · [新完整P/Q/R真实数据报告](results/hiwa_repaired_full_pqr_dandi/HIWA_DANDI_REAL_SOURCE_CODE_CORRECTION_REPORT.md)
+
+---
+
+
+
 ## 2026-11-19 · 第一轮前提实验已完成（含失败的正向对照）
 
 **结论：有运动相关的神经簇结构，但目前不能直接启动Hard/Soft大规模对比。** PCA4神经硬簇与瞬时速度八方向的标准化MI=0.110（试次置换95%界限0.0367），与手部位置象限MI=0.307。真实跨试次物理1NN检索：Hard五种子位置10%容差平均10.44%、速度30°容差平均18.36%，恒等匹配9.69%、20.29%；Hard仅2/5初值有明显物理改善，Soft 0/5且严格ADMM0/5。
