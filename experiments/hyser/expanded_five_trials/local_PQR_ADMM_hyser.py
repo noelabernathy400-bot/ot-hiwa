@@ -23,8 +23,20 @@ from scipy.special import softmax
 HERE=Path(__file__).resolve().parent
 REPO=HERE.parents[2] # expanded_five_trials -> hyser -> experiments -> repo
 sys.path.insert(0,str(REPO))
+import src.cc_hiwa.soft_hiwa as sh
 from src.cc_hiwa.soft_hiwa import SoftHiWA
+from rectangular_group_ot import group_entropic_transport
 from heldout_best2d_and_nn import train_radius,evaluate,random_baseline
+
+# Equivalent cost + entropy + group marginals, numerically stable dual solution.
+# Scoped to this script; DOES NOT change the repository-wide solver behavior.
+# The original direct kernel scaling may fail because exp(-cost/gamma) underflows.
+def stable_group_P(C,gamma,maxiter):
+    n,m=C.shape
+    alpha=np.full(n,1./n)
+    beta=np.full(m,1./m)
+    return group_entropic_transport(C,alpha,beta,eps=gamma,tol=1e-9)
+
 
 K=4
 D=5
@@ -95,6 +107,7 @@ def main():
     p.add_argument("--save-first-Q",action="store_true")
     args=p.parse_args()
     args.out.mkdir(parents=True,exist_ok=True)
+    sh.sinkhorn_groups=stable_group_P
     rows=[]
     for conf in args.configs:
         for fold in args.folds:
@@ -186,6 +199,7 @@ def main():
        "different_from_prior_96_anchor_global_R":True,
        "source_and_target_sampled_independently":True,
        "local_solver":"repo.src.cc_hiwa.soft_hiwa.SoftHiWA full support with hard one-hot vs soft K-means",
+       "numerical_P_solver":"stable dual-root/log-Sinkhorn for same entropic group OT objective and same gamma; original direct-kernel solver underflowed",
        "physical_correspondence_only_evaluation":True,
        "runs":rows},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     summary=[]
