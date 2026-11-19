@@ -1,0 +1,26 @@
+[
+  {
+    "config": "PCA5_RAW5",
+    "method": "hard",
+    "n_runs": 1,
+    "coverage": 0.468,
+    "physical_hit": 0.024,
+    "exact_index": 0.0,
+    "random_hit": 0.057904000000000004,
+    "last_primal": 0.2585281467267435,
+    "converged_count": 0,
+    "last_group_marginal": 1.1102230246251565e-16
+  },
+  {
+    "config": "PCA5_RAW5",
+    "method": "soft05",
+    "n_runs": 1,
+    "coverage": 0.432,
+    "physical_hit": 0.02,
+    "exact_index": 0.004,
+    "random_hit": 0.057904000000000004,
+    "last_primal": 0.09985490487952488,
+    "converged_count": 1,
+    "last_group_marginal": 5.551115123125783e-17
+  }
+]
