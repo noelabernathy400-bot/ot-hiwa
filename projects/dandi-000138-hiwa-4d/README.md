@@ -1,5 +1,29 @@
 # DANDI 000138 · 四维 HiWA / Soft-GCOT 严格无监督实验
 
+## 2026-11-19 · PCA4 与 FA4 在真实162维神经数据上的实际对照（首个内部验证）
+
+**已运行并保存结果，不是计划。** 原DANDI:000138完整NWB历史文件SHA核对成功（1188ddf5...），重新分箱162神经元、sqrt、40ms时间平滑，分别在原400个train trials的**320 trial训练/80 trial验证**重新拟合PCA4和FA4，原100 test trials完全不用；Target始终为原4D手位置/速度。所有源/目标分簇独立，Hard/Soft完整求解P/Q/R，K4/每域160实际OT点、相同外500/内20/样本Sinkhorn45/组Sinkhorn200、3共同求解种子42—44。不使用跨域样本配对或真实行为标签参与拟合。实测FA4在7个EM迭代收敛。
+
+| 指标 | PCA4 | FA4 |
+|---|---:|---:|
+| 神经KMeans轮廓系数 | **0.351** | 0.334 |
+| 验证簇与运动方向归一化互信息 | **0.119** | 0.114 |
+| Hard未配对验证自由W2²（各自表征尺度） | 0.416 | **0.360** |
+| Hard物理位置10%容差命中 | 6.42% | **9.06%** |
+| Hard物理速度30°容差命中 | 13.33% | **18.02%** |
+| Soft物理位置10%容差命中 | 6.63% | **8.33%** |
+| Soft物理速度30°容差命中 | 14.29% | **15.57%** |
+| Hard严格ADMM | 3/3 | 3/3 |
+| Soft严格ADMM | 0/3 | 0/3 |
+
+**结论不能写成FA完全成功或数据已达上限。** 同一val的随机目标位置命中10%、速度方向13.20%，PCA4直接最近邻（恒等R）位置10.61%、方向17.39%。FA4 Hard略改善PCA4 Hard但位置仍低于随机候选，方向也不明显超过PCA无旋转；两个表征的神经簇运动语义都弱。FA4变更源域测度，不可仅凭两个表征的W2数值差异宣布物理迁移优劣；Soft未数值收敛，不能宣称Soft机制失败。应在原400训练试次内多个独立折复核，再考虑适合运动语义的非线性/时滞/3D嵌入，而不是反复利用已有100 test trials挑参。
+
+[完整中文实验结果和多种评价](results/PCA4_FA4_inner_validation/DANDI_PCA4_FA4_REPORT_ZH.md) · [PCA4/FA4聚类信息图](results/PCA4_FA4_inner_validation/DANDI_PCA4_FA4_FEATURE_CLUSTER_COMPARISON.png) · [Hard/Soft真实物理匹配与无配对W2对照图](results/PCA4_FA4_inner_validation/DANDI_PCA4_FA4_HARD_SOFT_PHYSICAL_OT.png) · [逐种子完整P、R与P/Q误差审计JSON](results/PCA4_FA4_inner_validation/DANDI_PCA4_FA4_INNER_VALIDATION_RESULTS.json) · [可复现原始NWB实验代码](code/compare_pca4_fa4_inner_train_ot.py)
+
+---
+
+
+
 ## 2026-11-19 · 原作者源码审计、实际代码修复、合成与真实数据再验证
 
 **关键结论：**独立转写 MATLAB 的一整轮HiWA更新，与我们的R/P/Q/ADMM计算在浮点精度内一致；从Git历史读取修复前求解器，与修复后默认模式比较所有R/P/16组Q和迭代历史**差异为0**。没有发现导致原失败的核心公式转置错误。真正的代码缺失是原GCOT可选projections接口调用不存在的zip_gcot.preprocessing模块，现已补全，新增源/目标各自组子空间投影及训练边际的无配对旋转初值，**不改变归档默认求解**。
