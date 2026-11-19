@@ -1,0 +1,85 @@
+name: Hyser true five-finger 5D K4-vs-K5 Hard/Soft trial-heldout comparison
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-5d-k4-k5-pilot.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Fetch the newly archived source-verified five-finger five-dimensional folds
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_5d"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_s01_s1_5fingers_5D_folds_v1.zip \
+            --dir "$RUNNER_TEMP/hyser_5d"
+          unzip -q "$RUNNER_TEMP/hyser_5d/hyser_s01_s1_5fingers_5D_folds_v1.zip" \
+            -d "$RUNNER_TEMP/hyser_5d"
+          test -f "$RUNNER_TEMP/hyser_5d/trial_heldout_5_5d.npz"
+      - name: Same five-dimensional physical inputs; Hard vs Soft, four clusters
+        run: |
+          python experiments/hyser/expanded_five_trials/run_fivefinger_5d_K4_K5.py \
+            --data-dir "$RUNNER_TEMP/hyser_5d" \
+            --out experiments/hyser/expanded_five_trials/results_5D_K4 \
+            --k 4 --seeds 42 43 --folds 1 2 3 4 5 --anchors 96 --outer 45
+      - name: Same five-dimensional physical inputs; Hard vs Soft, five clusters
+        run: |
+          python experiments/hyser/expanded_five_trials/run_fivefinger_5d_K4_K5.py \
+            --data-dir "$RUNNER_TEMP/hyser_5d" \
+            --out experiments/hyser/expanded_five_trials/results_5D_K5 \
+            --k 5 --seeds 42 43 --folds 1 2 3 4 5 --anchors 96 --outer 45
+      - name: Verify 40 trials and 5D objective dimensions
+        run: |
+          python - <<'PY'
+          import json,pathlib,numpy as np
+          base=pathlib.Path("experiments/hyser/expanded_five_trials")
+          for K in (4,5):
+            o=json.loads((base/f"results_5D_K{K}/results_all.json").read_text())
+            assert len(o["runs"])==20,(K,len(o["runs"]))
+            for r in o["runs"]:
+              assert r["K"]==K
+              assert np.array(r["P"]).shape==(K,K)
+              assert np.array(r["R"]).shape==(5,5)
+              assert r["pair_synchrony_never_used_in_training"]
+              assert "after" in r["heldout_common_hard_K_reference"]
+              assert r["train"]["training_result_at_final_global_R"]["marginal_max"]<1e-5
+          print("Verified 40 runs / five trials / five dimensions")
+          PY
+      - name: Save isolated 5D runs; preserve original 3D benchmarks
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_5D_K4 \
+                  experiments/hyser/expanded_five_trials/results_5D_K5
+          if ! git diff --cached --quiet; then
+            git commit -m "Archive true-five-finger five-dimensional Hyser K4/K5 Hard-Soft trial-heldout comparisons"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-5d-k4-k5-numerical-control
+          path: |
+            experiments/hyser/expanded_five_trials/results_5D_K4/
+            experiments/hyser/expanded_five_trials/results_5D_K5/
+          if-no-files-found: warn
+          retention-days: 90
