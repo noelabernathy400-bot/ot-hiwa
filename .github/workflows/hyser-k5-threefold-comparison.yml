@@ -60,6 +60,7 @@ jobs:
           git add experiments/hyser/expanded_five_trials/results_K5_3D
           if ! git diff --cached --quiet; then
             git commit -m "Record 3D Hyser fivefold K5 Hard/Soft independent cluster results"
+            git pull --rebase origin main
             git push origin HEAD:main
           fi
       - uses: actions/upload-artifact@v4
