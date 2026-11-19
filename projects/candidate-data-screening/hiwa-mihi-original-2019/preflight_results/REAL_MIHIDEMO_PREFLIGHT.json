@@ -1,0 +1,86 @@
+{
+  "dataset": "Authors original PyHiWA real monkey center-out reaching (mihi_demo.mat)",
+  "source": "https://github.com/nerdslab/PyHiWA/blob/master/data/mihi_demo.mat",
+  "original_file_sha256": "907bc78863d9488ef352eaad8af8296bc28484d5a49591309b1c8576c6009f8c",
+  "file_bytes": 105990,
+  "keys_and_shapes": {
+    "Tte": [
+      803,
+      1
+    ],
+    "Ttr": [
+      623,
+      1
+    ],
+    "Xte": [
+      803,
+      2
+    ],
+    "Xtr": [
+      623,
+      2
+    ],
+    "Yte": [
+      803,
+      187
+    ],
+    "Ytr": [
+      623,
+      174
+    ]
+  },
+  "source_label_counts": {
+    "3": 229,
+    "4": 210,
+    "5": 197,
+    "7": 167
+  },
+  "target_label_counts": {
+    "3": 177,
+    "4": 161,
+    "5": 150,
+    "7": 135
+  },
+  "same_direction_class_set": true,
+  "finite_source_and_target": true,
+  "neural_nonconstant_input_channels": 154,
+  "source_3d": "authors FA3 on nonconstant Yte neural source, norm by unpaired RMS",
+  "target_3d": "authors hand 2D (x,y,sqrt(x2+y2)), norm by unpaired RMS",
+  "neural_FA3_niter": 21,
+  "neural_KMeans_four_groups": {
+    "counts": [
+      283,
+      207,
+      214,
+      99
+    ],
+    "silhouette": 0.42511688339416037,
+    "posthoc_nmi_vs_real_direction": 0.41308352631903866,
+    "posthoc_ARI_vs_real_direction": 0.2734507905567831
+  },
+  "hand_KMeans_four_groups": {
+    "counts": [
+      136,
+      72,
+      112,
+      303
+    ],
+    "silhouette": 0.5427344788915942,
+    "posthoc_nmi_vs_real_direction": 0.3718950610670579,
+    "posthoc_ARI_vs_real_direction": 0.18179377511552614
+  },
+  "posthoc_four_true_direction_centroid_distance_geometry_correlation": {
+    "Pearson": 0.9236593388576881,
+    "Spearman": 0.8285714285714287
+  },
+  "posthoc_synchronized_Xte_Yte_pairwise_distance_correlation_15k_pairs": {
+    "Pearson": 0.6299819824862162,
+    "Spearman": 0.6334791059334676
+  },
+  "LABELS_NEVER_USED_FOR_OT_FITTING": true,
+  "only_unsupervised_kmeans_and_fa_fitted": true,
+  "author_original_demo_was_not_strict_unpaired_group_discovery": true,
+  "no_trial_metadata_verified": true,
+  "not_claiming_generalized_performance": true,
+  "plot": "MIHI_REAL_DATA_PREFLIGHT_K4_SOURCE_TARGET_3D.png"
+}
