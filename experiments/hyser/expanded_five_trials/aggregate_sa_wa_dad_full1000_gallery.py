@@ -67,90 +67,254 @@ def method_rotations(rep,fold,x,y,full,frozen):
     assert all(np.linalg.norm(R.T@R-np.eye(x.shape[1]))<1e-6 for R in m.values())
     return m
 
-def own(ax,z,labels,title):
+def colored_2d(ax, coords, labels, title, xlim=None, ylim=None, legend=False):
+    """One cloud per panel. Source and target KMeans colors are INDEPENDENT."""
+    assert coords.shape == (1000, 2) and labels.shape == (1000,)
     for k in range(4):
-        mask=labels==k
-        ax.scatter(z[mask,0],z[mask,1],s=8,alpha=.52,c=COLORS[k],
-                   linewidths=0,rasterized=True)
-    ax.set_title(title,fontsize=9)
-    ax.set_xlabel("Fisher 1");ax.set_ylabel("Fisher 2");ax.grid(alpha=.1)
+        mask = (labels == k)
+        ax.scatter(coords[mask, 0], coords[mask, 1],
+                   s=7, alpha=.60, c=COLORS[k],
+                   linewidths=0, rasterized=True,
+                   label=f"Own cluster {k + 1}")
+    if xlim is not None:
+        ax.set_xlim(*xlim)
+    if ylim is not None:
+        ax.set_ylim(*ylim)
+    ax.set_aspect("equal", adjustable="box")
+    ax.set(xlabel="Fisher 1", ylabel="Fisher 2")
+    ax.set_title(title, fontsize=9)
+    ax.grid(alpha=.12)
+    if legend:
+        ax.legend(loc="best", fontsize=7, frameon=False, ncol=2)
 
-def overlay(ax,z,tgt,labs,title,xlim,ylim,legend=False):
-    assert len(z)==len(tgt)==len(labs)==1000
-    ax.scatter(tgt[:,0],tgt[:,1],s=10,c="#414952",alpha=.32,
-               linewidths=0,rasterized=True,label="1000 target")
+
+def shared_2d_limits(target, raw_source_in_target, transformed):
+    """Exactly the same x/y ranges for target and ALL method output plots."""
+    clouds = np.vstack((target, raw_source_in_target, *transformed.values()))
+    assert clouds.shape[1] == 2 and np.all(np.isfinite(clouds))
+    lo, hi = clouds.min(axis=0), clouds.max(axis=0)
+    pad = np.maximum((hi - lo) * .055, .08)
+    return ((lo[0] - pad[0], hi[0] + pad[0]),
+            (lo[1] - pad[1], hi[1] + pad[1]))
+
+
+def shared_native3d_limits(target, raw_source, rotations):
+    """Original 3D source & target coordinate system, equal axis units."""
+    clouds = np.vstack((target, raw_source,
+                        *(raw_source @ R.T for R in rotations.values())))
+    assert clouds.shape[1] == 3 and np.all(np.isfinite(clouds))
+    lo, hi = clouds.min(axis=0), clouds.max(axis=0)
+    center = .5 * (lo + hi)
+    half_span = .55 * np.max(hi - lo)
+    assert half_span > 0
+    return tuple((float(c - half_span), float(c + half_span))
+                 for c in center)
+
+
+def colored_native3d(ax, coords, labels, title, limits):
+    """No PCA/Fisher projection: scatter genuine native 3D train features."""
+    assert coords.shape == (1000, 3) and labels.shape == (1000,)
     for k in range(4):
-        mask=labs==k
-        ax.scatter(z[mask,0],z[mask,1],s=8,alpha=.6,c=COLORS[k],
-                   linewidths=0,rasterized=True,label=f"Source group{k+1}")
-    ax.set(xlim=xlim,ylim=ylim,xlabel="Target Fisher 1",ylabel="Target Fisher 2")
-    ax.set_title(title,fontsize=9);ax.grid(alpha=.09)
-    if legend:ax.legend(frameon=False,fontsize=7,ncol=2)
+        ids = labels == k
+        ax.scatter(coords[ids, 0], coords[ids, 1], coords[ids, 2],
+                   s=6, alpha=.62, c=COLORS[k], linewidths=0,
+                   rasterized=True, depthshade=False)
+    ax.set_xlim(*limits[0])
+    ax.set_ylim(*limits[1])
+    ax.set_zlim(*limits[2])
+    ax.set_box_aspect((1, 1, 1))
+    ax.view_init(elev=24, azim=-62)
+    ax.set(xlabel="Coordinate 1", ylabel="Coordinate 2", zlabel="Coordinate 3")
+    ax.set_title(title, fontsize=9, pad=7)
 
-def all_scatter(out,full,frozen,feat):
-    p=out/"figures";p.mkdir(exist_ok=True)
-    indiv=p/"individual_fold1";indiv.mkdir(exist_ok=True)
-    audit=[]
+
+def save_separate_2d_montage(path, rep, fold, source_own, target,
+                             source_labels, target_labels, methods, limits,
+                             source_basis_is_independent=True):
+    """Every method row is Target ONLY | Transformed Source ONLY."""
+    xlim, ylim = limits
+    nrows = 1 + len(methods)
+    fig, axes = plt.subplots(nrows, 2, figsize=(12.7, 3.55 * nrows),
+                             constrained_layout=True)
+    colored_2d(axes[0, 0], source_own, source_labels,
+               "Original EMG source · own TRAIN Fisher")
+    colored_2d(axes[0, 1], target, target_labels,
+               "Original force target · target TRAIN Fisher",
+               xlim=xlim, ylim=ylim)
+    for row, (method, transformed) in enumerate(methods.items(), start=1):
+        colored_2d(axes[row, 0], target, target_labels,
+                   f"TARGET ONLY · {method} · n=1000",
+                   xlim=xlim, ylim=ylim)
+        colored_2d(axes[row, 1], transformed, source_labels,
+                   f"{method} · ALIGNED SOURCE ONLY · n=1000",
+                   xlim=xlim, ylim=ylim)
+    fig.suptitle(
+        f"HySeR {rep}, fold {fold} · full1000 train / modality · seed42\n"
+        "Each row: TARGET alone | ALIGNED SOURCE alone; common axes for ALL methods.\n"
+        "Both domains' cluster colors are learned independently; Fisher 2D only for display.",
+        fontsize=11)
+    fig.savefig(path, dpi=143)
+    plt.close(fig)
+
+
+def save_separate_3d_montage(path, rep, fold, source, target, source_labels,
+                             target_labels, rotations, limits):
+    """Both raw point clouds and every transformed one are TRUE original 3D."""
+    nrows = 1 + len(rotations)
+    fig = plt.figure(figsize=(13.3, 3.65 * nrows), constrained_layout=True)
+    axes = [fig.add_subplot(nrows, 2, j + 1, projection="3d")
+            for j in range(nrows * 2)]
+    colored_native3d(axes[0], source, source_labels,
+                     "Original source 3D · 1000", limits)
+    colored_native3d(axes[1], target, target_labels,
+                     "Original target 3D · 1000", limits)
+    for row, (method, R) in enumerate(rotations.items(), start=1):
+        colored_native3d(axes[2 * row], target, target_labels,
+                         f"TARGET ONLY · {method} · 1000", limits)
+        colored_native3d(axes[2 * row + 1], source @ R.T, source_labels,
+                         f"{method} · SOURCE AFTER · 1000", limits)
+    fig.suptitle(
+        f"HySeR {rep}, fold {fold} · NATIVE 3D (NO 2D PROJECTION)\n"
+        "Target and aligned source are separate panels, same XYZ ranges, equal axes and camera.",
+        fontsize=11)
+    fig.savefig(path, dpi=133)
+    plt.close(fig)
+
+
+def all_scatter(out, full, frozen, feat):
+    p = out / "figures"
+    p.mkdir(exist_ok=True)
+    individual2d = p / "individual_fold1"
+    individual2d.mkdir(exist_ok=True)
+    individual3d = p / "native3D_individual_allfolds"
+    individual3d.mkdir(exist_ok=True)
+    montages3d = p / "native3D_allmethods"
+    montages3d.mkdir(exist_ok=True)
+    audit = []
+    total3d_individual = 0
+    total3d_montage = 0
+
     for rep in REPS:
-        for fold in range(1,6):
-            x,y=features(feat,rep,fold)
-            m=method_rotations(rep,fold,x,y,full,frozen)
-            kmx=KMeans(4,n_init=30,random_state=42).fit(x)
-            kmy=KMeans(4,n_init=30,random_state=43).fit(y)
-            fx=fisher2(x,kmx.labels_)
-            fy=fisher2(y,kmy.labels_)
-            ownsrc=(x-fx["mean"])@fx["basis"]
-            owntgt=(y-fy["mean"])@fy["basis"]
-            zs={name:(x@R.T-fy["mean"])@fy["basis"] for name,R in m.items()}
-            before=(x-fy["mean"])@fy["basis"]
-            both=np.vstack([owntgt,before,*zs.values()])
-            minimum=both.min(axis=0);maximum=both.max(axis=0)
-            pad=np.maximum((maximum-minimum)*.04,.08)
-            xlim=(minimum[0]-pad[0],maximum[0]+pad[0])
-            ylim=(minimum[1]-pad[1],maximum[1]+pad[1])
-            items=[("Before alignment",before),*list(zs.items())]
-            n=2+len(items)
-            nrows=int(math.ceil(n/3))
-            fig,axes=plt.subplots(nrows,3,figsize=(17.5,4.8*nrows),
-                                  constrained_layout=True)
-            aa=list(axes.ravel())
-            own(aa[0],ownsrc,kmx.labels_,"EMG source 1000 · SOURCE-Fisher")
-            own(aa[1],owntgt,kmy.labels_,"Force target 1000 · TARGET-Fisher")
-            for ix,(name,z) in enumerate(items,start=2):
-                overlay(aa[ix],z,owntgt,kmx.labels_,
-                        name+" · 1000 source + 1000 target",xlim,ylim)
-            for ax in aa[n:]:ax.axis("off")
-            fig.suptitle(
-                f"Hyser {rep} | fold {fold} | all 1000 TRAIN points per domain | seed42\n"
-                "Source colors are independent TRAIN KMeans clusters; target gray. "
-                "Fisher is ONLY a display, not a model input.",fontsize=10)
-            name=f"{rep}_FOLD{fold}_ALL1000_Fisher_METHODS.png"
-            fig.savefig(p/name,dpi=145)
-            plt.close(fig)
-            audit.append({"rep":rep,"fold":fold,"file":name,
-                          "source_points_each_method":1000,
-                          "target_points_each_method":1000,
-                          "method_names":list(m),
-                          "source_cluster_counts":np.bincount(kmx.labels_,minlength=4).tolist(),
-                          "target_cluster_counts":np.bincount(kmy.labels_,minlength=4).tolist(),
-                          "test_not_used_to_fit_fisher":True,
-                          "source_target_labels_independent":True})
-            if fold==1:
-                for method,z in zs.items():
-                    fig,ax=plt.subplots(figsize=(7.5,6.0),constrained_layout=True)
-                    overlay(ax,z,owntgt,kmx.labels_,
-                            f"{rep} {method} | ALL 1000 + 1000 TRAIN | Target Fisher2D",
-                            xlim,ylim,legend=True)
-                    name=f"{rep}_FOLD1_{method.replace(' ','_')}_ALL1000_Fisher.png"
-                    fig.savefig(indiv/name,dpi=170)
+        for fold in range(1, 6):
+            x, y = features(feat, rep, fold)
+            m = method_rotations(rep, fold, x, y, full, frozen)
+            kmx = KMeans(4, n_init=30, random_state=42).fit(x)
+            kmy = KMeans(4, n_init=30, random_state=43).fit(y)
+            source_labels, target_labels = kmx.labels_, kmy.labels_
+            fx = fisher2(x, source_labels)
+            fy = fisher2(y, target_labels)
+
+            source_own = (x - fx["mean"]) @ fx["basis"]
+            target_fisher = (y - fy["mean"]) @ fy["basis"]
+            aligned_fisher = {
+                method: (x @ R.T - fy["mean"]) @ fy["basis"]
+                for method, R in m.items()
+            }
+            before = (x - fy["mean"]) @ fy["basis"]
+            limits2d = shared_2d_limits(target_fisher, before, aligned_fisher)
+            name2d = f"{rep}_FOLD{fold}_ALL1000_Fisher_METHODS.png"
+            save_separate_2d_montage(
+                p / name2d, rep, fold, source_own, target_fisher,
+                source_labels, target_labels, aligned_fisher, limits2d
+            )
+            assert (p / name2d).stat().st_size > 30_000
+
+            # The pre-existing 30 paths are deliberately REPLACED with clear
+            # target-only and aligned-source-only side-by-side plots.
+            if fold == 1:
+                for method, transformed in aligned_fisher.items():
+                    fig, axes = plt.subplots(1, 2, figsize=(12.8, 5.35),
+                                             constrained_layout=True)
+                    colored_2d(axes[0], target_fisher, target_labels,
+                               "TARGET ONLY · 1000 train points",
+                               xlim=limits2d[0], ylim=limits2d[1], legend=True)
+                    colored_2d(axes[1], transformed, source_labels,
+                               f"{method} · ALIGNED SOURCE ONLY · 1000 train points",
+                               xlim=limits2d[0], ylim=limits2d[1], legend=True)
+                    fig.suptitle(
+                        f"{rep} · fold1 · {method} · same target-trained Fisher axes"
+                        " and identical limits; separate source/target panels",
+                        fontsize=10)
+                    outname = (f"{rep}_FOLD1_{method.replace(' ', '_')}"
+                               "_ALL1000_Fisher.png")
+                    fig.savefig(individual2d / outname, dpi=169)
                     plt.close(fig)
-            print("FULL1000_FISHER_FIG",rep,fold,flush=True)
-    assert len(audit)==20
-    (out/"scatter_count_audit.json").write_text(json.dumps({
-        "figures":audit,"Fisher2D_only_for_plotting":True,
-        "each_overlay_contains_1000_source_and_1000_target":True,
-        "n_fold_gallery":20
-    },ensure_ascii=False,indent=2)+"\n",encoding="utf8")
+
+            entry = {
+                "rep": rep, "fold": fold, "file": name2d,
+                "source_points_each_method": 1000,
+                "target_points_each_method": 1000,
+                "method_names": list(m),
+                "source_cluster_counts": np.bincount(source_labels, minlength=4).tolist(),
+                "target_cluster_counts": np.bincount(target_labels, minlength=4).tolist(),
+                "test_not_used_to_fit_fisher": True,
+                "source_target_labels_independent": True,
+                "target_and_source_in_separate_2d_panels": True,
+                "exact_same_2d_axes_across_target_and_methods": True,
+                "common_2d_xlimits": list(limits2d[0]),
+                "common_2d_ylimits": list(limits2d[1]),
+            }
+            if x.shape[1] == 3:
+                # Genuine raw three-coordinate point clouds, NOT a
+                # two-dimensional Fisher rendering or '3D-looking' picture.
+                lim3d = shared_native3d_limits(y, x, m)
+                name3d = f"{rep}_FOLD{fold}_ALL1000_NATIVE3D_SEPARATE_METHODS.png"
+                save_separate_3d_montage(
+                    montages3d / name3d, rep, fold, x, y,
+                    source_labels, target_labels, m, lim3d
+                )
+                assert (montages3d / name3d).stat().st_size > 40_000
+                total3d_montage += 1
+
+                # Each method/each fold has its own 2-panel original 3D
+                # scatter with all 1000+1000 genuine train points.
+                for method, R in m.items():
+                    fig = plt.figure(figsize=(12.5, 5.8), constrained_layout=True)
+                    ax1 = fig.add_subplot(1, 2, 1, projection="3d")
+                    ax2 = fig.add_subplot(1, 2, 2, projection="3d")
+                    colored_native3d(ax1, y, target_labels,
+                                     "TARGET ONLY · original 3D · 1000", lim3d)
+                    colored_native3d(ax2, x @ R.T, source_labels,
+                                     f"{method} · SOURCE AFTER · original 3D · 1000",
+                                     lim3d)
+                    fig.suptitle(
+                        f"HySer {rep} · fold {fold} · {method} | common true 3D axes",
+                        fontsize=10)
+                    outname = (f"{rep}_FOLD{fold}_{method.replace(' ', '_')}"
+                               "_NATIVE3D_SEPARATE1000.png")
+                    fig.savefig(individual3d / outname, dpi=166)
+                    plt.close(fig)
+                    total3d_individual += 1
+
+                entry.update({
+                    "native3d_montage": name3d,
+                    "native3d_separate_scatter_original_feature_coordinates": True,
+                    "exact_same_xyz_limits_all_methods": True,
+                    "native3d_xlim_ylim_zlim": [list(v) for v in lim3d],
+                    "native3d_identical_view_and_equal_box_aspect": True,
+                })
+            audit.append(entry)
+            print("FULL1000_SEPARATE_FISHER_NATIVE3D", rep, fold,
+                  "methods", len(m), flush=True)
+
+    assert len(audit) == 20 and total3d_montage == 10
+    assert total3d_individual == 80
+    (out / "scatter_count_audit.json").write_text(
+        json.dumps({
+            "figures": audit,
+            "2D_representation":"TRAIN-fitted target Fisher 2D for after-alignment panels",
+            "3D_representation":"NATIVE original full 3-dimensional model coordinates",
+            "target_and_aligned_source_never_overlaid": True,
+            "target_and_source_separate_panels": True,
+            "exact_same_axes_within_each_target_source_comparison": True,
+            "each_method_draws_all_1000_source_and_all_1000_target": True,
+            "n_fold_gallery_2d": 20,
+            "n_fold_gallery_3d": total3d_montage,
+            "n_single_method_3d_allfold": total3d_individual,
+            "n_single_method_2d_fold1": 30,
+        }, ensure_ascii=False, indent=2) + "\n", encoding="utf8"
+    )
+
 
 def main():
     ap=argparse.ArgumentParser()
