@@ -1,0 +1,2719 @@
+{
+  "runs": [
+    {
+      "config": "PCA3_PCA3",
+      "fold": 1,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4351349785162932
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41480048737994096
+      ],
+      "train_only_threshold": 0.28684104607521,
+      "random_null_hit": 0.07398400000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.768,
+        "target_nn_coverage_distance_mean": 0.2351176506169132,
+        "target_nn_coverage_distance_median": 0.1447252760191362,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.048,
+        "nn_retrieval_physical_neighbor_fraction": 0.064,
+        "nn_retrieval_physical_neighbor_error_mean": 0.9148105826006991,
+        "nn_retrieval_physical_neighbor_error_median": 0.8513078804673868,
+        "paired_aligned_distance_lt_r_fraction": 0.036,
+        "paired_aligned_distance_mean": 0.9506993352603503,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 1,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4351349785162932
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41480048737994096
+      ],
+      "train_only_threshold": 0.28684104607521,
+      "random_null_hit": 0.07398400000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.764,
+        "target_nn_coverage_distance_mean": 0.23604451854358163,
+        "target_nn_coverage_distance_median": 0.14546207527422958,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.048,
+        "nn_retrieval_physical_neighbor_fraction": 0.06,
+        "nn_retrieval_physical_neighbor_error_mean": 0.9130784097420135,
+        "nn_retrieval_physical_neighbor_error_median": 0.8496184292488231,
+        "paired_aligned_distance_lt_r_fraction": 0.036,
+        "paired_aligned_distance_mean": 0.9495502348362341,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 1,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4351349785162932
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41480048737994096
+      ],
+      "train_only_threshold": 0.28684104607521,
+      "random_null_hit": 0.07398400000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.74,
+        "target_nn_coverage_distance_mean": 0.24850445299820484,
+        "target_nn_coverage_distance_median": 0.19221906562377766,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_fraction": 0.032,
+        "nn_retrieval_physical_neighbor_error_mean": 0.9105061235883022,
+        "nn_retrieval_physical_neighbor_error_median": 0.8475496243155329,
+        "paired_aligned_distance_lt_r_fraction": 0.012,
+        "paired_aligned_distance_mean": 0.9759184889887419,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 1,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4351349785162932
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41480048737994096
+      ],
+      "train_only_threshold": 0.28684104607521,
+      "random_null_hit": 0.07398400000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.736,
+        "target_nn_coverage_distance_mean": 0.248506909752206,
+        "target_nn_coverage_distance_median": 0.1917794252692565,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_fraction": 0.032,
+        "nn_retrieval_physical_neighbor_error_mean": 0.909786015424949,
+        "nn_retrieval_physical_neighbor_error_median": 0.8475496243155329,
+        "paired_aligned_distance_lt_r_fraction": 0.012,
+        "paired_aligned_distance_mean": 0.976321379018036,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 2,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4347936553484242
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3112763832153679
+      ],
+      "train_only_threshold": 0.3330927389493023,
+      "random_null_hit": 0.060744000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.872,
+        "target_nn_coverage_distance_mean": 0.22476458643226735,
+        "target_nn_coverage_distance_median": 0.1529717379466452,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.044,
+        "nn_retrieval_physical_neighbor_fraction": 0.088,
+        "nn_retrieval_physical_neighbor_error_mean": 0.9069327338524997,
+        "nn_retrieval_physical_neighbor_error_median": 0.7868877866228897,
+        "paired_aligned_distance_lt_r_fraction": 0.072,
+        "paired_aligned_distance_mean": 0.9812688731153639,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 2,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4347936553484242
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3112763832153679
+      ],
+      "train_only_threshold": 0.3330927389493023,
+      "random_null_hit": 0.060744000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.872,
+        "target_nn_coverage_distance_mean": 0.22891463396632786,
+        "target_nn_coverage_distance_median": 0.15329109679664193,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.052,
+        "nn_retrieval_physical_neighbor_fraction": 0.088,
+        "nn_retrieval_physical_neighbor_error_mean": 0.9039043035797697,
+        "nn_retrieval_physical_neighbor_error_median": 0.7988175993006179,
+        "paired_aligned_distance_lt_r_fraction": 0.076,
+        "paired_aligned_distance_mean": 0.9826200174581982,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 2,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4347936553484242
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3112763832153679
+      ],
+      "train_only_threshold": 0.3330927389493023,
+      "random_null_hit": 0.060744000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.736,
+        "target_nn_coverage_distance_mean": 0.32429465240243766,
+        "target_nn_coverage_distance_median": 0.19497072865557186,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.044,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1199255040918807,
+        "nn_retrieval_physical_neighbor_error_median": 0.9733666849221512,
+        "paired_aligned_distance_lt_r_fraction": 0.052,
+        "paired_aligned_distance_mean": 1.2749108290123603,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 2,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4347936553484242
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3112763832153679
+      ],
+      "train_only_threshold": 0.3330927389493023,
+      "random_null_hit": 0.060744000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.748,
+        "target_nn_coverage_distance_mean": 0.3182759745476635,
+        "target_nn_coverage_distance_median": 0.17932964938626306,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.012,
+        "nn_retrieval_physical_neighbor_fraction": 0.052,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1193417967932353,
+        "nn_retrieval_physical_neighbor_error_median": 0.9733279826854226,
+        "paired_aligned_distance_lt_r_fraction": 0.052,
+        "paired_aligned_distance_mean": 1.2692133515844728,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 3,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.43075891235764957
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.397135955742834
+      ],
+      "train_only_threshold": 0.3256528681889918,
+      "random_null_hit": 0.12007200000000003,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.4,
+        "target_nn_coverage_distance_mean": 0.4227265779861219,
+        "target_nn_coverage_distance_median": 0.37377859383821005,
+        "nn_retrieval_exact_time_index_fraction": 0.02,
+        "nn_retrieval_top5_time_index_fraction": 0.048,
+        "nn_retrieval_physical_neighbor_fraction": 0.064,
+        "nn_retrieval_physical_neighbor_error_mean": 1.065090593361258,
+        "nn_retrieval_physical_neighbor_error_median": 1.079275627183038,
+        "paired_aligned_distance_lt_r_fraction": 0.016,
+        "paired_aligned_distance_mean": 1.2116749905178932,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 3,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.43075891235764957
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.397135955742834
+      ],
+      "train_only_threshold": 0.3256528681889918,
+      "random_null_hit": 0.12007200000000003,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.4,
+        "target_nn_coverage_distance_mean": 0.4238389136532269,
+        "target_nn_coverage_distance_median": 0.3778881950686501,
+        "nn_retrieval_exact_time_index_fraction": 0.02,
+        "nn_retrieval_top5_time_index_fraction": 0.048,
+        "nn_retrieval_physical_neighbor_fraction": 0.06,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0662606655825682,
+        "nn_retrieval_physical_neighbor_error_median": 1.079275627183038,
+        "paired_aligned_distance_lt_r_fraction": 0.016,
+        "paired_aligned_distance_mean": 1.2116080844327322,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 3,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.43075891235764957
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.397135955742834
+      ],
+      "train_only_threshold": 0.3256528681889918,
+      "random_null_hit": 0.12007200000000003,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.536,
+        "target_nn_coverage_distance_mean": 0.384785713757139,
+        "target_nn_coverage_distance_median": 0.31726717676654603,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.028,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1489729759075027,
+        "nn_retrieval_physical_neighbor_error_median": 1.12151230384081,
+        "paired_aligned_distance_lt_r_fraction": 0.004,
+        "paired_aligned_distance_mean": 1.2618404197316337,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 3,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.43075891235764957
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.397135955742834
+      ],
+      "train_only_threshold": 0.3256528681889918,
+      "random_null_hit": 0.12007200000000003,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.54,
+        "target_nn_coverage_distance_mean": 0.3850800242498186,
+        "target_nn_coverage_distance_median": 0.31493205502450516,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.032,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1484749967386596,
+        "nn_retrieval_physical_neighbor_error_median": 1.135710795912325,
+        "paired_aligned_distance_lt_r_fraction": 0.004,
+        "paired_aligned_distance_mean": 1.2609774480744944,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 4,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.41247608423559945
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41483776551183255
+      ],
+      "train_only_threshold": 0.33689159050451467,
+      "random_null_hit": 0.13472800000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.74,
+        "target_nn_coverage_distance_mean": 0.2777233266486646,
+        "target_nn_coverage_distance_median": 0.15704082219520127,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.044,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0669293284611354,
+        "nn_retrieval_physical_neighbor_error_median": 0.9076969995606199,
+        "paired_aligned_distance_lt_r_fraction": 0.032,
+        "paired_aligned_distance_mean": 1.1611031408125978,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 4,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.41247608423559945
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41483776551183255
+      ],
+      "train_only_threshold": 0.33689159050451467,
+      "random_null_hit": 0.13472800000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.744,
+        "target_nn_coverage_distance_mean": 0.27960028666569164,
+        "target_nn_coverage_distance_median": 0.16175873136135066,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.052,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0618875321807395,
+        "nn_retrieval_physical_neighbor_error_median": 0.9087234719314639,
+        "paired_aligned_distance_lt_r_fraction": 0.036,
+        "paired_aligned_distance_mean": 1.1594619035175935,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 4,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.41247608423559945
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41483776551183255
+      ],
+      "train_only_threshold": 0.33689159050451467,
+      "random_null_hit": 0.13472800000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.672,
+        "target_nn_coverage_distance_mean": 0.3368017957227255,
+        "target_nn_coverage_distance_median": 0.2273564272356408,
+        "nn_retrieval_exact_time_index_fraction": 0.012,
+        "nn_retrieval_top5_time_index_fraction": 0.028,
+        "nn_retrieval_physical_neighbor_fraction": 0.06,
+        "nn_retrieval_physical_neighbor_error_mean": 1.102784352077847,
+        "nn_retrieval_physical_neighbor_error_median": 1.0962564298860626,
+        "paired_aligned_distance_lt_r_fraction": 0.036,
+        "paired_aligned_distance_mean": 1.2058971859440661,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 4,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.41247608423559945
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41483776551183255
+      ],
+      "train_only_threshold": 0.33689159050451467,
+      "random_null_hit": 0.13472800000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.668,
+        "target_nn_coverage_distance_mean": 0.3325172421619452,
+        "target_nn_coverage_distance_median": 0.2315606321987737,
+        "nn_retrieval_exact_time_index_fraction": 0.012,
+        "nn_retrieval_top5_time_index_fraction": 0.028,
+        "nn_retrieval_physical_neighbor_fraction": 0.06,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1029443839460396,
+        "nn_retrieval_physical_neighbor_error_median": 1.0981350872722448,
+        "paired_aligned_distance_lt_r_fraction": 0.036,
+        "paired_aligned_distance_mean": 1.205398614003487,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 5,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4195343662274732
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.28716909284957237
+      ],
+      "train_only_threshold": 0.3140570671975377,
+      "random_null_hit": 0.060064000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.344,
+        "target_nn_coverage_distance_mean": 0.48040947453210925,
+        "target_nn_coverage_distance_median": 0.3684910087009615,
+        "nn_retrieval_exact_time_index_fraction": 0.016,
+        "nn_retrieval_top5_time_index_fraction": 0.092,
+        "nn_retrieval_physical_neighbor_fraction": 0.136,
+        "nn_retrieval_physical_neighbor_error_mean": 1.015614978012899,
+        "nn_retrieval_physical_neighbor_error_median": 0.9467067294582681,
+        "paired_aligned_distance_lt_r_fraction": 0.028,
+        "paired_aligned_distance_mean": 1.2195412938575603,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 5,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4195343662274732
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.28716909284957237
+      ],
+      "train_only_threshold": 0.3140570671975377,
+      "random_null_hit": 0.060064000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.352,
+        "target_nn_coverage_distance_mean": 0.4767823571540914,
+        "target_nn_coverage_distance_median": 0.3642250266152735,
+        "nn_retrieval_exact_time_index_fraction": 0.012,
+        "nn_retrieval_top5_time_index_fraction": 0.088,
+        "nn_retrieval_physical_neighbor_fraction": 0.136,
+        "nn_retrieval_physical_neighbor_error_mean": 1.011916129703913,
+        "nn_retrieval_physical_neighbor_error_median": 0.9432160032915939,
+        "paired_aligned_distance_lt_r_fraction": 0.036,
+        "paired_aligned_distance_mean": 1.2022130322856501,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 5,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4195343662274732
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.28716909284957237
+      ],
+      "train_only_threshold": 0.3140570671975377,
+      "random_null_hit": 0.060064000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.504,
+        "target_nn_coverage_distance_mean": 0.5946686291436964,
+        "target_nn_coverage_distance_median": 0.31145714097314775,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.004,
+        "nn_retrieval_physical_neighbor_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_error_mean": 1.7055206076372442,
+        "nn_retrieval_physical_neighbor_error_median": 1.7019261509118742,
+        "paired_aligned_distance_lt_r_fraction": 0.0,
+        "paired_aligned_distance_mean": 1.964677738484419,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_PCA3",
+      "fold": 5,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4195343662274732
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.28716909284957237
+      ],
+      "train_only_threshold": 0.3140570671975377,
+      "random_null_hit": 0.060064000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.504,
+        "target_nn_coverage_distance_mean": 0.6013030283284584,
+        "target_nn_coverage_distance_median": 0.3088438102723159,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.004,
+        "nn_retrieval_physical_neighbor_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_error_mean": 1.715140169333006,
+        "nn_retrieval_physical_neighbor_error_median": 1.710511731429143,
+        "paired_aligned_distance_lt_r_fraction": 0.0,
+        "paired_aligned_distance_mean": 1.9711261413730368,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 1,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4201082032987779
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41480048737994096
+      ],
+      "train_only_threshold": 0.28684104607521,
+      "random_null_hit": 0.07398400000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.748,
+        "target_nn_coverage_distance_mean": 0.25529799286765525,
+        "target_nn_coverage_distance_median": 0.20195499853798,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.052,
+        "nn_retrieval_physical_neighbor_fraction": 0.036,
+        "nn_retrieval_physical_neighbor_error_mean": 0.8701411513421636,
+        "nn_retrieval_physical_neighbor_error_median": 0.8483143551128086,
+        "paired_aligned_distance_lt_r_fraction": 0.032,
+        "paired_aligned_distance_mean": 0.8953557899918773,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 1,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4201082032987779
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41480048737994096
+      ],
+      "train_only_threshold": 0.28684104607521,
+      "random_null_hit": 0.07398400000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.744,
+        "target_nn_coverage_distance_mean": 0.2560301818468008,
+        "target_nn_coverage_distance_median": 0.20026673134953363,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.052,
+        "nn_retrieval_physical_neighbor_fraction": 0.04,
+        "nn_retrieval_physical_neighbor_error_mean": 0.8724459798049113,
+        "nn_retrieval_physical_neighbor_error_median": 0.8483143551128086,
+        "paired_aligned_distance_lt_r_fraction": 0.032,
+        "paired_aligned_distance_mean": 0.8970729813367759,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 1,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4201082032987779
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41480048737994096
+      ],
+      "train_only_threshold": 0.28684104607521,
+      "random_null_hit": 0.07398400000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.832,
+        "target_nn_coverage_distance_mean": 0.2050646838055371,
+        "target_nn_coverage_distance_median": 0.17743977211891165,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.036,
+        "nn_retrieval_physical_neighbor_fraction": 0.052,
+        "nn_retrieval_physical_neighbor_error_mean": 0.8795771203710262,
+        "nn_retrieval_physical_neighbor_error_median": 0.8436257289539237,
+        "paired_aligned_distance_lt_r_fraction": 0.02,
+        "paired_aligned_distance_mean": 0.9148605472897157,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 1,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4201082032987779
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41480048737994096
+      ],
+      "train_only_threshold": 0.28684104607521,
+      "random_null_hit": 0.07398400000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.832,
+        "target_nn_coverage_distance_mean": 0.20546269595769526,
+        "target_nn_coverage_distance_median": 0.17730559633349852,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.036,
+        "nn_retrieval_physical_neighbor_fraction": 0.056,
+        "nn_retrieval_physical_neighbor_error_mean": 0.8765117844448931,
+        "nn_retrieval_physical_neighbor_error_median": 0.8436257289539237,
+        "paired_aligned_distance_lt_r_fraction": 0.024,
+        "paired_aligned_distance_mean": 0.9133842282556115,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 2,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.42239878547687637
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3112763832153679
+      ],
+      "train_only_threshold": 0.3330927389493023,
+      "random_null_hit": 0.060744000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.848,
+        "target_nn_coverage_distance_mean": 0.26925104638978387,
+        "target_nn_coverage_distance_median": 0.18704095785198696,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_fraction": 0.024,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1529517817100063,
+        "nn_retrieval_physical_neighbor_error_median": 1.066750897084817,
+        "paired_aligned_distance_lt_r_fraction": 0.02,
+        "paired_aligned_distance_mean": 1.2535722364610689,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 2,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.42239878547687637
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3112763832153679
+      ],
+      "train_only_threshold": 0.3330927389493023,
+      "random_null_hit": 0.060744000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.844,
+        "target_nn_coverage_distance_mean": 0.2804190827752479,
+        "target_nn_coverage_distance_median": 0.18082188504413865,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.012,
+        "nn_retrieval_physical_neighbor_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1583067919134138,
+        "nn_retrieval_physical_neighbor_error_median": 1.0693046263476877,
+        "paired_aligned_distance_lt_r_fraction": 0.008,
+        "paired_aligned_distance_mean": 1.263181928948272,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 2,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.42239878547687637
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3112763832153679
+      ],
+      "train_only_threshold": 0.3330927389493023,
+      "random_null_hit": 0.060744000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.752,
+        "target_nn_coverage_distance_mean": 0.32991624781932677,
+        "target_nn_coverage_distance_median": 0.189851341437128,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.012,
+        "nn_retrieval_physical_neighbor_fraction": 0.052,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0696823002811284,
+        "nn_retrieval_physical_neighbor_error_median": 0.9481532183639543,
+        "paired_aligned_distance_lt_r_fraction": 0.052,
+        "paired_aligned_distance_mean": 1.2169959104410568,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 2,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.42239878547687637
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3112763832153679
+      ],
+      "train_only_threshold": 0.3330927389493023,
+      "random_null_hit": 0.060744000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.752,
+        "target_nn_coverage_distance_mean": 0.3227496325947602,
+        "target_nn_coverage_distance_median": 0.18497895917199553,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.052,
+        "nn_retrieval_physical_neighbor_error_mean": 1.074428366075051,
+        "nn_retrieval_physical_neighbor_error_median": 0.9544499201412502,
+        "paired_aligned_distance_lt_r_fraction": 0.06,
+        "paired_aligned_distance_mean": 1.2222342715844312,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 3,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.41998228428211987
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.397135955742834
+      ],
+      "train_only_threshold": 0.3256528681889918,
+      "random_null_hit": 0.12007200000000003,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.436,
+        "target_nn_coverage_distance_mean": 0.44405898037403435,
+        "target_nn_coverage_distance_median": 0.359656391022196,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_fraction": 0.024,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1190670630294985,
+        "nn_retrieval_physical_neighbor_error_median": 1.1337219054446024,
+        "paired_aligned_distance_lt_r_fraction": 0.008,
+        "paired_aligned_distance_mean": 1.3163205104330449,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 3,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.41998228428211987
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.397135955742834
+      ],
+      "train_only_threshold": 0.3256528681889918,
+      "random_null_hit": 0.12007200000000003,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.444,
+        "target_nn_coverage_distance_mean": 0.44069253907787076,
+        "target_nn_coverage_distance_median": 0.3506363989328973,
+        "nn_retrieval_exact_time_index_fraction": 0.012,
+        "nn_retrieval_top5_time_index_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_fraction": 0.024,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1135734326735494,
+        "nn_retrieval_physical_neighbor_error_median": 1.1185731412559565,
+        "paired_aligned_distance_lt_r_fraction": 0.008,
+        "paired_aligned_distance_mean": 1.3143090656377685,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 3,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.41998228428211987
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.397135955742834
+      ],
+      "train_only_threshold": 0.3256528681889918,
+      "random_null_hit": 0.12007200000000003,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.608,
+        "target_nn_coverage_distance_mean": 0.4082666321413664,
+        "target_nn_coverage_distance_median": 0.2930375615693565,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.044,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0625989880187194,
+        "nn_retrieval_physical_neighbor_error_median": 1.0713903192714995,
+        "paired_aligned_distance_lt_r_fraction": 0.012,
+        "paired_aligned_distance_mean": 1.2353060113573355,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 3,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.41998228428211987
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.397135955742834
+      ],
+      "train_only_threshold": 0.3256528681889918,
+      "random_null_hit": 0.12007200000000003,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.62,
+        "target_nn_coverage_distance_mean": 0.4075780442470666,
+        "target_nn_coverage_distance_median": 0.2874179525330839,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.044,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0665610742893512,
+        "nn_retrieval_physical_neighbor_error_median": 1.0739914922309315,
+        "paired_aligned_distance_lt_r_fraction": 0.012,
+        "paired_aligned_distance_mean": 1.23673985853424,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 4,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4034759302335699
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41483776551183255
+      ],
+      "train_only_threshold": 0.33689159050451467,
+      "random_null_hit": 0.13472800000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.772,
+        "target_nn_coverage_distance_mean": 0.3264721828731027,
+        "target_nn_coverage_distance_median": 0.16469944015653515,
+        "nn_retrieval_exact_time_index_fraction": 0.012,
+        "nn_retrieval_top5_time_index_fraction": 0.036,
+        "nn_retrieval_physical_neighbor_fraction": 0.148,
+        "nn_retrieval_physical_neighbor_error_mean": 0.8051624560627111,
+        "nn_retrieval_physical_neighbor_error_median": 0.6928843330591368,
+        "paired_aligned_distance_lt_r_fraction": 0.068,
+        "paired_aligned_distance_mean": 0.9574980134252364,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 4,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4034759302335699
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41483776551183255
+      ],
+      "train_only_threshold": 0.33689159050451467,
+      "random_null_hit": 0.13472800000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.772,
+        "target_nn_coverage_distance_mean": 0.3261061657902989,
+        "target_nn_coverage_distance_median": 0.16389939111438004,
+        "nn_retrieval_exact_time_index_fraction": 0.012,
+        "nn_retrieval_top5_time_index_fraction": 0.036,
+        "nn_retrieval_physical_neighbor_fraction": 0.148,
+        "nn_retrieval_physical_neighbor_error_mean": 0.8053011971565648,
+        "nn_retrieval_physical_neighbor_error_median": 0.7013365771365191,
+        "paired_aligned_distance_lt_r_fraction": 0.068,
+        "paired_aligned_distance_mean": 0.9575524090743127,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 4,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4034759302335699
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41483776551183255
+      ],
+      "train_only_threshold": 0.33689159050451467,
+      "random_null_hit": 0.13472800000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.8,
+        "target_nn_coverage_distance_mean": 0.2643644405613891,
+        "target_nn_coverage_distance_median": 0.17719264400894946,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.012,
+        "nn_retrieval_physical_neighbor_fraction": 0.04,
+        "nn_retrieval_physical_neighbor_error_mean": 1.009373687983369,
+        "nn_retrieval_physical_neighbor_error_median": 0.94411938098957,
+        "paired_aligned_distance_lt_r_fraction": 0.004,
+        "paired_aligned_distance_mean": 1.1076667314831128,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 4,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4034759302335699
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.41483776551183255
+      ],
+      "train_only_threshold": 0.33689159050451467,
+      "random_null_hit": 0.13472800000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.804,
+        "target_nn_coverage_distance_mean": 0.2662485145705232,
+        "target_nn_coverage_distance_median": 0.18253970090482935,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.012,
+        "nn_retrieval_physical_neighbor_fraction": 0.032,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0129093095468056,
+        "nn_retrieval_physical_neighbor_error_median": 0.94411938098957,
+        "paired_aligned_distance_lt_r_fraction": 0.004,
+        "paired_aligned_distance_mean": 1.1078003727976782,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 5,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        3,
+        0.39370484759464774
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.28716909284957237
+      ],
+      "train_only_threshold": 0.3140570671975377,
+      "random_null_hit": 0.060064000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.356,
+        "target_nn_coverage_distance_mean": 0.6741924142237171,
+        "target_nn_coverage_distance_median": 0.5016744022986233,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_error_mean": 1.7690380700261412,
+        "nn_retrieval_physical_neighbor_error_median": 1.83986812425567,
+        "paired_aligned_distance_lt_r_fraction": 0.0,
+        "paired_aligned_distance_mean": 2.081328609933705,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 5,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        3,
+        0.39370484759464774
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.28716909284957237
+      ],
+      "train_only_threshold": 0.3140570671975377,
+      "random_null_hit": 0.060064000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.344,
+        "target_nn_coverage_distance_mean": 0.6789357279600157,
+        "target_nn_coverage_distance_median": 0.5101335977860729,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_error_mean": 1.7906355457969196,
+        "nn_retrieval_physical_neighbor_error_median": 1.8587481291493746,
+        "paired_aligned_distance_lt_r_fraction": 0.008,
+        "paired_aligned_distance_mean": 2.105344229607528,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 5,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        3,
+        0.39370484759464774
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.28716909284957237
+      ],
+      "train_only_threshold": 0.3140570671975377,
+      "random_null_hit": 0.060064000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.232,
+        "target_nn_coverage_distance_mean": 0.7315817354950054,
+        "target_nn_coverage_distance_median": 0.5360485906169483,
+        "nn_retrieval_exact_time_index_fraction": 0.012,
+        "nn_retrieval_top5_time_index_fraction": 0.048,
+        "nn_retrieval_physical_neighbor_fraction": 0.06,
+        "nn_retrieval_physical_neighbor_error_mean": 1.2197876509611933,
+        "nn_retrieval_physical_neighbor_error_median": 1.2293890991996046,
+        "paired_aligned_distance_lt_r_fraction": 0.012,
+        "paired_aligned_distance_mean": 1.6805880715172203,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_PCA3",
+      "fold": 5,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        3,
+        0.39370484759464774
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.28716909284957237
+      ],
+      "train_only_threshold": 0.3140570671975377,
+      "random_null_hit": 0.060064000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.228,
+        "target_nn_coverage_distance_mean": 0.7230660223837929,
+        "target_nn_coverage_distance_median": 0.5676536668444254,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.044,
+        "nn_retrieval_physical_neighbor_fraction": 0.06,
+        "nn_retrieval_physical_neighbor_error_mean": 1.2173072352833263,
+        "nn_retrieval_physical_neighbor_error_median": 1.2419835243825539,
+        "paired_aligned_distance_lt_r_fraction": 0.008,
+        "paired_aligned_distance_mean": 1.6615483174479024,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 1,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4351349785162932
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.39599804936705096
+      ],
+      "train_only_threshold": 0.17671174735248005,
+      "random_null_hit": 0.040824000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.68,
+        "target_nn_coverage_distance_mean": 0.19351276389671193,
+        "target_nn_coverage_distance_median": 0.12548542949663746,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_fraction": 0.004,
+        "nn_retrieval_physical_neighbor_error_mean": 0.8925325204039989,
+        "nn_retrieval_physical_neighbor_error_median": 0.8042181244676139,
+        "paired_aligned_distance_lt_r_fraction": 0.016,
+        "paired_aligned_distance_mean": 0.9357794633409451,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 1,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4351349785162932
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.39599804936705096
+      ],
+      "train_only_threshold": 0.17671174735248005,
+      "random_null_hit": 0.040824000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.684,
+        "target_nn_coverage_distance_mean": 0.19120185205191745,
+        "target_nn_coverage_distance_median": 0.12168509765591026,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_fraction": 0.004,
+        "nn_retrieval_physical_neighbor_error_mean": 0.8937281613545245,
+        "nn_retrieval_physical_neighbor_error_median": 0.8042181244676139,
+        "paired_aligned_distance_lt_r_fraction": 0.012,
+        "paired_aligned_distance_mean": 0.9374847583456916,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 1,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4351349785162932
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.39599804936705096
+      ],
+      "train_only_threshold": 0.17671174735248005,
+      "random_null_hit": 0.040824000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.356,
+        "target_nn_coverage_distance_mean": 0.2574357641429653,
+        "target_nn_coverage_distance_median": 0.23118258116060708,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.04,
+        "nn_retrieval_physical_neighbor_fraction": 0.04,
+        "nn_retrieval_physical_neighbor_error_mean": 0.9026925068488001,
+        "nn_retrieval_physical_neighbor_error_median": 0.9513639801833746,
+        "paired_aligned_distance_lt_r_fraction": 0.004,
+        "paired_aligned_distance_mean": 0.9839042768772004,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 1,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4351349785162932
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.39599804936705096
+      ],
+      "train_only_threshold": 0.17671174735248005,
+      "random_null_hit": 0.040824000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.368,
+        "target_nn_coverage_distance_mean": 0.24921580971044544,
+        "target_nn_coverage_distance_median": 0.22072012559254822,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.044,
+        "nn_retrieval_physical_neighbor_fraction": 0.036,
+        "nn_retrieval_physical_neighbor_error_mean": 0.9051076117981253,
+        "nn_retrieval_physical_neighbor_error_median": 0.9558965293767991,
+        "paired_aligned_distance_lt_r_fraction": 0.008,
+        "paired_aligned_distance_mean": 0.9819948599391148,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 2,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4347936553484242
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.27802511344382497
+      ],
+      "train_only_threshold": 0.30504593305897004,
+      "random_null_hit": 0.05887200000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.788,
+        "target_nn_coverage_distance_mean": 0.25529459872062144,
+        "target_nn_coverage_distance_median": 0.17555394127083923,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0743171065857546,
+        "nn_retrieval_physical_neighbor_error_median": 0.9586503717765911,
+        "paired_aligned_distance_lt_r_fraction": 0.004,
+        "paired_aligned_distance_mean": 1.1353398312717387,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 2,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4347936553484242
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.27802511344382497
+      ],
+      "train_only_threshold": 0.30504593305897004,
+      "random_null_hit": 0.05887200000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.804,
+        "target_nn_coverage_distance_mean": 0.2603935919167202,
+        "target_nn_coverage_distance_median": 0.17973576475852399,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0760361491119974,
+        "nn_retrieval_physical_neighbor_error_median": 0.962449294691152,
+        "paired_aligned_distance_lt_r_fraction": 0.004,
+        "paired_aligned_distance_mean": 1.1372144198366436,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 2,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4347936553484242
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.27802511344382497
+      ],
+      "train_only_threshold": 0.30504593305897004,
+      "random_null_hit": 0.05887200000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.756,
+        "target_nn_coverage_distance_mean": 0.31276940783032386,
+        "target_nn_coverage_distance_median": 0.19709713752086033,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.068,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0328534765531747,
+        "nn_retrieval_physical_neighbor_error_median": 0.9268209004469614,
+        "paired_aligned_distance_lt_r_fraction": 0.032,
+        "paired_aligned_distance_mean": 1.1588522430410404,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 2,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4347936553484242
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.27802511344382497
+      ],
+      "train_only_threshold": 0.30504593305897004,
+      "random_null_hit": 0.05887200000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.752,
+        "target_nn_coverage_distance_mean": 0.31285953695207475,
+        "target_nn_coverage_distance_median": 0.19454221640030117,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.064,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0337013933351658,
+        "nn_retrieval_physical_neighbor_error_median": 0.9180829420069457,
+        "paired_aligned_distance_lt_r_fraction": 0.032,
+        "paired_aligned_distance_mean": 1.160431032496701,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 3,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.43075891235764957
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.34975890041803886
+      ],
+      "train_only_threshold": 0.3565803543349681,
+      "random_null_hit": 0.140888,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.684,
+        "target_nn_coverage_distance_mean": 0.38524023387436207,
+        "target_nn_coverage_distance_median": 0.25922908068580597,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.012,
+        "nn_retrieval_physical_neighbor_fraction": 0.028,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0142402971414528,
+        "nn_retrieval_physical_neighbor_error_median": 0.9350240773555805,
+        "paired_aligned_distance_lt_r_fraction": 0.012,
+        "paired_aligned_distance_mean": 1.1512863505435327,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 3,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.43075891235764957
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.34975890041803886
+      ],
+      "train_only_threshold": 0.3565803543349681,
+      "random_null_hit": 0.140888,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.696,
+        "target_nn_coverage_distance_mean": 0.38806670975534213,
+        "target_nn_coverage_distance_median": 0.26447998340291967,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.012,
+        "nn_retrieval_physical_neighbor_fraction": 0.024,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0243322348929433,
+        "nn_retrieval_physical_neighbor_error_median": 0.9394803317466975,
+        "paired_aligned_distance_lt_r_fraction": 0.008,
+        "paired_aligned_distance_mean": 1.1547966844508086,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 3,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.43075891235764957
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.34975890041803886
+      ],
+      "train_only_threshold": 0.3565803543349681,
+      "random_null_hit": 0.140888,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.64,
+        "target_nn_coverage_distance_mean": 0.3897158743366219,
+        "target_nn_coverage_distance_median": 0.2807407694310223,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.036,
+        "nn_retrieval_physical_neighbor_fraction": 0.08,
+        "nn_retrieval_physical_neighbor_error_mean": 1.085848514250089,
+        "nn_retrieval_physical_neighbor_error_median": 1.0273947092346436,
+        "paired_aligned_distance_lt_r_fraction": 0.012,
+        "paired_aligned_distance_mean": 1.2808300798729717,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 3,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.43075891235764957
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.34975890041803886
+      ],
+      "train_only_threshold": 0.3565803543349681,
+      "random_null_hit": 0.140888,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.656,
+        "target_nn_coverage_distance_mean": 0.3803871063578133,
+        "target_nn_coverage_distance_median": 0.2814695467143185,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.036,
+        "nn_retrieval_physical_neighbor_fraction": 0.08,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0995676586375775,
+        "nn_retrieval_physical_neighbor_error_median": 1.0381296966490339,
+        "paired_aligned_distance_lt_r_fraction": 0.008,
+        "paired_aligned_distance_mean": 1.2783981226849226,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 4,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.41247608423559945
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3254086046361166
+      ],
+      "train_only_threshold": 0.33363606144319047,
+      "random_null_hit": 0.15826400000000002,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.396,
+        "target_nn_coverage_distance_mean": 0.3993826958343439,
+        "target_nn_coverage_distance_median": 0.3837361489829041,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.028,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0273311259305824,
+        "nn_retrieval_physical_neighbor_error_median": 0.908135192734336,
+        "paired_aligned_distance_lt_r_fraction": 0.008,
+        "paired_aligned_distance_mean": 1.2175595515359652,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 4,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.41247608423559945
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3254086046361166
+      ],
+      "train_only_threshold": 0.33363606144319047,
+      "random_null_hit": 0.15826400000000002,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.42,
+        "target_nn_coverage_distance_mean": 0.3865107514383153,
+        "target_nn_coverage_distance_median": 0.3652764365227211,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.024,
+        "nn_retrieval_physical_neighbor_fraction": 0.032,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0200801873491934,
+        "nn_retrieval_physical_neighbor_error_median": 0.9007779553347335,
+        "paired_aligned_distance_lt_r_fraction": 0.008,
+        "paired_aligned_distance_mean": 1.2140185326611985,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 4,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.41247608423559945
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3254086046361166
+      ],
+      "train_only_threshold": 0.33363606144319047,
+      "random_null_hit": 0.15826400000000002,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.636,
+        "target_nn_coverage_distance_mean": 0.3723302475981742,
+        "target_nn_coverage_distance_median": 0.2818179886081174,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_fraction": 0.032,
+        "nn_retrieval_physical_neighbor_error_mean": 1.2262668091226825,
+        "nn_retrieval_physical_neighbor_error_median": 1.2443384299169429,
+        "paired_aligned_distance_lt_r_fraction": 0.004,
+        "paired_aligned_distance_mean": 1.2970481472574285,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 4,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.41247608423559945
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3254086046361166
+      ],
+      "train_only_threshold": 0.33363606144319047,
+      "random_null_hit": 0.15826400000000002,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.652,
+        "target_nn_coverage_distance_mean": 0.35556060872090006,
+        "target_nn_coverage_distance_median": 0.2722731387173246,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.024,
+        "nn_retrieval_physical_neighbor_fraction": 0.032,
+        "nn_retrieval_physical_neighbor_error_mean": 1.232091872503233,
+        "nn_retrieval_physical_neighbor_error_median": 1.2900317990816732,
+        "paired_aligned_distance_lt_r_fraction": 0.012,
+        "paired_aligned_distance_mean": 1.2947074617924335,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 5,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4195343662274732
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.35615340628730086
+      ],
+      "train_only_threshold": 0.31968285336193125,
+      "random_null_hit": 0.05888000000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.504,
+        "target_nn_coverage_distance_mean": 0.4474378884578328,
+        "target_nn_coverage_distance_median": 0.313250962367167,
+        "nn_retrieval_exact_time_index_fraction": 0.012,
+        "nn_retrieval_top5_time_index_fraction": 0.04,
+        "nn_retrieval_physical_neighbor_fraction": 0.12,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1641396189315005,
+        "nn_retrieval_physical_neighbor_error_median": 1.2196142501765521,
+        "paired_aligned_distance_lt_r_fraction": 0.104,
+        "paired_aligned_distance_mean": 1.357063697319267,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 5,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4195343662274732
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.35615340628730086
+      ],
+      "train_only_threshold": 0.31968285336193125,
+      "random_null_hit": 0.05888000000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.484,
+        "target_nn_coverage_distance_mean": 0.47137665058358025,
+        "target_nn_coverage_distance_median": 0.338001746103896,
+        "nn_retrieval_exact_time_index_fraction": 0.012,
+        "nn_retrieval_top5_time_index_fraction": 0.032,
+        "nn_retrieval_physical_neighbor_fraction": 0.128,
+        "nn_retrieval_physical_neighbor_error_mean": 1.170891529838922,
+        "nn_retrieval_physical_neighbor_error_median": 1.234721043509437,
+        "paired_aligned_distance_lt_r_fraction": 0.104,
+        "paired_aligned_distance_mean": 1.3832131639881822,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 5,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4195343662274732
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.35615340628730086
+      ],
+      "train_only_threshold": 0.31968285336193125,
+      "random_null_hit": 0.05888000000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.464,
+        "target_nn_coverage_distance_mean": 0.6332843574108287,
+        "target_nn_coverage_distance_median": 0.33693802295495767,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_error_mean": 1.405991356145827,
+        "nn_retrieval_physical_neighbor_error_median": 1.377897435623575,
+        "paired_aligned_distance_lt_r_fraction": 0.008,
+        "paired_aligned_distance_mean": 1.8550756233204482,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "PCA3_FA3",
+      "fold": 5,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4195343662274732
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.35615340628730086
+      ],
+      "train_only_threshold": 0.31968285336193125,
+      "random_null_hit": 0.05888000000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.452,
+        "target_nn_coverage_distance_mean": 0.6390952028826256,
+        "target_nn_coverage_distance_median": 0.34951688090740474,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_fraction": 0.028,
+        "nn_retrieval_physical_neighbor_error_mean": 1.4153328026635101,
+        "nn_retrieval_physical_neighbor_error_median": 1.407365986857957,
+        "paired_aligned_distance_lt_r_fraction": 0.012,
+        "paired_aligned_distance_mean": 1.86476181084598,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 1,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4201082032987779
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.39599804936705096
+      ],
+      "train_only_threshold": 0.17671174735248005,
+      "random_null_hit": 0.040824000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.704,
+        "target_nn_coverage_distance_mean": 0.18727742704163475,
+        "target_nn_coverage_distance_median": 0.1328884673812634,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.024,
+        "nn_retrieval_physical_neighbor_error_mean": 0.8665155174147641,
+        "nn_retrieval_physical_neighbor_error_median": 0.8378150463888745,
+        "paired_aligned_distance_lt_r_fraction": 0.02,
+        "paired_aligned_distance_mean": 0.8908738734996998,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 1,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4201082032987779
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.39599804936705096
+      ],
+      "train_only_threshold": 0.17671174735248005,
+      "random_null_hit": 0.040824000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.692,
+        "target_nn_coverage_distance_mean": 0.18493804425464214,
+        "target_nn_coverage_distance_median": 0.1341845823007889,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.024,
+        "nn_retrieval_physical_neighbor_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_error_mean": 0.8712279374908426,
+        "nn_retrieval_physical_neighbor_error_median": 0.8378150463888745,
+        "paired_aligned_distance_lt_r_fraction": 0.02,
+        "paired_aligned_distance_mean": 0.89256218404641,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 1,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4201082032987779
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.39599804936705096
+      ],
+      "train_only_threshold": 0.17671174735248005,
+      "random_null_hit": 0.040824000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.456,
+        "target_nn_coverage_distance_mean": 0.21423138585873677,
+        "target_nn_coverage_distance_median": 0.19012848015405873,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.044,
+        "nn_retrieval_physical_neighbor_fraction": 0.064,
+        "nn_retrieval_physical_neighbor_error_mean": 0.8704963482388749,
+        "nn_retrieval_physical_neighbor_error_median": 0.9506023536629139,
+        "paired_aligned_distance_lt_r_fraction": 0.02,
+        "paired_aligned_distance_mean": 0.9213708495902146,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 1,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.4201082032987779
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.39599804936705096
+      ],
+      "train_only_threshold": 0.17671174735248005,
+      "random_null_hit": 0.040824000000000006,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.452,
+        "target_nn_coverage_distance_mean": 0.21185394517310635,
+        "target_nn_coverage_distance_median": 0.18495566837382385,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.036,
+        "nn_retrieval_physical_neighbor_fraction": 0.064,
+        "nn_retrieval_physical_neighbor_error_mean": 0.8695690430640771,
+        "nn_retrieval_physical_neighbor_error_median": 0.9453789282085341,
+        "paired_aligned_distance_lt_r_fraction": 0.024,
+        "paired_aligned_distance_mean": 0.921001301803102,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 2,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.42239878547687637
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.27802511344382497
+      ],
+      "train_only_threshold": 0.30504593305897004,
+      "random_null_hit": 0.05887200000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.692,
+        "target_nn_coverage_distance_mean": 0.2783510731599561,
+        "target_nn_coverage_distance_median": 0.20174072750061386,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1434689527962636,
+        "nn_retrieval_physical_neighbor_error_median": 1.0976339057470579,
+        "paired_aligned_distance_lt_r_fraction": 0.0,
+        "paired_aligned_distance_mean": 1.2044581009747466,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 2,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.42239878547687637
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.27802511344382497
+      ],
+      "train_only_threshold": 0.30504593305897004,
+      "random_null_hit": 0.05887200000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.684,
+        "target_nn_coverage_distance_mean": 0.2802614502911372,
+        "target_nn_coverage_distance_median": 0.20542075252029957,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1525065939114483,
+        "nn_retrieval_physical_neighbor_error_median": 1.1044921121554307,
+        "paired_aligned_distance_lt_r_fraction": 0.0,
+        "paired_aligned_distance_mean": 1.2054619629784393,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 2,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.42239878547687637
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.27802511344382497
+      ],
+      "train_only_threshold": 0.30504593305897004,
+      "random_null_hit": 0.05887200000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.692,
+        "target_nn_coverage_distance_mean": 0.32932051325473655,
+        "target_nn_coverage_distance_median": 0.22767985613461178,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.004,
+        "nn_retrieval_physical_neighbor_fraction": 0.004,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1844717114586065,
+        "nn_retrieval_physical_neighbor_error_median": 1.0539415421055982,
+        "paired_aligned_distance_lt_r_fraction": 0.004,
+        "paired_aligned_distance_mean": 1.2695022941266227,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 2,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.42239878547687637
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.27802511344382497
+      ],
+      "train_only_threshold": 0.30504593305897004,
+      "random_null_hit": 0.05887200000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.7,
+        "target_nn_coverage_distance_mean": 0.32720013655723995,
+        "target_nn_coverage_distance_median": 0.22021754467791127,
+        "nn_retrieval_exact_time_index_fraction": 0.0,
+        "nn_retrieval_top5_time_index_fraction": 0.004,
+        "nn_retrieval_physical_neighbor_fraction": 0.008,
+        "nn_retrieval_physical_neighbor_error_mean": 1.191653500457198,
+        "nn_retrieval_physical_neighbor_error_median": 1.074312255216157,
+        "paired_aligned_distance_lt_r_fraction": 0.004,
+        "paired_aligned_distance_mean": 1.2759939328969445,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 3,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.41998228428211987
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.34975890041803886
+      ],
+      "train_only_threshold": 0.3565803543349681,
+      "random_null_hit": 0.140888,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.748,
+        "target_nn_coverage_distance_mean": 0.36642686714951617,
+        "target_nn_coverage_distance_median": 0.2457492731696247,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_fraction": 0.144,
+        "nn_retrieval_physical_neighbor_error_mean": 0.9035408577829135,
+        "nn_retrieval_physical_neighbor_error_median": 0.7977140214612017,
+        "paired_aligned_distance_lt_r_fraction": 0.064,
+        "paired_aligned_distance_mean": 1.0662254142631478,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 3,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.41998228428211987
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.34975890041803886
+      ],
+      "train_only_threshold": 0.3565803543349681,
+      "random_null_hit": 0.140888,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.752,
+        "target_nn_coverage_distance_mean": 0.35783844116777325,
+        "target_nn_coverage_distance_median": 0.23835070439785383,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_fraction": 0.164,
+        "nn_retrieval_physical_neighbor_error_mean": 0.9109282726139795,
+        "nn_retrieval_physical_neighbor_error_median": 0.7941575098208098,
+        "paired_aligned_distance_lt_r_fraction": 0.068,
+        "paired_aligned_distance_mean": 1.0609873303485404,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 3,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.41998228428211987
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.34975890041803886
+      ],
+      "train_only_threshold": 0.3565803543349681,
+      "random_null_hit": 0.140888,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.54,
+        "target_nn_coverage_distance_mean": 0.4624749128279693,
+        "target_nn_coverage_distance_median": 0.3368872009517802,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.012,
+        "nn_retrieval_physical_neighbor_fraction": 0.048,
+        "nn_retrieval_physical_neighbor_error_mean": 1.131023228914847,
+        "nn_retrieval_physical_neighbor_error_median": 1.0504781130188054,
+        "paired_aligned_distance_lt_r_fraction": 0.012,
+        "paired_aligned_distance_mean": 1.3664423606785923,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 3,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        2,
+        3,
+        0.41998228428211987
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.34975890041803886
+      ],
+      "train_only_threshold": 0.3565803543349681,
+      "random_null_hit": 0.140888,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.536,
+        "target_nn_coverage_distance_mean": 0.4569795467832067,
+        "target_nn_coverage_distance_median": 0.33505727020153,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.012,
+        "nn_retrieval_physical_neighbor_fraction": 0.04,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1316622875592313,
+        "nn_retrieval_physical_neighbor_error_median": 1.0395050712004958,
+        "paired_aligned_distance_lt_r_fraction": 0.012,
+        "paired_aligned_distance_mean": 1.3657165518324978,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 4,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4034759302335699
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3254086046361166
+      ],
+      "train_only_threshold": 0.33363606144319047,
+      "random_null_hit": 0.15826400000000002,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.768,
+        "target_nn_coverage_distance_mean": 0.271165254761906,
+        "target_nn_coverage_distance_median": 0.19545800823998494,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_fraction": 0.064,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0716970950769982,
+        "nn_retrieval_physical_neighbor_error_median": 0.9658082390361411,
+        "paired_aligned_distance_lt_r_fraction": 0.056,
+        "paired_aligned_distance_mean": 1.1399493412821489,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 4,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4034759302335699
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3254086046361166
+      ],
+      "train_only_threshold": 0.33363606144319047,
+      "random_null_hit": 0.15826400000000002,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.784,
+        "target_nn_coverage_distance_mean": 0.2752827638824824,
+        "target_nn_coverage_distance_median": 0.21745222855279622,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.016,
+        "nn_retrieval_physical_neighbor_fraction": 0.084,
+        "nn_retrieval_physical_neighbor_error_mean": 1.0639580994634212,
+        "nn_retrieval_physical_neighbor_error_median": 0.949148784243272,
+        "paired_aligned_distance_lt_r_fraction": 0.052,
+        "paired_aligned_distance_mean": 1.14423766973784,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 4,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4034759302335699
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3254086046361166
+      ],
+      "train_only_threshold": 0.33363606144319047,
+      "random_null_hit": 0.15826400000000002,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.644,
+        "target_nn_coverage_distance_mean": 0.40372272298030976,
+        "target_nn_coverage_distance_median": 0.3035933472975262,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.02,
+        "nn_retrieval_physical_neighbor_fraction": 0.064,
+        "nn_retrieval_physical_neighbor_error_mean": 0.9210870631221045,
+        "nn_retrieval_physical_neighbor_error_median": 1.0107109744204625,
+        "paired_aligned_distance_lt_r_fraction": 0.02,
+        "paired_aligned_distance_mean": 1.1163003167432521,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 4,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        2,
+        0.4034759302335699
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.3254086046361166
+      ],
+      "train_only_threshold": 0.33363606144319047,
+      "random_null_hit": 0.15826400000000002,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.704,
+        "target_nn_coverage_distance_mean": 0.3965478868519074,
+        "target_nn_coverage_distance_median": 0.28865390431124177,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.024,
+        "nn_retrieval_physical_neighbor_fraction": 0.064,
+        "nn_retrieval_physical_neighbor_error_mean": 0.9287084297412559,
+        "nn_retrieval_physical_neighbor_error_median": 1.01218974939168,
+        "paired_aligned_distance_lt_r_fraction": 0.02,
+        "paired_aligned_distance_mean": 1.1183772737605258,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 5,
+      "seed": 42,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        3,
+        0.39370484759464774
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.35615340628730086
+      ],
+      "train_only_threshold": 0.31968285336193125,
+      "random_null_hit": 0.05888000000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.5,
+        "target_nn_coverage_distance_mean": 0.4767562611150105,
+        "target_nn_coverage_distance_median": 0.31881589300035773,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.024,
+        "nn_retrieval_physical_neighbor_fraction": 0.096,
+        "nn_retrieval_physical_neighbor_error_mean": 1.771671958417719,
+        "nn_retrieval_physical_neighbor_error_median": 2.0320543713983197,
+        "paired_aligned_distance_lt_r_fraction": 0.088,
+        "paired_aligned_distance_mean": 1.9928137863600055,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 5,
+      "seed": 42,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        3,
+        0.39370484759464774
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.35615340628730086
+      ],
+      "train_only_threshold": 0.31968285336193125,
+      "random_null_hit": 0.05888000000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.496,
+        "target_nn_coverage_distance_mean": 0.4954166128068906,
+        "target_nn_coverage_distance_median": 0.32120600456135273,
+        "nn_retrieval_exact_time_index_fraction": 0.004,
+        "nn_retrieval_top5_time_index_fraction": 0.024,
+        "nn_retrieval_physical_neighbor_fraction": 0.1,
+        "nn_retrieval_physical_neighbor_error_mean": 1.7761303097889836,
+        "nn_retrieval_physical_neighbor_error_median": 2.032551282618305,
+        "paired_aligned_distance_lt_r_fraction": 0.084,
+        "paired_aligned_distance_mean": 2.0155379249198138,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 5,
+      "seed": 43,
+      "method": "hard",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        3,
+        0.39370484759464774
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.35615340628730086
+      ],
+      "train_only_threshold": 0.31968285336193125,
+      "random_null_hit": 0.05888000000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.468,
+        "target_nn_coverage_distance_mean": 0.46947066893298783,
+        "target_nn_coverage_distance_median": 0.36531916284712396,
+        "nn_retrieval_exact_time_index_fraction": 0.016,
+        "nn_retrieval_top5_time_index_fraction": 0.04,
+        "nn_retrieval_physical_neighbor_fraction": 0.112,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1872198999527814,
+        "nn_retrieval_physical_neighbor_error_median": 1.2052176581628342,
+        "paired_aligned_distance_lt_r_fraction": 0.1,
+        "paired_aligned_distance_mean": 1.4011137351430056,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    },
+    {
+      "config": "FA3_FA3",
+      "fold": 5,
+      "seed": 43,
+      "method": "soft05",
+      "d": 3,
+      "training_best2D_source": [
+        1,
+        3,
+        0.39370484759464774
+      ],
+      "training_best2D_target": [
+        1,
+        2,
+        0.35615340628730086
+      ],
+      "train_only_threshold": 0.31968285336193125,
+      "random_null_hit": 0.05888000000000001,
+      "metrics": {
+        "target_nn_coverage_fraction": 0.468,
+        "target_nn_coverage_distance_mean": 0.48014343762299083,
+        "target_nn_coverage_distance_median": 0.35927783550948683,
+        "nn_retrieval_exact_time_index_fraction": 0.008,
+        "nn_retrieval_top5_time_index_fraction": 0.04,
+        "nn_retrieval_physical_neighbor_fraction": 0.116,
+        "nn_retrieval_physical_neighbor_error_mean": 1.1871184467465146,
+        "nn_retrieval_physical_neighbor_error_median": 1.203625362050076,
+        "paired_aligned_distance_lt_r_fraction": 0.1,
+        "paired_aligned_distance_mean": 1.4045995527604698,
+        "n_test": 250
+      },
+      "uses_test_pairs_only_after_training": true
+    }
+  ],
+  "summary": [
+    {
+      "conf": "PCA3_PCA3",
+      "method": "hard",
+      "coverage": 0.6312000000000001,
+      "physical_neighbor_correct": 0.0568,
+      "exact_index": 0.006,
+      "null_hit": 0.08991840000000001,
+      "train_only_radius": 0.31930706218311133
+    },
+    {
+      "conf": "PCA3_PCA3",
+      "method": "soft05",
+      "coverage": 0.6327999999999999,
+      "physical_neighbor_correct": 0.057999999999999996,
+      "exact_index": 0.0064,
+      "null_hit": 0.08991840000000001,
+      "train_only_radius": 0.31930706218311133
+    },
+    {
+      "conf": "FA3_PCA3",
+      "method": "hard",
+      "coverage": 0.6384000000000001,
+      "physical_neighbor_correct": 0.0496,
+      "exact_index": 0.005599999999999999,
+      "null_hit": 0.08991840000000001,
+      "train_only_radius": 0.31930706218311133
+    },
+    {
+      "conf": "FA3_PCA3",
+      "method": "soft05",
+      "coverage": 0.6384000000000001,
+      "physical_neighbor_correct": 0.0488,
+      "exact_index": 0.0056,
+      "null_hit": 0.08991840000000001,
+      "train_only_radius": 0.31930706218311133
+    },
+    {
+      "conf": "PCA3_FA3",
+      "method": "hard",
+      "coverage": 0.5904,
+      "physical_neighbor_correct": 0.0428,
+      "exact_index": 0.004399999999999999,
+      "null_hit": 0.09154560000000002,
+      "train_only_radius": 0.29833138991030794
+    },
+    {
+      "conf": "PCA3_FA3",
+      "method": "soft05",
+      "coverage": 0.5968,
+      "physical_neighbor_correct": 0.04360000000000001,
+      "exact_index": 0.0048000000000000004,
+      "null_hit": 0.09154560000000002,
+      "train_only_radius": 0.29833138991030794
+    },
+    {
+      "conf": "FA3_FA3",
+      "method": "hard",
+      "coverage": 0.6212,
+      "physical_neighbor_correct": 0.0628,
+      "exact_index": 0.005200000000000001,
+      "null_hit": 0.09154560000000002,
+      "train_only_radius": 0.29833138991030794
+    },
+    {
+      "conf": "FA3_FA3",
+      "method": "soft05",
+      "coverage": 0.6267999999999999,
+      "physical_neighbor_correct": 0.0668,
+      "exact_index": 0.004,
+      "null_hit": 0.09154560000000002,
+      "train_only_radius": 0.29833138991030794
+    }
+  ],
+  "note": "3D force representations PCA3/FA3 were fitted on all five original finger force channels, NOT old three selected fingers."
+}
