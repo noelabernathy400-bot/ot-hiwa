@@ -320,6 +320,19 @@ def main():
                 train_q_max=max(max(float(np.max(abs(fit[f"Q_{i}_{j}"].sum(0)-build_measures(y[ty],bb,ishard)[j][1]))),
                                     float(np.max(abs(fit[f"Q_{i}_{j}"].sum(1)-build_measures(x[tx],aa,ishard)[i][1]))))
                                 for i in range(4) for j in range(4))
+                # Archive every actual local Q, local R_ij, global R, group P,
+                # lagrange dual and original row IDs. These are the actual
+                # transport matrices produced by the solver, not reconstructed
+                # from a plotted heatmap or from synchronized physical labels.
+                archive_name=f"DANDI_{name}_{grouping}_seed{seed}_FULL_P_Q_R.npz"
+                plans={f"Q_{i}_{j}":np.asarray(fit[f"Q_{i}_{j}"])
+                       for i in range(4) for j in range(4)}
+                np.savez_compressed(out/archive_name,
+                    P=np.asarray(fit["P"]),R=np.asarray(fit["R"]),
+                    local_R=np.asarray(fit["local_R"]),dual=np.asarray(fit["dual"]),
+                    source_train_row_indices=tx,target_train_row_indices=ty,
+                    sampled_source_features=x[tx],sampled_target_features=y[ty],
+                    **plans)
                 entry=dict(seed=int(seed),feature=name,grouping=grouping,
                      original_real_trial_train_source_indices_sha256=hashlib.sha256(tx.tobytes()).hexdigest(),
                      original_real_trial_train_target_indices_sha256=hashlib.sha256(ty.tobytes()).hexdigest(),
@@ -408,7 +421,7 @@ def main():
        "",
        "**判断边界：**原始100试次完全未用，但这是原400训练trial内部一次划分的探索性比较；独立trial内的相邻时间窗高度相关。不同特征所得嵌套P-Q成本虽在同一形式下计算，但两个表示改变了源域测度，不可仅按它判断原始物理对应。若Soft严格ADMM未收敛，不能将其成绩解释为软分组机制本身的成败。",
        "",
-       "[逐种子完整P/R和数值审计](DANDI_PCA4_FA4_INNER_VALIDATION_RESULTS.json) | [原始重建与实际代码](../../code/compare_pca4_fa4_inner_train_ot.py)",
+       "[逐种子完整P/R和数值审计](DANDI_PCA4_FA4_INNER_VALIDATION_RESULTS.json) | [每次运行真实Q/P/R压缩归档：命名DANDI_PCA4或FA4_Hard或Soft_seed42-44_FULL_P_Q_R.npz](.) | [原始重建与实际代码](../../code/compare_pca4_fa4_inner_train_ot.py)",
        ""]
     (out/"DANDI_PCA4_FA4_REPORT_ZH.md").write_text("\n".join(report)+"\n",encoding="utf8")
     fig,ax=plt.subplots(1,3,figsize=(16,5),constrained_layout=True)
