@@ -1,0 +1,73 @@
+name: Hyser local Rkl P/Q ADMM full-support sanity (one heldout fold)
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-local-admm-sanity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  original-structure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Obtain trial-isolated PCA5/FA5 complete-force features
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_full_admm"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip \
+            --dir "$RUNNER_TEMP/hyser_full_admm"
+          unzip -q "$RUNNER_TEMP/hyser_full_admm/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
+            -d "$RUNNER_TEMP/hyser_full_admm"
+      - name: Full P/Q/local R consensus ADMM on non-anchor 250 TRAIN points, 250 heldout
+        run: |
+          python experiments/hyser/expanded_five_trials/local_PQR_ADMM_hyser.py \
+            --features "$RUNNER_TEMP/hyser_full_admm" \
+            --out experiments/hyser/expanded_five_trials/results_local_ADMM_sanity \
+            --folds 1 --seeds 42 --configs PCA5_RAW5 FA5_RAW5 \
+            --maxiter 60 --sa-maxiter 40 --save-first-Q
+      - name: Verify 4 actual local ADMM fits and all 16 full-Q matrices each
+        run: |
+          python - <<'PY'
+          import pathlib,json,numpy as np
+          p=pathlib.Path("experiments/hyser/expanded_five_trials/results_local_ADMM_sanity")
+          d=json.loads((p/"local_ADMM_results.json").read_text())
+          assert len(d["runs"])==4
+          for r in d["runs"]:
+            assert len(r["q_stats"])==16
+            assert all(q["shape"]==[250,250] for q in r["q_stats"])
+            assert np.array(r["P"]).shape==(4,4)
+            assert np.array(r["R"]).shape==(5,5)
+          assert len(list(p.glob("*_original_ADMM_Q.npz")))==4
+          print("Verified four fitted original-local P/Q/R ADMM cases")
+          PY
+      - name: Commit small-data original-structure fidelity pilot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_local_ADMM_sanity
+          if ! git diff --cached --quiet; then
+            git commit -m "Verify local Rkl Qkl P consensus ADMM and nearest-neighbor correctness on Hyser"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-local-PQR-ADMM-fold1-full-Q-matrices
+          path: experiments/hyser/expanded_five_trials/results_local_ADMM_sanity/
+          if-no-files-found: warn
