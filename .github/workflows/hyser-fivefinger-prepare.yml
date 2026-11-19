@@ -1,0 +1,84 @@
+name: Hyser recover all five physical force channels
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-fivefinger-prepare.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fivefinger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "wfdb>=4.1,<5"
+      - name: Get existing original waveforms and logged 3D window inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser5"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_s01_s1_random_5trials_raw_wfdb.zip \
+            --pattern hyser_s01_s1_random_5trials_features_cv.zip \
+            --dir "$RUNNER_TEMP/hyser5"
+          unzip -q "$RUNNER_TEMP/hyser5/hyser_s01_s1_random_5trials_raw_wfdb.zip" -d "$RUNNER_TEMP/hyser5"
+          unzip -q "$RUNNER_TEMP/hyser5/hyser_s01_s1_random_5trials_features_cv.zip" -d "$RUNNER_TEMP/hyser5"
+          ls -l "$RUNNER_TEMP/hyser5/raw_wfdb/" | head
+      - name: Verify signal header finger names, extract all five, build new 5D folds
+        run: |
+          python experiments/hyser/expanded_five_trials/prepare_five_finger_5d.py \
+            --raw-dir "$RUNNER_TEMP/hyser5/raw_wfdb" \
+            --features-3d-archive-dir "$RUNNER_TEMP/hyser5/derived" \
+            --out "$RUNNER_TEMP/hyser5/new5d"
+      - name: Validate original five-finger source and train/test-only preprocessing
+        run: |
+          python - <<'PY'
+          import pathlib,json,os,numpy as np
+          p=pathlib.Path(os.environ["RUNNER_TEMP"])/"hyser5/new5d"
+          a=json.loads((p/"FIVE_FINGER_SOURCE_CHECK.json").read_text())
+          assert a["five_finger_target_order"]==["thumb","index","middle","ring","little"]
+          assert a["full_arrays"]=={"X":[1250,256],"Y":[1250,5]}
+          assert len(a["train_only_per_fold_PCA5_and_whitening"])==5
+          for i in range(1,6):
+            with np.load(p/f"trial_heldout_{i}_5d.npz") as z:
+              assert z["X_train"].shape==z["Y_train"].shape==(1000,5)
+              assert z["X_test"].shape==z["Y_test"].shape==(250,5)
+          print("Verified all five physical finger channels and five trial-disjoint folds")
+          PY
+      - name: Publish new 5D processed features to the EXISTING Hyser dataset release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd "$RUNNER_TEMP/hyser5/new5d"
+          zip -q -r "$RUNNER_TEMP/hyser5/hyser_s01_s1_5fingers_5D_folds_v1.zip" .
+          gh release upload hyser-s01-s1-random-5trials-v1 \
+            "$RUNNER_TEMP/hyser5/hyser_s01_s1_5fingers_5D_folds_v1.zip"
+      - name: Commit verified channel-name provenance, not 125 MB raw waveforms
+        run: |
+          cp "$RUNNER_TEMP/hyser5/new5d/FIVE_FINGER_SOURCE_CHECK.json" \
+            experiments/hyser/expanded_five_trials/FIVE_FINGER_SOURCE_CHECK.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/FIVE_FINGER_SOURCE_CHECK.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Record physical five-finger WFDB channel identities and 5D heldout splits"
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-five-finger-5d-trial-folds
+          path: ${{ runner.temp }}/hyser5/new5d
+          if-no-files-found: warn
+          retention-days: 90
