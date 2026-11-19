@@ -29,14 +29,13 @@ jobs:
             test -f "experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000/by_rep/$rep/runs_bundle.json"
           done
 
-      - name: Download original full1000 train-only Hyser 3D and 5D representations
-        env:
-          GH_TOKEN: \${{ github.token }}
+      - name: Download public immutable Hyser release zip without token auth
         run: |
           mkdir -p "$RUNNER_TEMP/hyser1000_visuals"
-          gh release download hyser-s01-s1-random-5trials-v1 \
-            --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip \
-            --dir "$RUNNER_TEMP/hyser1000_visuals"
+          curl --fail --location --retry 4 --retry-delay 2 \
+            "https://github.com/noelabernathy400-bot/ot-hiwa/releases/download/hyser-s01-s1-random-5trials-v1/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
+            -o "$RUNNER_TEMP/hyser1000_visuals/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip"
+          test "$(stat -c%s "$RUNNER_TEMP/hyser1000_visuals/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip")" = "3604579"
           unzip -q "$RUNNER_TEMP/hyser1000_visuals/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
             -d "$RUNNER_TEMP/hyser1000_visuals"
           test -f "$RUNNER_TEMP/hyser1000_visuals/PCA3_PCA3/trial_heldout_1.npz"
