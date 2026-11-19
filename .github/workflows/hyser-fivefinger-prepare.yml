@@ -62,7 +62,7 @@ jobs:
         run: |
           cd "$RUNNER_TEMP/hyser5/new5d"
           zip -q -r "$RUNNER_TEMP/hyser5/hyser_s01_s1_5fingers_5D_folds_v1.zip" .
-          gh release upload hyser-s01-s1-random-5trials-v1 \
+          gh release upload --repo "$GITHUB_REPOSITORY" hyser-s01-s1-random-5trials-v1 \
             "$RUNNER_TEMP/hyser5/hyser_s01_s1_5fingers_5D_folds_v1.zip"
       - name: Commit verified channel-name provenance, not 125 MB raw waveforms
         run: |
