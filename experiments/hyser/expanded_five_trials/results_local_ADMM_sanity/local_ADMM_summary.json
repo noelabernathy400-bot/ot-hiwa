@@ -7,7 +7,7 @@
     "physical_hit": 0.024,
     "exact_index": 0.004,
     "random_hit": 0.057904000000000004,
-    "last_primal": 0.8736298675653205,
+    "last_primal": 0.873629867610706,
     "converged_count": 0,
     "last_group_marginal": 8.326672684688674e-17
   },
@@ -19,7 +19,7 @@
     "physical_hit": 0.024,
     "exact_index": 0.004,
     "random_hit": 0.057904000000000004,
-    "last_primal": 0.2656150090039958,
+    "last_primal": 0.2656150090007479,
     "converged_count": 0,
     "last_group_marginal": 1.1102230246251565e-16
   },
@@ -31,9 +31,9 @@
     "physical_hit": 0.036,
     "exact_index": 0.008,
     "random_hit": 0.057904000000000004,
-    "last_primal": 2.6935141966342644,
+    "last_primal": 2.6935141966620018,
     "converged_count": 0,
-    "last_group_marginal": 1.1102230246251565e-16
+    "last_group_marginal": 1.942890293094024e-16
   },
   {
     "config": "FA5_RAW5",
@@ -43,7 +43,7 @@
     "physical_hit": 0.044,
     "exact_index": 0.004,
     "random_hit": 0.057904000000000004,
-    "last_primal": 1.1130952967541166,
+    "last_primal": 1.1130952967582057,
     "converged_count": 0,
     "last_group_marginal": 5.551115123125783e-17
   }
