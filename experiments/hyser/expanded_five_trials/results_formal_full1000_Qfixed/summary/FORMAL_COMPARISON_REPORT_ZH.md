@@ -7,23 +7,23 @@ K4 independently in both domains; Hard one-hot vs Soft τ=0.5; local Q uses the 
 Original author default μ=.005 did NOT numerically converge on Hyser after 300 iterations. Training-subset solver checks predeclared μ=.05 and the SAME local warm-start for BOTH groups using numerical convergence only, not heldout test scores. K4, γ1=.2, γ2=.1/P, outer max300, inner max40, both domains independently grouped. Stable log-domain Q is used only when the identical entropic objective's legacy kernel scaling violates mass marginals.
 Fisher 2D subspaces are presentation only, selected by TRAIN pseudolabels; no 2D coordinate plane or 2D transport metric is used.
 
-Number of full runs found: 40/40. Eligible matched Hard/Soft seed-fold pairs: 0/20.
-Status: PARTIAL_OR_UNCONVERGED
+Number of full runs found: 40/40. Eligible matched Hard/Soft seed-fold pairs: 20/20.
+Status: COMPLETE_ALL_CONVERGED
 
 ## All run observations (UNQUALIFIED rows are not valid model-performance claims)
 
 | Representation | Method | Observed/expected | Numerically converged | Heldout W2² (all descriptive) | Inductive target-train-bank physical NN (all descriptive) | Transductive test-bank NN (all descriptive) |
 |---|---|---:|---:|---:|---:|---:|
-|PCA5_RAW5|hard|10/10|0|0.90553|0.13600|0.17760|
+|PCA5_RAW5|hard|10/10|10|0.90553|0.13600|0.17760|
 |PCA5_RAW5|soft05|10/10|10|0.96746|0.13920|0.17400|
-|FA5_RAW5|hard|10/10|0|0.77235|0.11040|0.15160|
+|FA5_RAW5|hard|10/10|10|0.77235|0.11040|0.15160|
 |FA5_RAW5|soft05|10/10|10|0.83204|0.10320|0.14880|
 
 ## Matched paired effects on BOTH-converged runs (Soft - Hard, negative is better for errors)
 | Representation | eligible fold-seed pairs | Δ heldout W2² | Δ inductive physical NN correct fraction | Δ transductive physical NN correct fraction | Δ physical RMSE |
 |---|---:|---:|---:|---:|---:|
-|PCA5_RAW5|0|NA|NA|NA|NA|
-|FA5_RAW5|0|NA|NA|NA|NA|
+|PCA5_RAW5|10|+0.061935|+0.003200|-0.003600|-0.000900|
+|FA5_RAW5|10|+0.059691|-0.007200|-0.002800|-0.001909|
 
 ## Scientific inference restrictions
 - If any paired runs do not meet both solver residuals, full-sample formal comparison is numerically INCONCLUSIVE. Never report cherry-picked converged subsets as if they represented five folds.
