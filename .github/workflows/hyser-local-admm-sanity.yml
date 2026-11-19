@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - ".github/workflows/hyser-local-admm-sanity.yml"
-      - "experiments/hyser/expanded_five_trials/local_PQR_ADMM_hyser.py"
   workflow_dispatch:
 
 permissions:
