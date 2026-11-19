@@ -222,6 +222,18 @@ def main():
                         "q_stats":qstats,
                         "local_rotations_Rkl":model.local_rotations.tolist(),
                         "ADMM_dual_multipliers_final":model.admm_dual_multipliers.tolist(),
+                        "membership_source_mean_entropy":float(np.mean(-np.sum(aa*np.log(np.maximum(aa,1e-300)),axis=1))),
+                        "membership_target_mean_entropy":float(np.mean(-np.sum(bb*np.log(np.maximum(bb,1e-300)),axis=1))),
+                        "source_mixed_fraction_max_membership_below_0p8":float(np.mean(aa.max(axis=1)<.8)),
+                        "target_mixed_fraction_max_membership_below_0p8":float(np.mean(bb.max(axis=1)<.8)),
+                        "P_mean_row_max":float(np.mean(P.max(axis=1))),
+                        "ADMM_iteration_history":{
+                            "rotation_change":diagnostic["Rg_norm"].tolist(),
+                            "primal_residual":diagnostic["admm_primal_residual"].tolist(),
+                            "dual_residual":diagnostic["admm_dual_residual"].tolist(),
+                            "transport_objective":diagnostic["transport_objective_history"].tolist(),
+                            "local_Q_marginal_error":diagnostic["max_sinkhorn_marginal_error"].tolist()
+                        },
                         "local_R_matrices_learned":True,
                         "full_Q_matrices_learned_for_each_16_pairs":True,
                         "numeric_convergence_ADMM_primal_and_rotation":False,
