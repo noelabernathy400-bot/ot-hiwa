@@ -1,0 +1,159 @@
+name: Hyser SA WA adapted DAD all1000 fivefold and every method Fisher scatter
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-sa-wa-dad-full1000-allfold-fisher-gallery.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fit-baselines:
+    name: Fit 1000 source and target samples / ${{ matrix.rep }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    strategy:
+      fail-fast: false
+      matrix:
+        rep:
+          - PCA3_PCA3
+          - FA3_FA3
+          - PCA5_RAW5
+          - FA5_RAW5
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      NUMEXPR_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Retrieve frozen Hyser real five-finger 3D/5D trial-disjoint release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_sawad_features"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip \
+            --dir "$RUNNER_TEMP/hyser_sawad_features"
+          unzip -q "$RUNNER_TEMP/hyser_sawad_features/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
+            -d "$RUNNER_TEMP/hyser_sawad_features"
+      - name: Fit all 5 independent holdout trials, DANDI SA WA and modified DAD where supported
+        run: |
+          python -u experiments/hyser/expanded_five_trials/sa_wa_dad_dandi_port_full1000.py \
+            --features "$RUNNER_TEMP/hyser_sawad_features" \
+            --reference experiments/hyser/expanded_five_trials/results_3D_5D_unified \
+            --representation "${{ matrix.rep }}" \
+            --folds 1 2 3 4 5 --wa-seeds 42 43 \
+            --out "experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000/by_rep/${{ matrix.rep }}"
+      - name: Verify real 1000 training point count and all complete folds
+        run: |
+          python - <<'PY'
+          import json,os,pathlib,numpy as np
+          rep=os.environ['HYSER_REP']
+          p=pathlib.Path("experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000/by_rep")/rep
+          z=json.loads((p/"runs_bundle.json").read_text())
+          r=z["all_results_including_failures"]
+          expected=20 if rep.endswith(("PCA3","FA3")) else 15
+          assert len(r)==expected,(rep,len(r),expected)
+          assert all(q["qualified"] for q in r),[(q["fold"],q["method"],q.get("error")) for q in r if not q["qualified"]]
+          assert set(q["fold"] for q in r)=={1,2,3,4,5}
+          assert all(q["source_train_n"]==q["target_train_n"]==1000 and q["test_n"]==250 for q in r)
+          assert all(np.linalg.norm(np.asarray(q["R"]).T@np.asarray(q["R"])-np.eye(np.asarray(q["R"]).shape[0]))<1e-6 for q in r)
+          assert all(len(q["physical_errors_250"])==250 for q in r)
+          if rep.endswith("RAW5"): assert all(q["method"]!="DAD_like_3D" for q in r)
+          print("QUALIFIED",rep,len(r),"actual SA WA DAD-like training runs")
+          PY
+        env:
+          HYSER_REP: ${{ matrix.rep }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-sawad-${{ matrix.rep }}
+          path: experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000/by_rep/${{ matrix.rep }}/
+          retention-days: 90
+          if-no-files-found: error
+
+  aggregate-compare-scatter:
+    needs: fit-baselines
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hyser-sawad-*
+          path: ${{ runner.temp }}/hyser_sawad_models
+          merge-multiple: false
+      - name: Unpack archived 1000-point models into Hyser-only folder
+        run: |
+          for rep in PCA3_PCA3 FA3_FA3 PCA5_RAW5 FA5_RAW5; do
+            folder="experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000/by_rep/$rep"
+            mkdir -p "$folder"
+            cp "$RUNNER_TEMP/hyser_sawad_models/hyser-sawad-$rep/runs_bundle.json" "$folder/runs_bundle.json"
+          done
+      - name: Retrieve same original trial-disjoint release for all 1000 point Fisher graphs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_sawad_features"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip \
+            --dir "$RUNNER_TEMP/hyser_sawad_features"
+          unzip -q "$RUNNER_TEMP/hyser_sawad_features/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
+            -d "$RUNNER_TEMP/hyser_sawad_features"
+      - name: Produce complete fivefold method comparisons and all1000 Fisher scatter gallery
+        run: |
+          python -u experiments/hyser/expanded_five_trials/aggregate_sa_wa_dad_full1000_gallery.py \
+            --features "$RUNNER_TEMP/hyser_sawad_features" \
+            --baselines-dir experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000/by_rep \
+            --frozen experiments/hyser/expanded_five_trials \
+            --out experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000
+      - name: Audit every method panel uses all1000 points and all folds
+        run: |
+          python - <<'PY'
+          import json,csv,pathlib
+          p=pathlib.Path('experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000')
+          z=json.loads((p/'scatter_count_audit.json').read_text())
+          runs=json.loads((p/'all_SA_WA_DAD_run_records.json').read_text())['results']
+          summary=list(csv.DictReader((p/'summary_SA_WA_DAD_HiWA.csv').open()))
+          assert len(z['figures'])==20 and len(runs)==70 and len(summary)==18
+          assert all(x['source_points_each_method']==x['target_points_each_method']==1000 for x in z['figures'])
+          assert all(x['n_runs']==x['n_qualified'] for x in summary)
+          assert len(list((p/'figures').glob('*_FOLD*_ALL1000_Fisher_METHODS.png')))==20
+          assert len(list((p/'figures'/'individual_fold1').glob('*.png')))==30
+          assert len(list((p/'figures').glob('*_eps_curves_all_methods.png')))==4
+          assert (p/'SA_WA_DAD_HYSER_1000_FINAL_REPORT_ZH.md').stat().st_size>2000
+          print('PASS all 1000+1000 scatter points, 20 fivefold montages, 30 individual overlays, 70 real baseline runs')
+          PY
+      - name: Commit ONLY Hyser data and every figure, preserve DANDI and archived HiWA
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000
+          if ! git diff --cached --quiet; then
+            git commit -m "Add real Hyser full1000 SA WA modified-DAD fivefold results with every Fisher scatter figure"
+            for attempt in 1 2 3 4 5 6; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then exit 0; fi
+              sleep 2
+            done
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-sawad-all1000-complete-figures-report
+          path: experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000
+          retention-days: 90
+          if-no-files-found: warn
