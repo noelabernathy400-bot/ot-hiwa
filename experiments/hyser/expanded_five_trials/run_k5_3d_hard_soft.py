@@ -33,7 +33,7 @@ sys.path.insert(0,str(HERE.parent/"scripts"))
 from solver import sinkhorn,polar
 
 def precise_group_entropic_OT(cost,eps=.2):
-    # Dual root for the SAME entropy-regularized 4x4 transportation problem.
+    # Dual root for the SAME entropy-regularized KxK transportation problem.
     c=cost-cost.min(axis=1,keepdims=True)
     c=c-c.min(axis=0,keepdims=True)
     def plan(z):
@@ -184,7 +184,7 @@ def test_shared_reference(Xtr,Ytr,Xte,Yte,R,reference_centers_x,reference_center
     def one(r):
         P=np.full((K,K),1/(K*K))
         for _ in range(5):
-            C=np.zeros((4,4));errs=0.
+            C=np.zeros((K,K));errs=0.
             for k,(x,a) in enumerate(mx):
                 for l,(y,b) in enumerate(my):
                     cost=cdist(x@r.T,y,metric="sqeuclidean")
@@ -267,7 +267,7 @@ def main():
                     "ambiguous_0p8_Y":float(np.mean(Bm.max(1)<.8)),
                     "R":R.tolist(),"P":P.tolist(),
                     "train":train,
-                    "heldout_common_hard_K4_reference":held,
+                    "heldout_common_hard_K5_reference":held,
                     "test_W2_identity":before_global,
                     "test_W2_after":w2(Xte,Yte,R),
                     "paired_holdout_R2_EVAL_ONLY":float(1-np.sum((Xte@R.T-Yte)**2)/np.sum((Yte-Yte.mean(0))**2)),
@@ -295,8 +295,8 @@ def main():
         a=[r for r in results if r["method"]==m]
         for key,get in [
             ("test_W2",lambda r:r["test_W2_after"]),
-            ("heldout_shared_T",lambda r:r["heldout_common_hard_K4_reference"].get("after",{}).get("T",float("nan"))),
-            ("heldout_shared_J",lambda r:r["heldout_common_hard_K4_reference"].get("after",{}).get("J",float("nan"))),
+            ("heldout_shared_T",lambda r:r["heldout_common_hard_K5_reference"].get("after",{}).get("T",float("nan"))),
+            ("heldout_shared_J",lambda r:r["heldout_common_hard_K5_reference"].get("after",{}).get("J",float("nan"))),
             ("anchor_train_T",lambda r:r["train"]["training_result_at_final_global_R"]["T"])]:
             v=np.array([get(r) for r in a],float)
             summary.append({"method":m,"metric":key,"n":len(v),
@@ -307,7 +307,7 @@ def main():
     fig,axes=plt.subplots(1,2,figsize=(12,4.7),constrained_layout=True)
     for axis,(metric,extract) in enumerate([
         ("test_W2_after",lambda r:r["test_W2_after"]),
-        ("shared_hierarchical_T",lambda r:r["heldout_common_hard_K4_reference"].get("after",{}).get("T",float("nan")))]):
+        ("shared_hierarchical_T",lambda r:r["heldout_common_hard_K5_reference"].get("after",{}).get("T",float("nan")))]):
         ax=axes[axis]
         hh=[];ss=[]
         for fold in z.folds:
@@ -342,8 +342,8 @@ def main():
             h=next(r for r in results if r["holdout_fold"]==fold and r["seed"]==seed and r["method"]=="hard")
             s=next(r for r in results if r["holdout_fold"]==fold and r["seed"]==seed and r["method"]=="soft05")
             lines.append(
-                f"|{fold}|{seed}|{h['heldout_common_hard_K4_reference'].get('after',{}).get('T',float('nan')):.5f}|"
-                f"{s['heldout_common_hard_K4_reference'].get('after',{}).get('T',float('nan')):.5f}|"
+                f"|{fold}|{seed}|{h['heldout_common_hard_K5_reference'].get('after',{}).get('T',float('nan')):.5f}|"
+                f"{s['heldout_common_hard_K5_reference'].get('after',{}).get('T',float('nan')):.5f}|"
                 f"{h['test_W2_after']:.5f}|{s['test_W2_after']:.5f}|")
     lines += ["", "## 尚存局限",
         "该优化器是同一全局正交R下的交替P/Q/R优化：不是原始局部Rkl+共识ADMM，因此只能先作为受控数值方法对照。",
