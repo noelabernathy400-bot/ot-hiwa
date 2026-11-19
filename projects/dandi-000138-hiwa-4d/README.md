@@ -1,3 +1,18 @@
+# DANDI:000138 实验 · 2026-11-19 研究收尾入口
+
+**当前研究结论已冻结：**未证实 Soft-GCOT 稳定优于 Hard-HiWA，低无配对运输成本不能证明真实神经—运动样本对应；本数据实验不再围绕“画出漂亮几何对齐”追加调参。原始结果、旧错误、合成控制和严格无监督对照均保留不删。
+
+**请从这里开始阅读：**
+
+- [**最终实验总结：研究路线、实测结果、成功与失误、科研判断**](archive/FINAL_EXPERIMENT_SUMMARY_ZH.md)
+- [**下一次实验标准流程：先检查数据、设定问题和停止门槛，再实验与分析**](archive/NEXT_EXPERIMENT_WORKFLOW_ZH.md)
+- [**全部模型与参数：Hard/Soft/PyHiWA、真实 SA/WA/改编 DAD、未运行基线的严格区分**](archive/METHODS_AND_PARAMETERS_ZH.md)
+- [**实验代码、结果、图像、原始数据 SHA、Phase1C 与 DANDI-only 工作流索引**](archive/ARCHIVE_AND_PROVENANCE_INDEX_ZH.md)
+
+**时间线提醒**：下方是各历史阶段原样保留的记录，部分更早的“下一步计划”后来已完成，部分原始100 test试次已被探索性重复查看；关于**本次项目的最终状态**请以上面的归档为准。**Hyser 属于独立项目，本分支不修改 `experiments/hyser/`。**
+
+---
+
 # DANDI 000138 · 四维 HiWA / Soft-GCOT 严格无监督实验
 
 ## 2026-11-19 · PCA4 与 FA4 在真实162维神经数据上的实际对照（首个内部验证）

@@ -1,0 +1,75 @@
+name: DANDI138 PHASE-I preflight true-rotation synthetic control and real Hard Soft solver
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-preflight-synthetic-control.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  positive-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original solver and plotting dependencies
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Known rotation true-group hidden control using SAME DANDI Hard Soft P/Q/R optimizer
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/preflight_synthetic_positive_control.py \
+            --output projects/dandi-000138-hiwa-4d/results/phase1_synthetic_control \
+            --seeds 42 43 44 --outer 500 --inner 20 --sinkhorn 45 --group-sinkhorn 200 \
+            --prototype-maxiter 300
+      - name: Verify no true-pair labels leak into fitting, actual full P/R and seed results for two regimes
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/phase1_synthetic_control')
+          v=json.loads((p/'SYNTHETIC_POSITIVE_CONTROL_RESULTS.json').read_text())
+          assert v['synthetic_only'] and v['true_rotation_known_only_postfit']
+          assert v['true_group_labels_known_only_postfit'] and v['P_freely_optimized']
+          assert v['unpaired_independent_generation']
+          assert v['source_target_cluster_estimation_independent']
+          assert not v['no_real_DANDI_data_used'] is False
+          assert len(v['regimes'])==2
+          for d in v['regimes'].values():
+              for key in ('hard','soft'):
+                  assert [q['seed'] for q in d['runs'][key]]==[42,43,44]
+                  for row in d['runs'][key]:
+                      assert np.isfinite(row['rotation_frobenius_error'])
+                      assert np.isfinite(row['test_true_group_nearest_neighbor_acc'])
+                      P=np.array(row['P'])
+                      R=np.array(row['R'])
+                      assert abs(P.sum()-1)<1e-6
+                      assert np.max(np.abs(P.sum(0)-.25))<1e-6
+                      assert np.linalg.norm(R.T@R-np.eye(4))<1e-7
+          assert (p/'SYNTHETIC_POSITIVE_CONTROL_HARD_SOFT.png').stat().st_size>60000
+          print('PASS: same DANDI solver under known true-rotation and deliberately overlapped-group positive controls')
+          PY
+      - name: Publish synthetic control results without touching original DANDI experiment
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/phase1_synthetic_control
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish reproducible positive controls: actual strict unpaired Hard Soft solver on known-rotation synthetic data'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-preflight-known-rotation-control
+          path: projects/dandi-000138-hiwa-4d/results/phase1_synthetic_control
+          if-no-files-found: warn

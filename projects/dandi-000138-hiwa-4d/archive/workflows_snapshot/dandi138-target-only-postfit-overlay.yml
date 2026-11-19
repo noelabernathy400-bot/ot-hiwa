@@ -1,0 +1,59 @@
+name: POSTFIT source vs target overlays for target-only geometry experiment
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-target-only-postfit-overlay.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  postfit-overlay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Plot actual 3500 test points source R vs target in all 6 projections
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/plot_target_transform_source_target_overlay.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --baseline projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_RESULTS.json \
+            --results projects/dandi-000138-hiwa-4d/results/target_only_geometry_full/TARGET_TRANSFORM_RESULTS.json \
+            --output projects/dandi-000138-hiwa-4d/results/target_only_geometry_full
+      - name: Check actual picture outputs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/target_only_geometry_full')
+          for name in ['HELDOUT_SOURCE_TARGET_OVERLAY_HARD_six_projections.png',
+                       'HELDOUT_SOURCE_TARGET_OVERLAY_SOFT_six_projections.png',
+                       'TRAIN_ONLY_COVARIANCE_SPECTRA_AND_DISTANCE_QUANTILES.png']:
+              assert (p/name).stat().st_size>50000,name
+          print('PASS: actual paired-free postfit source-target cloud overlays 3500 pts, six 2D projections')
+          PY
+      - name: Commit plots
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/target_only_geometry_full/*.png
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish full heldout source vs target Hard/Soft after target-only transforms; train-only manifold shape spectra'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-target-only-geometry-source-overlays
+          path: projects/dandi-000138-hiwa-4d/results/target_only_geometry_full/*.png
+          if-no-files-found: warn

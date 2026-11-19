@@ -1,0 +1,85 @@
+name: DANDI 000138 generate LaTeX PDF and diagnostics
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/dandi138-generate-report.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Python research dependencies
+        run: |
+          python -m pip install numpy scipy scikit-learn matplotlib
+      - name: Install XeLaTeX and Simplified Chinese fonts
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            texlive-xetex texlive-lang-chinese texlive-latex-extra texlive-fonts-recommended \
+            fonts-noto-cjk fonts-liberation fonts-dejavu-core poppler-utils
+      - name: Compute frozen-data research diagnostics
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          python projects/dandi-000138-hiwa-4d/code/diagnose_hiwa.py
+          python projects/dandi-000138-hiwa-4d/code/diagnose_fixed_window_lag.py
+          python projects/dandi-000138-hiwa-4d/code/diagnose_group_structure.py
+      - name: Compile 13-page Chinese research report with XeLaTeX
+        run: |
+          cd projects/dandi-000138-hiwa-4d
+          mkdir -p _latex_build
+          xelatex -interaction=nonstopmode -halt-on-error -file-line-error -output-directory=_latex_build '四维HardHiWA实验与问题诊断.tex'
+          xelatex -interaction=nonstopmode -halt-on-error -file-line-error -output-directory=_latex_build '四维HardHiWA实验与问题诊断.tex'
+          cp '_latex_build/四维HardHiWA实验与问题诊断.pdf' '四维HardHiWA实验与问题诊断.pdf'
+          test -s '四维HardHiWA实验与问题诊断.pdf'
+          pdfinfo '四维HardHiWA实验与问题诊断.pdf' | grep Pages
+      - name: Sanity check original data protocol and diagnostic metrics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=Path('projects/dandi-000138-hiwa-4d/results/diagnostics')
+          d=json.loads((r/'diagnosis.json').read_text())
+          t=json.loads((r/'fixed_window_lag.json').read_text())
+          g=json.loads((r/'group_geometry.json').read_text())
+          assert d['full_linear_ridge_zero_lag_R2'] > 0.25
+          assert d['orthogonal_train_supervised_R2'] < 0
+          assert t['best_validation_lag']['lag_bins'] == 7
+          assert t['heldout_R2_chosen'] > .35
+          assert g['max_deviation_from_uniform_mass']['hand'] > .2
+          assert len(g['per_seed_HiWA_transport_alignment_vs_true_time_cooccurrence']) == 5
+          print('Data invariants and scientific diagnostic checks passed')
+          PY
+      - name: Commit PDF and diagnostic outputs into project root
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- 'projects/dandi-000138-hiwa-4d/四维HardHiWA实验与问题诊断.pdf' 'projects/dandi-000138-hiwa-4d/results/diagnostics'
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Build Chinese LaTeX PDF report and publish real DANDI 000138 failure diagnostics'
+            git push origin HEAD:main
+          fi
+      - name: Upload reproducible report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DANDI000138-HiWA-LaTeX-report-diagnostics
+          path: |
+            projects/dandi-000138-hiwa-4d/四维HardHiWA实验与问题诊断.pdf
+            projects/dandi-000138-hiwa-4d/四维HardHiWA实验与问题诊断.tex
+            projects/dandi-000138-hiwa-4d/results/diagnostics/
+          if-no-files-found: warn

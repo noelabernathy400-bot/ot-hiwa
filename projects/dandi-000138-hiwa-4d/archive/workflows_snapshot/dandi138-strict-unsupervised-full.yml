@@ -1,0 +1,134 @@
+name: DANDI138 STRICT UNSUPERVISED independent-group Hard-vs-Soft 5-seed
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-strict-unsupervised-full.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  independent-groups:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install scientific dependencies for original ZIP GCOT
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Fit strict independent source and target 4D Hard KMeans and Soft prototypes
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/run_strict_unsupervised_hard_soft.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --output projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft \
+            --seeds 42 43 44 45 46 --outer 500 --inner 20 \
+            --sample-sinkhorn 45 --group-sinkhorn 200 \
+            --eval-Q-iters 120 --prototype-iters 300 --entropy-weight 1 \
+            --mu .05 --epsilon-group .2 --epsilon-sample .1
+      - name: Check ALL stored run inputs, learned free P, marginal and convergence audit
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          root=Path('projects/dandi-000138-hiwa-4d')
+          p=root/'results/strict_unsupervised_hard_soft'
+          s=json.loads((p/'STRICT_UNSUPERVISED_RESULTS.json').read_text())
+          assert s['source_and_target_hard_kmeans_independent'] and s['source_and_target_soft_prototypes_independent']
+          assert s['no_synchronized_pair_ids_used_in_fitting'] and s['no_shared_labels_field_used']
+          assert s['no_target_membership_copy'] and s['P_freely_optimized']
+          assert s['R_initialized_by_zip_original_random_seed_only']
+          assert s['target_group_permutation_fixed_from_paired_data'] is False
+          assert s['true_pairing_used_only_postfit']
+          assert s['training_n']==14000 and s['test_n']==3500
+          assert set(s['runs'])=={'hard','soft'} and all(len(z)==5 for z in s['runs'].values())
+          assert not np.array_equal(s['soft_prototypes']['source_centers'],s['soft_prototypes']['target_centers'])
+          with np.load(root/'results/clustering/clustered_4d.npz') as z:
+              assert not np.array_equal(z['neural_groups'],z['hand_groups'])
+              assert 'shared_labels' not in z.files
+          with np.load(p/'independent_soft_groups.npz') as z:
+              assert not np.array_equal(z['source_train_soft'],z['target_train_soft'])
+          for mode in ['hard','soft']:
+              for row in s['runs'][mode]:
+                  assert row['fitted_using_pairing'] is False
+                  assert np.isfinite(list(row['metrics'].values())).all()
+                  assert row['P_marginal_error']<1e-5 and row['Q_train_max_marginal']<1e-5 and row['Q_test_max_marginal']<1e-5
+                  assert np.linalg.norm(np.asarray(row['R']).T@np.asarray(row['R'])-np.eye(4),'fro')<1e-7
+                  P=np.asarray(row['P'])
+                  assert P.shape==(4,4) and np.all(P>=0)
+                  assert max(abs(P.sum(0)-.25).max(),abs(P.sum(1)-.25).max())<1e-5
+                  assert abs(P.sum()-1)<1e-8
+          for fname in ['unsupervised_hard_soft_errors.png','unsupervised_hard_soft_target_xy.png',
+              'unsupervised_hard_soft_target_six_views.png',
+              'target_visual_labels_vs_independent_training_groups.png']:
+              assert (p/fname).stat().st_size>30000
+          print('PASS: STRICT unpaired five-seed source/target independent grouping, free P, all numerical audits recorded')
+          PY
+      - name: Write latest verified strict unpaired comparison into research log
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          base=Path('projects/dandi-000138-hiwa-4d')
+          relative='results/strict_unsupervised_hard_soft'
+          s=json.loads((base/relative/'STRICT_UNSUPERVISED_RESULTS.json').read_text())
+          st=s['summary']
+          name='## 2026-11-18 · 无配对独立分组 Hard–Soft 正式对照（新基线）'
+          log=base/'EXPERIMENT_LOG.md'
+          content=log.read_text(encoding='utf-8')
+          if name not in content:
+              lines=[name,'',
+                '**训练绝不使用已知同步索引、分组匹配或目标继承标签。**原四维源域与目标域分别独立 K-means（Hard），'
+                '原ZIP GCOT 的 soft_groups 在 X/Y 两域分别独立拟合软原型（Soft）。'
+                '两者使用同一ZIP GCOT hierarchical_alignment，P完全自由，其他参数固定为原500外循环/20局部迭代/45样本Sinkhorn、'
+                '5 seeds，原400/100 trials分割、17500窗口及同4D归一化。',
+                '',
+                '| 测试指标 | 独立Hard | 独立Soft |',
+                '|---|---:|---:|']
+              for label,k in [
+                 ('完整P-Q总几何OT↓','P_Q_total_OT_W2sq'),
+                 ('全域自由OT W2²↓','global_free_W2sq'),
+                 ('同步相对MSE↓','sync_relative_MSE'),
+                 ('同步平均欧氏距离↓','sync_mean_Euclidean'),
+                 ('MAE↓','MAE'),('同步 R²↑','sync_R2')]:
+                  a=st['hard'][k];b=st['soft'][k]
+                  lines.append(f"| {label} | {a['mean']:.6f}±{a['sd_sample']:.6f} | {b['mean']:.6f}±{b['sd_sample']:.6f} |")
+              lines+=['',
+                '严格 ADMM criteria: Hard '+str(st['hard']['admm_criteria_passed'])+
+                '/5，Soft '+str(st['soft']['admm_criteria_passed'])+
+                '/5。仅迭代达到最大次数不等于数值收敛，所有残差在 JSON 中公开。',
+                '原组级监督结果只作为历史诊断，不与本无监督表混用。',
+                '',
+                '[实验报告](results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_REPORT.md) · '
+                '[原始 R/P 与误差](results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_RESULTS.json)',
+                '',
+                '![对比误差](results/strict_unsupervised_hard_soft/unsupervised_hard_soft_errors.png)',
+                '','---','','']
+              content=content.replace('# 实验日志（持续更新）\n',
+                  '# 实验日志（持续更新）\n\n'+'\n'.join(lines),1)
+              log.write_text(content,encoding='utf8')
+          PY
+      - name: Commit real unpaired training results in a separate output directory
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft \
+                     projects/dandi-000138-hiwa-4d/EXPERIMENT_LOG.md
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish strictly unpaired independently grouped original 4D Hard/Soft five-seed OT alignment and audits'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-STRICT-UNSUPERVISED-HARD-SOFT-5SEED
+          path: projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft
+          if-no-files-found: warn

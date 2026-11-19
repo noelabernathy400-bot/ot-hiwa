@@ -1,0 +1,51 @@
+name: DANDI138 Soft-GCOT source-only membership pilot
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-soft-pilot.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install source-archive scientific dependencies
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Pilot true soft full-support OT, archived GCOT solver
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/run_soft_fixedgroup.py \
+            --fixed projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz \
+            --hard projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/hard_hiwa_results.json \
+            --hard-ot projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/ot_evaluation/OT_HELDOUT_METRICS.json \
+            --output projects/dandi-000138-hiwa-4d/results/soft_fixedgroup_pilot \
+            --seeds 42 --outer 3 --inner 4 --sample-sinkhorn 15 --group-sinkhorn 50 --fit-per-group 40 --tau .4
+      - name: Validate source-only soft group identity and measured outputs
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import numpy as np
+          root=Path('projects/dandi-000138-hiwa-4d/results/soft_fixedgroup_pilot')
+          r=json.loads((root/'SOFT_HARD_COMPARISON.json').read_text())
+          assert r['labels_remain_original_hard_kmeans'] is True
+          assert r['same_test_subsets_used'] is True
+          assert len(r['soft_seeds'])==1
+          assert np.isfinite(r['soft_train_entropy_normalized'])
+          print('Soft GCOT pilot passed; entropy=',r['soft_train_entropy_normalized'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-soft-fullsupport-pilot
+          path: projects/dandi-000138-hiwa-4d/results/soft_fixedgroup_pilot
+          if-no-files-found: warn

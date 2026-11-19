@@ -1,0 +1,127 @@
+name: DANDI138 real 3D versus archived 4D original physical matching and PQR
+on:
+  push:
+    branches:
+      - experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119
+    paths:
+      - .github/workflows/dandi138-real-3d-vs-4d-innertrial.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  compare-real-3d-4d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      NUMEXPR_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8" "h5py>=3.10"
+      - name: Retrieve verified original DANDI 000138 NWB asset (not 4D cached PCA)
+        run: |
+          python -u - <<'PY'
+          from pathlib import Path
+          import urllib.request, hashlib, json
+          root='https://api.dandiarchive.org/api'
+          url=f'{root}/dandisets/000138/versions/0.220113.0407/assets/?page_size=100'
+          name='sub-Jenkins_ses-large_desc-train_behavior+ecephys.nwb'
+          asset=None
+          while url:
+              print('DANDI asset listing',url,flush=True)
+              with urllib.request.urlopen(url,timeout=120) as f:
+                  data=json.load(f)
+              for it in data['results']:
+                  if it.get('path','').endswith('/'+name) or it.get('path')==name:
+                      asset=it;break
+              if asset:break
+              url=data.get('next')
+          assert asset is not None
+          output=Path('/tmp')/name
+          req=urllib.request.Request(f"{root}/assets/{asset['asset_id']}/download/",
+                    headers={'User-Agent':'ot-hiwa-dandi3d-comparison/1.0'})
+          sha=hashlib.sha256()
+          count=0
+          with urllib.request.urlopen(req,timeout=480) as response,output.open('wb') as fp:
+              while True:
+                  part=response.read(8<<20)
+                  if not part:break
+                  fp.write(part);sha.update(part);count+=len(part)
+                  if count%(256<<20)<len(part):
+                      print('Downloaded MB',round(count/1048576),flush=True)
+          assert count==asset['size'],(count,asset['size'])
+          assert sha.hexdigest()=='1188ddf5b822dd9ac49afb8916f4b42a85867613cf7f169d0b04a1d1aeecd700'
+          Path('/tmp/dandi_real3d_original_nwb').write_text(str(output))
+          print('RAW_NWB_VERIFIED',sha.hexdigest(),count,flush=True)
+          PY
+      - name: Fit PCA3 FA3 from raw162 neural and PCA3 target, compare archived PCA4 FA4 exact trial validation
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/compare_pca3_fa3_to_archived_4d.py \
+            --nwb "$(cat /tmp/dandi_real3d_original_nwb)" \
+            --original-clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --four-d-reference projects/dandi-000138-hiwa-4d/results/PCA4_FA4_inner_validation/DANDI_PCA4_FA4_INNER_VALIDATION_RESULTS.json \
+            --output projects/dandi-000138-hiwa-4d/results/PCA3_FA3_vs_PCA4_FA4_inner_validation \
+            --seeds 42 43 44 --outer 500 --inner 20 --fa-max-iter 120
+      - name: Audit complete 3D and 4D historical matched protocols and true 4D physical scores
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          root=Path('projects/dandi-000138-hiwa-4d/results/PCA3_FA3_vs_PCA4_FA4_inner_validation')
+          d=json.loads((root/'DANDI_3D_VS_4D_RESULTS.json').read_text())
+          assert d['raw_nwb_sha256']=='1188ddf5b822dd9ac49afb8916f4b42a85867613cf7f169d0b04a1d1aeecd700'
+          assert d['test100_trials_untouched'] and d['original_100_test_trials_never_used']
+          assert d['training_trials']==320 and d['validation_trials']==80
+          assert d['physical_true_pair_only_used_after_fitting']
+          assert d['group_count']==4 and d['OT_training_samples_per_domain']==160
+          assert d['outer']==500 and d['inner']==20
+          assert set(d['methods'])=={'PCA3','FA3'}
+          assert set(d['four_d_archived_same_trial_split_reference']['methods'])=={'PCA4','FA4'}
+          assert 0<d['target_PCA3_explained_variance_fraction']<=1
+          for name in ('PCA3','FA3'):
+              for meth in ('Hard','Soft'):
+                  runs=d['methods'][name][meth]
+                  assert [x['seed'] for x in runs]==[42,43,44]
+                  for row in runs:
+                      R=np.asarray(row['R']);P=np.asarray(row['P'])
+                      assert R.shape==(3,3) and P.shape==(4,4)
+                      assert np.linalg.norm(R.T@R-np.eye(3))<1e-6
+                      assert np.max(np.abs(P.sum(axis=0)-.25))<1e-5
+                      assert np.max(np.abs(P.sum(axis=1)-.25))<1e-5
+                      assert row['train_Q_max_marginal_error']<1e-5
+                      assert row['validation_nested_PQ_max_marginal_error']<1e-5
+                      phys=row['validation_cross_trial_physical_retrieval']
+                      assert 0<=phys['pos_hit10pct']<=1
+                      assert 0<=phys['direction_hit30deg']<=1
+                      namefile=root/f"DANDI_{name}_{meth}_seed{row['seed']}_FULL_P_Q_R.npz"
+                      assert namefile.stat().st_size>20000
+                      with np.load(namefile,allow_pickle=False) as z:
+                          assert len(z['source_train_row_indices'])==160
+                          assert len(z['target_train_row_indices'])==160
+                          assert len([q for q in z.files if q.startswith('Q_')])==16
+          assert (root/'DANDI_3D_VS_4D_REPORT_ZH.md').stat().st_size>1000
+          print('PASS: real NWB 3D vs archival 4D, exactly same original trial split, 6 PQR fits and original 4D physical metrics')
+          PY
+      - name: Commit only new 3D scientific results to isolated experiment branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/PCA3_FA3_vs_PCA4_FA4_inner_validation
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record raw DANDI PCA3 FA3 vs PCA4 FA4 physical matching and full PQR metrics'
+            git pull --rebase origin experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119
+            git push origin HEAD:experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-real-3d-vs-4d-PQR-and-physical-matching
+          path: projects/dandi-000138-hiwa-4d/results/PCA3_FA3_vs_PCA4_FA4_inner_validation
+          if-no-files-found: warn

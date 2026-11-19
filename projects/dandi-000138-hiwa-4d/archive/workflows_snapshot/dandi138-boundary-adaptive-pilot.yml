@@ -1,0 +1,52 @@
+name: Boundary adaptive source KMeans soft GCOT pilot
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-boundary-adaptive-pilot.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  small-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install scientific dependencies
+        run: python -m pip install numpy scipy scikit-learn matplotlib
+      - name: Pilot boundary adaptive with inner trial split and sealed outer test
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/run_boundary_adaptive_ablation.py \
+            --fixed projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz \
+            --archive projects/dandi-000138-hiwa-4d/results/controlled_hard_vs_soft_PQ/CONTROLLED_ABLATION.json \
+            --output projects/dandi-000138-hiwa-4d/results/boundary_adaptive_pilot \
+            --pilot --outer 4 --inner 3 --local-sinkhorn 15 --eval-Q-iters 70
+      - name: Inspect pilot provenance and model artifacts
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/boundary_adaptive_pilot')
+          z=json.loads((p/'BOUNDARY_ADAPTIVE_RESULTS.json').read_text())
+          assert z['source_one_KMeans_only'] and z['original_hard_labels_unchanged']
+          assert z['target_membership_inherited_by_true_paired_window']
+          assert z['validation_train_trials']==320 and z['validation_trials']==80
+          assert len(z['validation_candidates'])==1 and len(z['test_runs'])==1
+          assert 0<=z['selected_h_tau']['mean_alpha']<=1
+          assert np.isfinite(z['test_runs'][0]['evaluation']['same_group_W2_squared'])
+          assert np.isfinite(z['test_runs'][0]['OT_after']['total_transport_W2sq'])
+          print('PASS: design, membership identity, heldout metrics and provenance')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-boundary-adaptive-pilot
+          path: projects/dandi-000138-hiwa-4d/results/boundary_adaptive_pilot
+          if-no-files-found: warn

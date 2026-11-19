@@ -1,0 +1,114 @@
+name: DIAGNOSTIC ONLY - paired source labels supplied to target groups
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/dandi138-source-fixed-convergence.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  convergence-extension:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install scientific libraries
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Verify frozen source labels before fitting
+        run: |
+          python - <<'PY'
+          import numpy as np
+          from pathlib import Path
+          p=Path("projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz")
+          with np.load(p,allow_pickle=False) as z:
+              assert np.array_equal(z["shared_labels"],z["neural_groups"])
+              assert np.array_equal(z["shared_labels"],z["hand_groups"])
+              assert int(z["train_mask"].sum())==14000 and int(z["test_mask"].sum())==3500
+          print("PASS: source-only KMeans labels strictly frozen, target inherits exact same labels")
+          PY
+      - name: Fit original Hard HiWA with 500 outer iterations maximum, no reclustering
+        run: |
+          python projects/dandi-000138-hiwa-4d/code/run_hard_hiwa.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz \
+            --output projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500 \
+            --seeds 42 43 44 45 46 --outer 500 --allow-group-supervised-diagnostic
+      - name: Evaluate fixed-label held-out results (five seeds)
+        run: |
+          python projects/dandi-000138-hiwa-4d/code/evaluate_fixed_group_alignment.py \
+            --input projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz \
+            --alignment projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/hard_hiwa_results.json \
+            --output projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500
+      - name: Compare convergence and scores with original 140-iteration run
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('projects/dandi-000138-hiwa-4d')
+          old=json.loads((root/'results/source_only_fixed_groups/frozen_label_metrics.json').read_text())
+          new=json.loads((root/'results/source_only_fixed_groups_outer500/frozen_label_metrics.json').read_text())
+          a=json.loads((root/'results/source_only_fixed_groups_outer500/hard_hiwa_results.json').read_text())
+          assert new['source_and_target_labels_identical']
+          assert len(a['seed_results'])==5
+          rows=['# 延长迭代的原版 Hard HiWA 收敛核查', '',
+                '**标签完全不变：**使用源域唯一 KMeans、目标继承源标签，'
+                '没有重新拟合/更改任何聚类。唯一区别：外循环最大迭代从 140 延长至 500。','',
+                '| seed | 140 次通过审计 | 500 次以内通过审计 | 实际迭代次数 | '
+                '140 次 R² | 延长后 R² |','|---:|:---:|:---:|---:|---:|---:|']
+          before={s['seed']:s for s in old['seed_results']}
+          after={s['seed']:s for s in new['seed_results']}
+          iterations={s['seed']:s['iterations'] for s in a['seed_results']}
+          for seed in [42,43,44,45,46]:
+              b,c=before[seed],after[seed]
+              rows.append(f"| {seed} | {b['converged']} | {c['converged']} | "
+                          f"{iterations[seed]} | {b['metrics']['R2']:.5f} | {c['metrics']['R2']:.5f} |")
+          rows.extend(['',
+                       '## 延长后总体指标（5 次均值 ± 样本 SD）','',
+                       '| 指标 | 初始 140 外循环 | 延长至 500 外循环 |','|---|---:|---:|'])
+          for key in ['one_nn_shared_group','MAE','paired_relative_MSE','rMSE_rotation_proxy','R2']:
+              b=old['statistics'][key];c=new['statistics'][key]
+              rows.append(f"| {key} | {b['mean']:.6f} ± {b['sd_sample']:.6f} | "
+                          f"{c['mean']:.6f} ± {c['sd_sample']:.6f} |")
+          rows.extend(['','大于最大迭代次数仍未满足共识审计时，不能宣称该 seed 数值收敛。',
+                       '作者原版的全局旋转阈值与额外局部共识审计分别保存于 hard_hiwa_results.json。',''])
+          d=root/'results/source_only_fixed_groups_outer500'
+          (d/'CONVERGENCE_REPORT.md').write_text('\n'.join(rows),encoding='utf-8')
+          log=root/'EXPERIMENT_LOG.md'
+          s=log.read_text(encoding='utf-8')
+          heading="## 2026-11-17 · 实验 D：唯一标签、原版 HiWA 延长 500 次迭代"
+          if heading not in s:
+              intro=heading+'\n\n仅最大外迭代数从 140 增为 500，源域一次 KMeans、目标标签继承与全部其他超参数不变。\n\n'
+              intro+='收敛审计通过的 seed：'+str([z['seed'] for z in new['seed_results'] if z['converged']])+'；'
+              intro+='五次均值 R²='+f"{new['statistics']['R2']['mean']:.5f}"+'。'
+              intro+='详见 [延长迭代的收敛报告](results/source_only_fixed_groups_outer500/CONVERGENCE_REPORT.md)。\n\n---\n\n'
+              s=s.replace('# 实验日志（持续更新）\n','# 实验日志（持续更新）\n\n'+intro,1)
+              log.write_text(s,encoding='utf-8')
+          print('\n'.join(rows))
+          PY
+      - name: Publish convergence checks and new 4D plots (do not overwrite 140 run)
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500 \
+              projects/dandi-000138-hiwa-4d/EXPERIMENT_LOG.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'Run original HiWA longer on frozen single-source groups and audit R2 and residuals'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Upload reproducible long-iteration artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dandi138-fixed-source-groups-outer500
+          path: projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500
+          if-no-files-found: warn

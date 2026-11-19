@@ -1,0 +1,69 @@
+name: DANDI138 ORIGINAL PyHiWA independently clustered 5seed 500outer
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-original-unsupervised-hiwa500.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  original-PyHiWA:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Run ORIGINAL archived PyHiWA with two independently learned Hard groups
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/run_hard_hiwa.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --output projects/dandi-000138-hiwa-4d/results/strict_unsupervised_original_hiwa500 \
+            --seeds 42 43 44 45 46 --outer 500 --local 20 \
+            --local-sinkhorn 45 --group-sinkhorn 200 \
+            --local-gamma .1 --group-gamma .2 --mu .05
+      - name: Audit original PyHiWA unpaired grouping, learnable P and convergence
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/strict_unsupervised_original_hiwa500/hard_hiwa_results.json')
+          r=json.loads(p.read_text())
+          assert r['algorithm']=='original ZIP HiWA, unmodified'
+          assert r['group_supervision_diagnostic'] is False
+          assert r['fit_uses_training_sample_pairing'] is False
+          assert r['training_n']==14000 and r['test_n']==3500
+          assert len(r['seed_results'])==5
+          for s in r['seed_results']:
+              P=np.asarray(s['P'])
+              assert P.shape==(4,4)
+              assert max(abs(P.sum(0)-.25).max(),abs(P.sum(1)-.25).max())<1e-5
+              assert s['orthogonality_fro']<1e-7
+              assert s['marginal_max']<1e-5
+              assert np.isfinite(list(s['metrics'].values())).all()
+          print('PASS: 5 independent source and target KMeans original PyHiWA training fits; full residuals recorded')
+          PY
+      - name: Publish distinct original-solver independently clustered benchmark
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/strict_unsupervised_original_hiwa500
+          if ! git diff --cached --quiet; then
+            git commit -m 'Re-run unchanged original PyHiWA with two independent KMeans and 500 outer iterations'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-original-PyHiWA-UNPAIRED-5SEED
+          path: projects/dandi-000138-hiwa-4d/results/strict_unsupervised_original_hiwa500
+          if-no-files-found: warn

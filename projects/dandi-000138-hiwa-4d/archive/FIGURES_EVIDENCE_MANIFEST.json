@@ -1,0 +1,27 @@
+{
+  "source_files": [
+    "projects/dandi-000138-hiwa-4d/results/PCA3_FA3_vs_PCA4_FA4_inner_validation/DANDI_3D_VS_4D_RESULTS.json",
+    "projects/dandi-000138-hiwa-4d/results/PCA4_FA4_inner_validation/DANDI_PCA4_FA4_INNER_VALIDATION_RESULTS.json",
+    "projects/dandi-000138-hiwa-4d/results/closeout_baselines_real_DANDI/DANDI_SA_WA_DAD_ADAPTED_RESULTS.json",
+    "projects/dandi-000138-hiwa-4d/results/target_only_geometry_full/TARGET_TRANSFORM_RESULTS.json",
+    "projects/dandi-000138-hiwa-4d/results/controlled_hard_vs_soft_PQ/CONTROLLED_ABLATION.json"
+  ],
+  "plots": [
+    "DIRECTION_TOLERANCE_3D_4D.png",
+    "LEGACY_TAU_SWEEP_SUPERVISED_WARNING.png",
+    "POSITION_TOLERANCE_3D_4D.png",
+    "DANDI_FA3_HARD_SOFT_SA_WA_DAD_BASELINES.png",
+    "DANDI_FA4_HARD_SOFT_SA_WA_DAD_BASELINES.png",
+    "DANDI_4D_TARGET_TRANSFORM_ABLATION.png"
+  ],
+  "tables": [
+    "DANDI_3D4D_REAL_PHYSICAL_TOLERANCE_CURVES.csv",
+    "DANDI_SAME_VALIDATION_METHOD_COMPARISON.csv",
+    "LEGACY_LEAKED_GROUP_TAU_SWEEP_DIAGNOSTIC_ONLY.csv",
+    "DANDI_4D_TARGET_TRANSFORM_ABLATION.csv"
+  ],
+  "main_curves": "physical tolerance; method comparison; 4D target transform",
+  "tau_curve_status": "historical supervision leakage; excluded from valid unpaired findings",
+  "requested_overlap_rate_vs_matching_curve_status": "NOT RUN: proposed future experiment only",
+  "figure_export_date": "2026-11-19"
+}
