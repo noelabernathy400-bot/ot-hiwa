@@ -1,0 +1,77 @@
+name: Hyser ADMM rho(mu) training-convergence sensitivity, no test selection
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-admm-mu-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  tune_numerical_convergence_only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    strategy:
+      fail-fast: false
+      matrix:
+        embedding: ["PCA5_RAW5","FA5_RAW5"]
+        mu: ["0.05","0.5"]
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Obtain independent PCA/FA fits without fifth trial leakage
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hiwa_mu"
+          gh release download hyser-s01-s1-random-5trials-v1 --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip --dir "$RUNNER_TEMP/hiwa_mu"
+          unzip -q "$RUNNER_TEMP/hiwa_mu/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" -d "$RUNNER_TEMP/hiwa_mu"
+      - name: Run both independent clusterings with same ADMM mu and other original parameters
+        run: |
+          python experiments/hyser/expanded_five_trials/local_PQR_ADMM_hyser.py \
+            --features "$RUNNER_TEMP/hiwa_mu" \
+            --out "experiments/hyser/expanded_five_trials/results_ADMM_mu_${{ matrix.mu }}_${{ matrix.embedding }}" \
+            --folds 1 --seeds 42 --configs "${{ matrix.embedding }}" \
+            --maxiter 300 --sa-maxiter 40 --mu "${{ matrix.mu }}" --warm-start-local
+      - name: Verify no numerical constraint relaxation; print only training solver convergence
+        env:
+          MU: ${{ matrix.mu }}
+          EMBEDDING: ${{ matrix.embedding }}
+        run: |
+          python - <<'PY'
+          import json,pathlib,os
+          d=pathlib.Path("experiments/hyser/expanded_five_trials")/f"results_ADMM_mu_{os.environ['MU']}_{os.environ['EMBEDDING']}"
+          a=json.loads((d/"local_ADMM_results.json").read_text())
+          assert len(a["runs"])==2
+          for r in a["runs"]:
+            assert r["Q_constraints_passed"]
+            print("Candidate mu",os.environ["MU"],"feature",os.environ["EMBEDDING"],
+               "group",r["method"],"converged",r["numeric_convergence_ADMM_primal_and_rotation"],
+               "last primal",r["diagnostics"]["admm_primal_residual"]["last"],
+               "last rotation change",r["diagnostics"]["Rg_norm"]["last"])
+          PY
+      - name: Publish full trial provenance and transport objects
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "experiments/hyser/expanded_five_trials/results_ADMM_mu_${{ matrix.mu }}_${{ matrix.embedding }}"
+          if ! git diff --cached --quiet; then
+            git commit -m "Audit common ADMM penalty ${{ matrix.mu }} ${{ matrix.embedding }} for both Hard and Soft without altering K4 gamma"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "hyser-admm-mu-${{ matrix.mu }}-${{ matrix.embedding }}"
+          path: "experiments/hyser/expanded_five_trials/results_ADMM_mu_${{ matrix.mu }}_${{ matrix.embedding }}/"
+          if-no-files-found: warn
