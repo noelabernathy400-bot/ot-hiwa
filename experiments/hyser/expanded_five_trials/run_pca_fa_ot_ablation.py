@@ -84,9 +84,12 @@ def main():
     parser.add_argument("--folds",type=int,nargs="+",default=list(FOLDS))
     parser.add_argument("--anchors",type=int,default=96)
     parser.add_argument("--outer",type=int,default=45)
+    parser.add_argument("--configs",nargs="+",choices=[z[0] for z in CONFS],
+                        default=[z[0] for z in CONFS])
     args=parser.parse_args();args.out.mkdir(exist_ok=True,parents=True)
+    selected=[z for z in CONFS if z[0] in args.configs]
     runs=[]
-    for conf,d in CONFS:
+    for conf,d in selected:
         mod=s3 if d==3 else s5
         if d==5:
             mod.K=K
@@ -153,10 +156,10 @@ def main():
                           "convergence",train["simple_numeric_convergence"],flush=True)
         (args.out/"partial_result.json").write_text(
           json.dumps({"status":"PARTIAL","runs":runs},ensure_ascii=False,indent=2)+"\n")
-    assert len(runs)==len(CONFS)*len(args.folds)*len(args.seeds)*2
+    assert len(runs)==len(selected)*len(args.folds)*len(args.seeds)*2
 
     summary=[];pairs=[]
-    for conf,d in CONFS:
+    for conf,d in selected:
         for method in ("hard","soft05"):
             rr=[r for r in runs if r["representation"]==conf and r["method"]==method]
             summary.append({
@@ -191,12 +194,12 @@ def main():
                         a["physical_evaluation"]["paired_force_R2_vs_trainmean_EVAL_ONLY"]),
                 })
     (args.out/"OT_results_all.json").write_text(
-      json.dumps({"study":"FA/PCA factorial, 6 representations x 5 folds x 2 seeds x 2 groupings",
+      json.dumps({"study":"FA/PCA factorial with predeclared representation subset x heldout folds x fixed seeds x both groupings",
                   "source": "Hyser s01/s1 Random Task, five actual trials",
                   "solver": "96 weighted-anchor two-level OT with a shared global orthogonal rotation; NOT original local Rij ADMM",
                   "no_synchronized_pairs_in_OT_training":True,
                   "force_decoder_trained_ONLY_in_target_domain":True,
-                  "meta":{"K":4,"eps_s":.1,"eps_g":.2,"soft_tau":.5,
+                  "meta":{"configs":[z[0] for z in selected],"K":4,"eps_s":.1,"eps_g":.2,"soft_tau":.5,
                           "trial_heldout":True,"n_method_runs":len(runs)},
                   "runs":runs,"summaries":summary,"paired_differences":pairs},
                 ensure_ascii=False,indent=2)+"\n")
@@ -212,7 +215,7 @@ def main():
         w=csv.DictWriter(f,fieldnames=list(pairs[0]));w.writeheader();w.writerows(pairs)
     # Plot paired differences in physically comparable force units and within-representation W2
     fig,axes=plt.subplots(1,2,figsize=(13,5.3),constrained_layout=True)
-    pos=np.arange(len(CONFS));labels=[x[0].replace("_","\n") for x in CONFS]
+    pos=np.arange(len(selected));labels=[x[0].replace("_","\n") for x in selected]
     for ax,k,title in [
         (axes[0],"soft_minus_hard_W2_sq",
             "Soft - Hard heldout W2² (only within each representation)"),
@@ -246,7 +249,7 @@ def main():
 
     md=["# Hyser PCA / FA factor representation on K4 Hard vs Soft-GCOT",
       "",
-      "**120 runs = 6 representations × 5 heldout trials × 2 fixed seeds × 2 groupings.**",
+      "**This file contains a specified subset of the predeclared six representations, evaluated on the indicated heldout trials and fixed seeds.**",
       "Both source and target factor methods are fitted independently on the four train trials.",
       "Two-level P/Q OT + global orthogonal R with 96 weighted anchors, not original full local R_kl HiWA ADMM.",
       "FA and PCA output coordinates are train-whitened before training both hard and soft.",
@@ -258,7 +261,7 @@ def main():
       "",
       "| Setup | Hard W2² | Soft W2² | Hard shared T | Soft shared T | Hard physical RMSE | Soft physical RMSE |",
       "|---|---:|---:|---:|---:|---:|---:|"]
-    for conf,d in CONFS:
+    for conf,d in selected:
         h=next(r for r in summary if r["representation"]==conf and r["method"]=="hard")
         so=next(r for r in summary if r["representation"]==conf and r["method"]=="soft05")
         fmt=lambda z:str(round(z,5)) if z is not None else "N/A"
