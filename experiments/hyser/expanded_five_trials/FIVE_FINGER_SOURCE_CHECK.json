@@ -1,0 +1,241 @@
+{
+  "task": "Hyser subject01/session1 random five trials",
+  "source": "PhysioNet HD-SEMG 2.0.0",
+  "force_header_validation": [
+    {
+      "trial": 1,
+      "original_channel_names": [
+        "thumb",
+        "index",
+        "middle",
+        "ring",
+        "little"
+      ],
+      "original_channel_indices_in_named_order": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "n_windows": 250
+    },
+    {
+      "trial": 2,
+      "original_channel_names": [
+        "thumb",
+        "index",
+        "middle",
+        "ring",
+        "little"
+      ],
+      "original_channel_indices_in_named_order": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "n_windows": 250
+    },
+    {
+      "trial": 3,
+      "original_channel_names": [
+        "thumb",
+        "index",
+        "middle",
+        "ring",
+        "little"
+      ],
+      "original_channel_indices_in_named_order": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "n_windows": 250
+    },
+    {
+      "trial": 4,
+      "original_channel_names": [
+        "thumb",
+        "index",
+        "middle",
+        "ring",
+        "little"
+      ],
+      "original_channel_indices_in_named_order": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "n_windows": 250
+    },
+    {
+      "trial": 5,
+      "original_channel_names": [
+        "thumb",
+        "index",
+        "middle",
+        "ring",
+        "little"
+      ],
+      "original_channel_indices_in_named_order": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "n_windows": 250
+    }
+  ],
+  "five_finger_target_order": [
+    "thumb",
+    "index",
+    "middle",
+    "ring",
+    "little"
+  ],
+  "full_arrays": {
+    "X": [
+      1250,
+      256
+    ],
+    "Y": [
+      1250,
+      5
+    ]
+  },
+  "train_only_per_fold_PCA5_and_whitening": [
+    {
+      "heldout": 1,
+      "PCA5_explained_variance_ratio": [
+        0.779040711929879,
+        0.09132877321726439,
+        0.03184998615660456,
+        0.022993176919602717,
+        0.015058491937273323
+      ],
+      "X_whitening_eigenvalues": [
+        3.858832768710687,
+        5.892145436855149,
+        8.16175821430509,
+        23.40356951313274,
+        199.63405631035954
+      ],
+      "Y_whitening_eigenvalues": [
+        0.001123145368956323,
+        0.0030681264805487714,
+        0.008280951995270774,
+        0.023140347128150343,
+        0.030541201204708244
+      ],
+      "Y_whitening_condition_number": 27.192563001073044
+    },
+    {
+      "heldout": 2,
+      "PCA5_explained_variance_ratio": [
+        0.7858094798307689,
+        0.09174268680884343,
+        0.031801787596177335,
+        0.02129268871132176,
+        0.011594673059811397
+      ],
+      "X_whitening_eigenvalues": [
+        2.9712075108225404,
+        5.456384694793159,
+        8.14940703165307,
+        23.509637460524434,
+        201.36859543210895
+      ],
+      "Y_whitening_eigenvalues": [
+        0.0008122196866944952,
+        0.0025557754634400894,
+        0.007711059273838304,
+        0.023161668013497557,
+        0.028829158978806477
+      ],
+      "Y_whitening_condition_number": 35.49428738440583
+    },
+    {
+      "heldout": 3,
+      "PCA5_explained_variance_ratio": [
+        0.8002343497410438,
+        0.08085484304607285,
+        0.029819075851298876,
+        0.02226500148673945,
+        0.012562504914747311
+      ],
+      "X_whitening_eigenvalues": [
+        3.219220478653968,
+        5.705545926531827,
+        7.641324742675182,
+        20.71955937917383,
+        205.06505859229964
+      ],
+      "Y_whitening_eigenvalues": [
+        0.000990483966331077,
+        0.00277428820489453,
+        0.009189162480709364,
+        0.022826152142449,
+        0.030987056180097203
+      ],
+      "Y_whitening_condition_number": 31.28476303849581
+    },
+    {
+      "heldout": 4,
+      "PCA5_explained_variance_ratio": [
+        0.7777441318171963,
+        0.0869476892697997,
+        0.03300047376449839,
+        0.024469227863202027,
+        0.015644609360674078
+      ],
+      "X_whitening_eigenvalues": [
+        4.0090290253579255,
+        6.2703927257054355,
+        8.456577861573173,
+        22.280889342411136,
+        199.30179954474713
+      ],
+      "Y_whitening_eigenvalues": [
+        0.0012274238572779366,
+        0.002513315347961743,
+        0.008137851623767952,
+        0.02196663394564282,
+        0.02886234355804375
+      ],
+      "Y_whitening_condition_number": 23.514569467512143
+    },
+    {
+      "heldout": 5,
+      "PCA5_explained_variance_ratio": [
+        0.7431953056437314,
+        0.0983332112689762,
+        0.03986012151445116,
+        0.02648056115306229,
+        0.01943942645065365
+      ],
+      "X_whitening_eigenvalues": [
+        4.981474646013339,
+        6.785809464648594,
+        10.214405513212707,
+        25.198500585443306,
+        190.4484466914866
+      ],
+      "Y_whitening_eigenvalues": [
+        0.0013058722257425046,
+        0.002108426662121904,
+        0.006677901500176395,
+        0.013051542168418872,
+        0.024431884612666085
+      ],
+      "Y_whitening_condition_number": 18.709245920882026
+    }
+  ],
+  "note": "5D is a NEW dataset representation; do not compare its absolute transport cost against old 3D experiment. Force channels are identified by header names, not assumed positions. No OT model fitted."
+}
