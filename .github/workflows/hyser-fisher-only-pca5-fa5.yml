@@ -1,0 +1,74 @@
+name: Hyser Fisher-only 2D visualization for PCA5 and FA5 Hard-Soft
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-fisher-only-pca5-fa5.yml"
+      - "experiments/hyser/expanded_five_trials/best_fisher_2d.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fisher:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Fetch verified latent embeddings from original full-five-finger data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/fisher"
+          gh release download hyser-s01-s1-random-5trials-v1 --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip --dir "$RUNNER_TEMP/fisher"
+          unzip -q "$RUNNER_TEMP/fisher/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" -d "$RUNNER_TEMP/fisher"
+      - name: Draw ONLY Fisher 2D subspaces, independent K4 train clustering, no coordinate projections
+        run: |
+          for config in PCA5_RAW5 FA5_RAW5; do
+            for method in hard soft05; do
+              python experiments/hyser/expanded_five_trials/best_fisher_2d.py \
+                --fold "$RUNNER_TEMP/fisher/$config/trial_heldout_1_5d.npz" \
+                --frozen-results experiments/hyser/expanded_five_trials/results_PCA_FA_5D_robust120/OT_results_all.json \
+                --config "$config" --heldout-fold 1 --seed 42 --method "$method" \
+                --out "experiments/hyser/expanded_five_trials/results_Fisher_only/${config}_${method}"
+            done
+          done
+      - name: Verify exactly 4 Fisher 2D figures and full train-based bases
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,numpy as np
+          base=Path("experiments/hyser/expanded_five_trials/results_Fisher_only")
+          assert len(list(base.glob("*/*.png")))==4
+          for p in base.glob("*/fisher_2D_basis_training_only.json"):
+            d=json.loads(p.read_text())
+            assert d["trained_only_on_four_training_trials"] and d["used_pseudo_labels_for_visualization_ONLY"]
+            assert np.array(d["source"]["basis"]).shape==(5,2)
+            assert np.array(d["target"]["basis"]).shape==(5,2)
+          print("Four train-fitted optimal Fisher 2D displays verified; no extra arbitrary projection")
+          PY
+      - name: Store Fisher-only four-way figure set in GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_Fisher_only
+          if ! git diff --cached --quiet; then
+            git commit -m "Present PCA5 and FA5 Hard/Soft Hyser using only train-fitted Fisher 2D plots"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-fisher-only-PCA5-FA5-Hard-Soft
+          path: experiments/hyser/expanded_five_trials/results_Fisher_only/
+          if-no-files-found: warn
