@@ -1,0 +1,103 @@
+{
+  "comparison": "only physical five-finger force error at shared raw-unit training quantile eps",
+  "no_cross_latent_W2_comparison": true,
+  "five_folds_not_independent_subjects": true,
+  "summary": [
+    {
+      "representation_family": "PCA",
+      "method": "hard",
+      "delta_hit_5pct_5D_minus_3D": 0.008000000000000004,
+      "delta_error_5D_minus_3D": 0.006747397788156517,
+      "folds_hit_improved_in_5D": 3,
+      "folds_error_improved_in_5D": 1,
+      "mean_hit3": 0.11720000000000001,
+      "mean_hit5": 0.12520000000000003,
+      "fold_delta_Hit5": [
+        -0.032,
+        0.004,
+        -0.064,
+        0.04600000000000001,
+        0.08600000000000001
+      ],
+      "fold_delta_error": [
+        0.006448568968016544,
+        -0.016581441584166523,
+        0.030181170974002372,
+        0.01032426124781563,
+        0.003364429335114563
+      ]
+    },
+    {
+      "representation_family": "PCA",
+      "method": "soft05",
+      "delta_hit_5pct_5D_minus_3D": 0.015199999999999997,
+      "delta_error_5D_minus_3D": -0.004321531691963356,
+      "folds_hit_improved_in_5D": 3,
+      "folds_error_improved_in_5D": 3,
+      "mean_hit3": 0.10840000000000001,
+      "mean_hit5": 0.12360000000000002,
+      "fold_delta_Hit5": [
+        -0.08,
+        0.004,
+        -0.008000000000000007,
+        0.09999999999999999,
+        0.060000000000000005
+      ],
+      "fold_delta_error": [
+        0.029430724138827885,
+        -0.012182154883470783,
+        0.007074476211287484,
+        -0.018078138156212772,
+        -0.027852565770248597
+      ]
+    },
+    {
+      "representation_family": "FA",
+      "method": "hard",
+      "delta_hit_5pct_5D_minus_3D": 0.048799999999999996,
+      "delta_error_5D_minus_3D": -0.017218991180472983,
+      "folds_hit_improved_in_5D": 4,
+      "folds_error_improved_in_5D": 4,
+      "mean_hit3": 0.0396,
+      "mean_hit5": 0.0884,
+      "fold_delta_Hit5": [
+        0.02600000000000001,
+        0.023999999999999997,
+        0.07,
+        0.124,
+        0.0
+      ],
+      "fold_delta_error": [
+        0.02660437305628363,
+        -0.01981605122107344,
+        -0.005460096023329003,
+        -0.07655263755100884,
+        -0.010870544163237267
+      ]
+    },
+    {
+      "representation_family": "FA",
+      "method": "soft05",
+      "delta_hit_5pct_5D_minus_3D": 0.030400000000000003,
+      "delta_error_5D_minus_3D": -0.00609018466186253,
+      "folds_hit_improved_in_5D": 4,
+      "folds_error_improved_in_5D": 3,
+      "mean_hit3": 0.038400000000000004,
+      "mean_hit5": 0.0688,
+      "fold_delta_Hit5": [
+        -0.057999999999999996,
+        0.018000000000000002,
+        0.06999999999999999,
+        0.116,
+        0.005999999999999998
+      ],
+      "fold_delta_error": [
+        0.00903300614715051,
+        -0.01998425121417599,
+        -0.011120464362429569,
+        -0.07411945978743686,
+        0.06574024590757926
+      ]
+    }
+  ]
+}
