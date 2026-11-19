@@ -62,7 +62,8 @@ def weighted_measures(x, memberships):
 
 
 def hierarchical_alignment(source_measures, target_measures, seed=0, config=None, scale=True,
-                           retain_plans=False, progress=None):
+                           retain_plans=False, progress=None, initial_R=None,
+                           local_start_from_global=False):
     """Source-grounded local alternating OT/Procrustes + ADMM.
 
     Local Q minimizes P_ij <Q,C> + epsilon_sample H(Q), hence the
@@ -78,7 +79,17 @@ def hierarchical_alignment(source_measures, target_measures, seed=0, config=None
     d = source_measures[0][0].shape[1]
     nx, ny = len(source_measures), len(target_measures)
     rng = np.random.default_rng(seed)
-    rglobal = polar(rng.random((d, d)))
+    # Optional train-only external geometric initialization.  The historical
+    # default remains bitwise identical: same RNG stream, polar(rand).
+    if initial_R is None:
+        rglobal = polar(rng.random((d, d)))
+    else:
+        init = np.asarray(initial_R, dtype=float)
+        if init.shape != (d, d) or not np.isfinite(init).all():
+            raise ValueError("initial_R must be a finite D x D orthogonal matrix")
+        if np.linalg.norm(init.T @ init - np.eye(d), ord="fro") > 1e-7:
+            raise ValueError("initial_R must already be orthogonal")
+        rglobal = init.copy()
     dual = np.zeros((nx, ny, d, d))
     local = np.tile(np.eye(d), (nx, ny, 1, 1))
     p = np.full((nx, ny), 1 / (nx * ny))
@@ -102,7 +113,9 @@ def hierarchical_alignment(source_measures, target_measures, seed=0, config=None
                 penalty = cfg.mu / divisor ** 2 * (rglobal - dual[i, j])
                 # Author resets Q to independent marginals for each block call.
                 q = np.outer(a, b)
-                r = polar(rng.random((d, d)))
+                # Legacy: reinitialize each local R randomly, as in MATLAB HiWA.
+                # Optional warm start is a distinct *experimental* solver variant.
+                r = rglobal.copy() if local_start_from_global else polar(rng.random((d, d)))
                 for _ in range(cfg.inner_maxiter):
                     prev = r
                     r = polar(2 * pij * (y.T @ q.T @ x) + penalty)
