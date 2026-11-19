@@ -1,0 +1,27 @@
+{
+  "n_full1000_HiWA_frozen_models": 80,
+  "references": "frozen existing 3D/5D physical errors and original fivefinger arrays",
+  "training": "unpaired source and target clouds; target TRAIN bank only",
+  "inductive": "test source only; true test force exclusively used in scoring",
+  "baseline_parameters": {
+    "single_layer_epsilon": 0.2,
+    "sinkhorn_iterations": 110,
+    "outer_steps": 16,
+    "ICP_trimming_fraction": 0.8,
+    "seeds": [
+      42,
+      43
+    ]
+  },
+  "controls_implemented": [
+    "identity",
+    "unpaired ICP",
+    "single-layer entropic OT-Procrustes"
+  ],
+  "not_claimed": [
+    "original SA/WA/DAD implementations",
+    "optimal single-level solver",
+    "independent subjects",
+    "statistical population significance"
+  ]
+}
