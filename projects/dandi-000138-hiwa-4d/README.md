@@ -1,5 +1,19 @@
 # DANDI 000138 · 四维 HiWA / Soft-GCOT 严格无监督实验
 
+## 2026-11-19 · 第一轮前提实验已完成（含失败的正向对照）
+
+**结论：有运动相关的神经簇结构，但目前不能直接启动Hard/Soft大规模对比。** PCA4神经硬簇与瞬时速度八方向的标准化MI=0.110（试次置换95%界限0.0367），与手部位置象限MI=0.307。真实跨试次物理1NN检索：Hard五种子位置10%容差平均10.44%、速度30°容差平均18.36%，恒等匹配9.69%、20.29%；Hard仅2/5初值有明显物理改善，Soft 0/5且严格ADMM0/5。
+
+**最重要的正向对照**：我们新生成了已知存在真实正交R*且各域独立采样的四维四簇数据（实际拟合中隐藏真R和真簇对应）；原P/Q/R随机初始化求解器并未稳定恢复真实簇迁移：清晰分簇情况下Hard约25%、Soft约41.7%。同一组合成数据采用完全无配对的训练协方差主轴16符号候选，并用训练OT选最佳，测试真实簇迁移达到100%。这意味着不能把真实神经实验的全部失败归因于数据：**当前求解路径、初始化、可辨识性都有问题**。但这个谱初值原样用于真实DANDI，实际位置/方向命中未获改善，不能直接宣称已找到解决方案。
+
+**阶段决策：先检验并修正求解器在明确可对齐分布上的可靠性；随后在400训练trial内部比较PCA4与FA4、运动语义与子空间，再继续完整P/Q/R、WA/Hard/Soft的严格对照。** 不使用已经检查过的100测试trial持续选择超参数。
+
+[完整阶段Ⅰ研究决策与下一阶段门槛](results/phase1_preflight/PHASE1_RESEARCH_DECISION_20261119.md) · [真实簇语义和位置速度匹配](results/phase1_preflight/PREFLIGHT_REPORT.md) · [原随机Hard/Soft P/Q/R正向对照](results/phase1_synthetic_control/SYNTHETIC_POSITIVE_CONTROL_REPORT.md) · [合成数据的谱识别对照](results/phase1_spectral_control/SPECTRAL_GEOMETRY_POSITIVE_CONTROL_REPORT.md) · [真实谱初始化否定性实验](results/phase1_real_spectral_control/DANDI_TRAIN_ONLY_SPECTRAL_GEOMETRY_REPORT.md)
+
+---
+
+
+
 **现行有效版本（2026-11-18）：源域与目标域分别独立分组；真实同步样本对应只在训练完成后用于评价和着色。**
 
 **下一阶段实验计划已记录：** [PCA4/FA4、Isomap低维几何、自动簇的运动意义、独立测试集跨域1NN匹配、真实位置容差命中率与速度方向准确率](NEXT_STAGE_EXPERIMENT_PROTOCOL.md)。该文件是待实施方案，现有正式实验结果未改变。
