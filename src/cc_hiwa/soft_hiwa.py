@@ -182,7 +182,10 @@ class SoftHiWA:
 
     ``support_mode='full'`` is the faithful GCOT reference: each Q_ij uses all
     samples with the normalized soft assignment column as its marginal.
-    ``'sparse'`` preserves the previous top-membership approximation.
+    ``support_mode='positive'`` trims ONLY mathematically zero-mass rows/columns,
+    preserving ALL conditional probability mass and every objective value;
+    for one-hot Hard it reproduces original HiWA per-cluster supports.
+    ``'sparse'`` is an explicit mass-truncation approximation.
     """
 
     def __init__(
@@ -227,8 +230,8 @@ class SoftHiWA:
         self.sa_shorn_gamma = sa_shorn_gamma
         self.retain_mass = retain_mass
         self.max_support_factor = max_support_factor
-        if support_mode not in {"full", "sparse"}:
-            raise ValueError("support_mode must be 'full' or 'sparse'")
+        if support_mode not in {"full", "positive", "sparse"}:
+            raise ValueError("support_mode must be 'full', 'positive', or 'sparse'")
         self.support_mode = support_mode
         self.random_state = random_state
         self.warm_start_local = warm_start_local
@@ -321,11 +324,23 @@ class SoftHiWA:
         n_groups_y = b.shape[1]
         x_mbed = (x_transform @ x_transform.T @ x_fit.T).T / np.sqrt(high_dim)
         y_mbed = (y_transform @ y_transform.T @ y_fit.T).T / np.sqrt(high_dim)
-        if self.support_mode == "full":
-            x_indices = [np.arange(x_mbed.shape[0]) for _ in range(n_groups_x)]
-            y_indices = [np.arange(y_mbed.shape[0]) for _ in range(n_groups_y)]
-            x_weights = [a[:, group] / np.maximum(a[:, group].sum(), EPS) for group in range(n_groups_x)]
-            y_weights = [b[:, group] / np.maximum(b[:, group].sum(), EPS) for group in range(n_groups_y)]
+        if self.support_mode in {"full", "positive"}:
+            if self.support_mode == "full":
+                x_indices = [np.arange(x_mbed.shape[0]) for _ in range(n_groups_x)]
+                y_indices = [np.arange(y_mbed.shape[0]) for _ in range(n_groups_y)]
+            else:
+                # Exact support reduction, NOT a threshold or approximation:
+                # zero-mass rows/columns make no contribution to any local Q.
+                x_indices = [np.flatnonzero(a[:, group] > 0)
+                             for group in range(n_groups_x)]
+                y_indices = [np.flatnonzero(b[:, group] > 0)
+                             for group in range(n_groups_y)]
+                if any(len(x)==0 for x in x_indices) or any(len(y)==0 for y in y_indices):
+                    raise ValueError("An exact nonzero group has no support")
+            x_weights = [a[idx, group] / np.maximum(a[idx, group].sum(), EPS)
+                         for group,idx in enumerate(x_indices)]
+            y_weights = [b[idx, group] / np.maximum(b[idx, group].sum(), EPS)
+                         for group,idx in enumerate(y_indices)]
             x_retained = [1.0] * n_groups_x
             y_retained = [1.0] * n_groups_y
         else:
