@@ -1,0 +1,53 @@
+name: DANDI138 Phase1C spectral sign identifiability audit
+on:
+  push:
+    branches:
+      - experiment/dandi-phase1-multiinstance-pilot-20261119
+    paths:
+      - .github/workflows/dandi138-phase1c-spectral-identifiability-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  spectral-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Compare train-only selected spectral candidate with posthoc truth and best-of-16 oracle
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/phase1c_spectral_identifiability_audit.py \
+            --output projects/dandi-000138-hiwa-4d/results/phase1c_spectral_identifiability \
+            --regimes separated mild_overlap severe_overlap \
+            --instances 0 1 2 3 4 5 6 7
+      - name: Validate 24 independent diagnostic instances and candidate completeness
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,numpy as np
+          root=Path("projects/dandi-000138-hiwa-4d/results/phase1c_spectral_identifiability")
+          a=json.loads((root/"RESULTS.json").read_text())
+          assert a["truth_never_used_to_pick_actual_initializer"]
+          assert len(a["instances"])==24
+          for r in a["instances"]:
+              assert len(r["16_sign_train_W2"])==16
+              assert len(r["16_sign_true_Rstar_Fro_error_POSTHOC"])==16
+              assert np.isfinite(r["selected_Rstar_fro_error_POSTHOC"])
+              assert np.isfinite(r["best_Rstar_error_among_16_POSTHOC"])
+              assert r["best_Rstar_error_among_16_POSTHOC"] <= r["selected_Rstar_fro_error_POSTHOC"]+1e-9
+          print("PASS: train-only selection isolated from posthoc true-R diagnostic, 24 x 16 candidate scores")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-phase1C-spectral-trueR-diagnostic
+          path: projects/dandi-000138-hiwa-4d/results/phase1c_spectral_identifiability
+          if-no-files-found: warn
