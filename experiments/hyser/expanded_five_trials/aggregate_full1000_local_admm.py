@@ -91,7 +91,14 @@ def main():
             par=r["params"]
             return (r["Q_constraints_passed"] and
                     r["numeric_convergence_ADMM_primal_and_rotation"] and
-                    len(qs)==16 and all(x["shape"]==[1000,1000] for x in qs) and
+                    len(qs)==16 and
+                    all(len(q["shape"])==2 and
+                        0<q["shape"][0]<=1000 and 0<q["shape"][1]<=1000 and
+                        abs(q["total_mass"]-1.)<1e-6 for q in qs) and
+                    (z.support_mode!="positive" or
+                     r["exact_nonzero_support_no_mass_removed"]) and
+                    r["max_final_Q_marginal_error"]<1e-5 and
+                    r["max_Rkl_orthogonality_error"]<1e-7 and
                     np.isfinite(R).all() and
                     np.linalg.norm(R@R.T-np.eye(5))<1e-7 and
                     max(abs(P.sum(axis=0)-.25).max(),
