@@ -3,7 +3,7 @@
 
 Five trial-disjoint folds (1000 training vs 250 testing windows in each domain).
 All 1000 training points inform independent KMeans and independent quantization
-of each domain; for tractability each 3D distribution is represented by 96
+of each domain; for tractability each 5D distribution is represented by 96
 weighted KMeans anchors in the inner Q optimizer. This five-finger five-dimensional experiment uses the SAME frozen 5D data for both K choices; compared within the same K across Hard/Soft. This is a disclosed
 approximation to the full-data hierarchical OT, NOT the original HiWA ADMM.
 
