@@ -105,6 +105,14 @@ def main():
     p.add_argument("--maxiter",type=int,default=60)
     p.add_argument("--sa-maxiter",type=int,default=40)
     p.add_argument("--save-first-Q",action="store_true")
+    p.add_argument("--full-training",action="store_true",
+                   help="Fit on all 1000 train windows in both domains, independently permuted.")
+    p.add_argument("--warm-start-local",action="store_true",
+                   help="Opt-in common numerical warm start for Hard & Soft (sensitivity, not historical default).")
+    p.add_argument("--mu",type=float,default=.005,
+                   help="ADMM penalty; .005 is historical default.")
+    p.add_argument("--only-methods",nargs="+",choices=["hard","soft05"],
+                   default=["hard","soft05"])
     args=p.parse_args()
     args.out.mkdir(parents=True,exist_ok=True)
     sh.sinkhorn_groups=stable_group_P
@@ -120,17 +128,26 @@ def main():
             assert Xtr.shape==Ytr.shape==(1000,5)
             assert Xte.shape==Yte.shape==(250,5)
             # Different subsamples by domain: no synchronized pair ordering
-            iX=choose_indices(traintrials,512)
-            iY=choose_indices(traintrials,2048)
+            if args.full_training:
+                # Independent within-domain permutations make any temporal
+                # index-pairing impossible for the unsupervised fit.
+                iX=np.random.default_rng(512).permutation(len(Xtr))
+                iY=np.random.default_rng(2048).permutation(len(Ytr))
+            else:
+                iX=choose_indices(traintrials,512)
+                iY=choose_indices(traintrials,2048)
             x=Xtr[iX];y=Ytr[iY]
+            nfit=len(x)
             rad=train_radius(Ytr/np.sqrt(5),traintrials)
             rr=random_baseline(Yte,rad["radius"])
             for seed in args.seeds:
-                for mode in ("hard","soft05"):
+                for mode in args.only_methods:
                     aa,bb=per_method_memberships(x,y,mode)
                     params=dict(PARAMS)
                     params.update(random_state=seed,maxiter=args.maxiter,
-                                  sa_maxiter=args.sa_maxiter)
+                                  sa_maxiter=args.sa_maxiter,
+                                  warm_start_local=args.warm_start_local,
+                                  mu=args.mu)
                     model=SoftHiWA(**params).fit(x,aa,y,bb,
                               X_transform=np.eye(5),Y_transform=np.eye(5))
                     R=np.asarray(model.Rg,float)
@@ -150,23 +167,26 @@ def main():
                     for i in range(K):
                         for j in range(K):
                             arr=np.asarray(q[i][j],float)
-                            if arr.shape!=(250,250) or not np.isfinite(arr).all():
+                            if arr.shape!=(nfit,nfit) or not np.isfinite(arr).all():
                                 raise ValueError("Unexpected full-Q local block")
                             qstats.append({"i":i,"j":j,
-                                 "shape":[250,250],"total_mass":float(arr.sum()),
+                                 "shape":[nfit,nfit],"total_mass":float(arr.sum()),
                                  "nonzero_fraction":float(np.mean(arr>1e-14)),
                                  "max_entry":float(np.max(arr))})
                     row={
                         "config":conf,"heldout_trial":fold,"seed":seed,"method":mode,
-                        "fitting":"local-PQR-ADMM full point-support on 250 randomly preselected TRAINING points, no anchors",
+                        "fitting":("Full 1000 unpaired TRAINING points each domain; exact dense local Q, no anchors"
+                                   if args.full_training else "250 preselected unpaired training points; exact local Q, no anchors"),
                         "n_full_representation_training":1000,
-                        "n_OT_train_source":250,"n_OT_train_target":250,
+                        "n_OT_train_source":nfit,"n_OT_train_target":nfit,
                         "n_heldout_test":250,
-                        "n_train_per_trial_chosen":[63,63,63,61],
+                        "n_train_per_trial_chosen":([250]*4 if args.full_training else [63,63,63,61]),
                         "sampling_indices_selected_before_model":[iX.tolist(),iY.tolist()],
                         "source_and_target_subsample_independent":True,
                         "K":K,"dims":5,"params":params,"R":R.tolist(),"P":P.tolist(),
                         "q_stats":qstats,
+                        "local_rotations_Rkl":model.local_rotations.tolist(),
+                        "ADMM_dual_multipliers_final":model.admm_dual_multipliers.tolist(),
                         "local_R_matrices_learned":True,
                         "full_Q_matrices_learned_for_each_16_pairs":True,
                         "numeric_convergence_ADMM_primal_and_rotation":False,
@@ -186,6 +206,23 @@ def main():
                     row["numeric_convergence_ADMM_primal_and_rotation"]=(
                         dpr.get("last",float("inf"))<=.1 and
                         dr.get("last",float("inf"))<=.1)
+                    # Verify ALL local conditional OT row/column marginals, not
+                    # only P. A numerical failure is recorded in row and NEVER
+                    # silently called a converged run.
+                    row["max_final_Q_marginal_error"] = float(
+                        diagnostic["max_sinkhorn_marginal_error"][-1])
+                    row["local_rotation_consensus_max_error"]=float(
+                        np.linalg.norm(model.local_rotations -
+                            R[:,:,None,None],axis=(0,1)).max())
+                    row["max_Rkl_orthogonality_error"]=float(max(
+                        np.linalg.norm(model.local_rotations[:,:,i,j].T @
+                                       model.local_rotations[:,:,i,j]-np.eye(D))
+                        for i in range(K) for j in range(K)))
+                    row["Q_constraints_passed"]=(
+                        row["max_final_Q_marginal_error"]<=1e-5 and
+                        all(abs(t["total_mass"]-1)<1e-6 for t in qstats))
+                    row["numeric_convergence_ADMM_primal_and_rotation"] &= bool(
+                        row["Q_constraints_passed"])
                     rows.append(row)
                     (args.out/"partial_results.json").write_text(
                         json.dumps({"status":"PARTIAL","runs":rows},ensure_ascii=False,indent=2)+"\n",
@@ -200,8 +237,10 @@ def main():
                       "P error",max(abs(P.sum(0)-.25).max(),abs(P.sum(1)-.25).max()),
                       "last delta",row["diagnostics"]["Rg_norm"],flush=True)
     (args.out/"local_ADMM_results.json").write_text(
-      json.dumps({"experiment":"Five-trial heldout full P,Q,Rkl ADMM, 250 TRAINING samples per domain subsampled from 1000",
-       "not_full_1000_point_OT":True,
+      json.dumps({"experiment":("Five-trial heldout true 1000 points/domain full dense P,Q,Rkl ADMM"
+                                 if args.full_training else
+                                 "Five-trial heldout P,Q,Rkl ADMM with 250 TRAINING points/domain"),
+       "not_full_1000_point_OT":not args.full_training,
        "different_from_prior_96_anchor_global_R":True,
        "source_and_target_sampled_independently":True,
        "local_solver":"repo.src.cc_hiwa.soft_hiwa.SoftHiWA full support with hard one-hot vs soft K-means",
@@ -210,7 +249,7 @@ def main():
        "runs":rows},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     summary=[]
     for conf in args.configs:
-        for meth in ("hard","soft05"):
+        for meth in args.only_methods:
             rr=[r for r in rows if r["config"]==conf and r["method"]==meth]
             summary.append({"config":conf,"method":meth,"n_runs":len(rr),
               "coverage":float(np.mean([r["nearest"]["target_nn_coverage_fraction"] for r in rr])),
@@ -228,7 +267,9 @@ def main():
        "",
        "This code runs the existing repo src.cc_hiwa.soft_hiwa.SoftHiWA with full Q for each of 16 local group pairs, local orthogonal R_kl, group P and ADMM consensus global Rg.",
        "HARD group assignment is one-hot, SOFT group assignment is independent temperature=.5 soft Kmeans; all P/Q/entropy/consensus parameters are otherwise identical.",
-       "**Scope limit**: each fold's complete 1000 training points build PCA5/FA5 representations and 4 group K-means is fitted on **250 real stratified training points per domain**, selected independently from each of four training trials (63+63+63+61). The fit fully solves all local Q blocks on those 250 points, not on 1000 original training points; no 96-anchor approximation is used. This is a scientifically honest small-data full-PQR-ADMM CONTROL, NOT claimed as full 1000-point original HiWA run.",
+       ("**FULL TRAINING**: 1000 training points/domain per fold, independent domain permutations, 16 full local Q matrices each 1000x1000, no anchors, no test pairs in model fit."
+        if args.full_training else
+        "**SUBSAMPLE**: only 250 training points/domain per fold, full Q on subsample, NOT the 1000-point formal fit."),
        "Holdout is the entire remaining 250 windows, never used to train PCA/FA/ADMM.",
        "Nearest target accuracy is based on true synchronized heldout Y, and train-only 5% inter-trial quantile radius. Coverage is not physical correctness.",
        "",
@@ -236,7 +277,8 @@ def main():
        "|---|---|---:|---:|---:|---:|---:|"]
     for r in summary:
         report.append(f"|{r['config']}|{r['method']}|{r['n_runs']}|{r['coverage']:.3%}|{r['physical_hit']:.3%}|{r['random_hit']:.3%}|{r['exact_index']:.3%}|")
-    report+=["","**Do not interpret a local-ADMM run with nonconverged primal residual as a successfully converged full HiWA model.** The numerical history, P/Q block statistics and group marginal errors are saved for review.",
+    report+=["",f"Solver initialization: warm_start_local={args.warm_start_local}; ADMM mu={args.mu}; outer limit={args.maxiter}; per-pair inner limit={args.sa_maxiter}.",
+        "**Do not interpret a local-ADMM run with nonconverged primal residual as a successfully converged full HiWA model.** The numerical history, P/Q block statistics and group marginal errors are saved for review.",
       "No inherited source cluster labels have been given to target. No synchronized row pair enters OT fitting."]
     (args.out/"README_ZH.md").write_text("\n".join(report)+"\n",encoding="utf-8")
     print(json.dumps({"status":"success","n_runs":len(rows),"summary":summary},ensure_ascii=False),flush=True)
