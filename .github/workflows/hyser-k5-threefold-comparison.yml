@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - ".github/workflows/hyser-k5-threefold-comparison.yml"
+      - "experiments/hyser/expanded_five_trials/run_k5_3d_hard_soft.py"
   workflow_dispatch:
 
 permissions:
