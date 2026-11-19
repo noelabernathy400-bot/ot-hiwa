@@ -132,7 +132,7 @@ def main():
            "middle_deviation_dominant","index_deviation_dominant"]
     with (out/"physical_force_labels_POSTHOC_ONLY.csv").open("w",newline="",encoding="utf-8") as f:
         writer=csv.writer(f)
-        writer.writerow(["trial_id","window_start_seconds","force_thumb","force_index",
+        writer.writerow(["trial_id","window_start_seconds","force_thumb","force_middle",
                          "force_index","force_proxy_state","force_proxy_code",
                          "source_kmeans_cluster_POSTHOC","target_kmeans_cluster_POSTHOC",
                          "REAL_ACTION_GROUND_TRUTH"])
