@@ -30,7 +30,7 @@ jobs:
           checks=[]
           for m in months:
               for net in networks:
-                  link=f'https://data.citybik.es/{m}-{net}-stats.parquet'
+                  link=f'https://data.citybik.es/dumps/by-network/{m[:4]}/{m}-{net}-stats.parquet'
                   req=urllib.request.Request(link,method='HEAD',
                     headers={'User-Agent':'academic-noncommercial-citybike-OT-dataset-screening/1.0'})
                   try:
