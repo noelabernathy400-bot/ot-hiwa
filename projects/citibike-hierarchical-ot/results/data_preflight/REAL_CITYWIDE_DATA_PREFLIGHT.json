@@ -1,0 +1,451 @@
+{
+  "dataset": "Citi Bike NYC official citywide monthly trip archives",
+  "archive_source": "https://citibikenyc.com/system-data",
+  "status": "preflight only; no OT fit; no real inventory claim",
+  "months_train": [
+    "202604",
+    "202605",
+    "202606"
+  ],
+  "months_validation": [
+    "202607"
+  ],
+  "months_reserved_test_not_read": [
+    "202608",
+    "202609"
+  ],
+  "official_input_archives": [
+    {
+      "official_zip_filename": "202604-citibike-tripdata.zip",
+      "sha256": "fefc1fca369818baeb9206792e02a098b71b59f263064b6627b42317965e2ffb",
+      "archive_bytes": 164592563,
+      "csv_members": [
+        "202604-citibike-tripdata-part1.csv",
+        "202604-citibike-tripdata-part2.csv",
+        "202604-citibike-tripdata-part3.csv",
+        "202604-citibike-tripdata-part4.csv"
+      ],
+      "csv_count": 4,
+      "headers": [
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ]
+      ],
+      "quality_counts": {
+        "raw_rides": 3860371,
+        "accepted_rides": 3847688,
+        "weekend_rides": 823297,
+        "missing_station_id": 12171,
+        "outside_month_or_cross_month": 512
+      },
+      "validated_rides": 3847688
+    },
+    {
+      "official_zip_filename": "202605-citibike-tripdata.zip",
+      "sha256": "b9461221fb7ce806d5274b046b4de46414a1d1116ba2bc46c6a870b7bda71adf",
+      "archive_bytes": 916981226,
+      "csv_members": [
+        "202605-citibike-tripdata_3.csv",
+        "202605-citibike-tripdata_2.csv",
+        "202605-citibike-tripdata_1.csv",
+        "202605-citibike-tripdata_5.csv",
+        "202605-citibike-tripdata_4.csv"
+      ],
+      "csv_count": 5,
+      "headers": [
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ]
+      ],
+      "quality_counts": {
+        "raw_rides": 4694878,
+        "accepted_rides": 4680752,
+        "weekend_rides": 1263463,
+        "missing_station_id": 13614,
+        "outside_month_or_cross_month": 512
+      },
+      "validated_rides": 4680752
+    },
+    {
+      "official_zip_filename": "202606-citibike-tripdata.zip",
+      "sha256": "4ba77e6422cee141041638f988281c13e5ebf72bd9e5ab89638eb5d7d3763f60",
+      "archive_bytes": 1051241498,
+      "csv_members": [
+        "202606-citibike-tripdata_6.csv",
+        "202606-citibike-tripdata_5.csv",
+        "202606-citibike-tripdata_4.csv",
+        "202606-citibike-tripdata_1.csv",
+        "202606-citibike-tripdata_3.csv",
+        "202606-citibike-tripdata_2.csv"
+      ],
+      "csv_count": 6,
+      "headers": [
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ]
+      ],
+      "quality_counts": {
+        "raw_rides": 5384468,
+        "accepted_rides": 5367011,
+        "weekend_rides": 1354986,
+        "missing_station_id": 16822,
+        "outside_month_or_cross_month": 635
+      },
+      "validated_rides": 5367011
+    },
+    {
+      "official_zip_filename": "202607-citibike-tripdata.zip",
+      "sha256": "9aeb4f2a1744ce4a81ab5a2bc999bb3e7794fc0a010415e64aeb80283a0c21c0",
+      "archive_bytes": 974302094,
+      "csv_members": [
+        "202607-citibike-tripdata_2.csv",
+        "202607-citibike-tripdata_3.csv",
+        "202607-citibike-tripdata_1.csv",
+        "202607-citibike-tripdata_4.csv",
+        "202607-citibike-tripdata_5.csv"
+      ],
+      "csv_count": 5,
+      "headers": [
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ],
+        [
+          "ride_id",
+          "rideable_type",
+          "started_at",
+          "ended_at",
+          "start_station_name",
+          "start_station_id",
+          "end_station_name",
+          "end_station_id",
+          "start_lat",
+          "start_lng",
+          "end_lat",
+          "end_lng",
+          "member_casual"
+        ]
+      ],
+      "quality_counts": {
+        "raw_rides": 4993137,
+        "accepted_rides": 4974594,
+        "weekend_rides": 1207011,
+        "outside_month_or_cross_month": 869,
+        "missing_station_id": 17674
+      },
+      "validated_rides": 4974594
+    }
+  ],
+  "trip_total_train": 13895451,
+  "trip_total_validation": 4974594,
+  "train_all_station_ids": 2463,
+  "validation_all_station_ids": 2418,
+  "stations_active_with_50_plus_train_events": 2382,
+  "group_K_for_visualization_only": 12,
+  "cluster_group_sizes": [
+    216,
+    250,
+    233,
+    199,
+    186,
+    267,
+    107,
+    207,
+    175,
+    217,
+    142,
+    183
+  ],
+  "soft_entropy_normalized_mean": 0.3764755299686465,
+  "soft_entropy_normalized_p10_p50_p90": [
+    0.18852809531979087,
+    0.38350092139465775,
+    0.5439952009003176
+  ],
+  "soft_membership_temperature_for_visualization_only_km2": 10.556186582108818,
+  "max_ride_induced_station_net_morning": 8367,
+  "min_ride_induced_station_net_morning": -3971,
+  "max_ride_induced_station_net_evening": 3456,
+  "min_ride_induced_station_net_evening": -6731,
+  "data_not_sufficient_for_actual_surplus_deficit": true,
+  "real_inventory_data_needed": "historical timestamped GBFS station_status + capacity/target and service-move ambiguity",
+  "plots": [
+    "CITIBIKE_NYC_CITYWIDE_STATION_STRUCTURE.png",
+    "CITIBIKE_NYC_HARD_SOFT_12GROUPS.png",
+    "CITIBIKE_NYC_DAILY_TRIP_VOLUME.png"
+  ],
+  "no_DANDI_or_Hyser_edits": true,
+  "no_true_paired_label_transfer": true
+}
