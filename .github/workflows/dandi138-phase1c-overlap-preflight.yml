@@ -1,0 +1,58 @@
+name: DANDI138 Phase1C genuine overlap independent generator preflight
+on:
+  push:
+    branches:
+      - experiment/dandi-phase1-multiinstance-pilot-20261119
+    paths:
+      - .github/workflows/dandi138-phase1c-overlap-preflight.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  overlap-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Audit predeclared mild/severe cluster-overlap geometry on eight independent generated instances
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/phase1c_overlap_and_recovery.py \
+            --preflight-only \
+            --output projects/dandi-000138-hiwa-4d/results/phase1c_overlap_preflight \
+            --regimes mild_overlap severe_overlap \
+            --instances 0 1 2 3 4 5 6 7
+      - name: Verify genuinely mixed classes and realistic oracle upper bound before fitting HiWA
+        run: |
+          python - <<'PY'
+          import json, numpy as np
+          from pathlib import Path
+          p=Path("projects/dandi-000138-hiwa-4d/results/phase1c_overlap_preflight/RESULTS.json")
+          data=json.loads(p.read_text())
+          assert data["fits"]==[] and len(data["overlap_preflight"])==16
+          for name in ("mild_overlap","severe_overlap"):
+              rows=[r for r in data["overlap_preflight"] if r["regime"]==name]
+              assert len(rows)==8
+              px=np.array([r["source_KMeans_true_class_purity_Hungarian"] for r in rows])
+              py=np.array([r["target_KMeans_true_class_purity_Hungarian"] for r in rows])
+              oracle=np.array([r["oracle_Rstar_true_class_1NN"] for r in rows])
+              print(name, "purityX",px.round(3), "purityY",py.round(3),
+                    "oracle", oracle.round(3))
+              assert np.median(px)<.95 and np.median(py)<.95
+              assert np.median(oracle)<.95
+              assert np.median(oracle)>.40
+          print("PASS: genuine overlap verified in both independently generated regimes")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-phase1C-genuine-overlap-preflight
+          path: projects/dandi-000138-hiwa-4d/results/phase1c_overlap_preflight
+          if-no-files-found: warn
