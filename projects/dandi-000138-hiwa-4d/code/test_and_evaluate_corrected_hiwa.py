@@ -34,6 +34,8 @@ def load_original():
     txt=subprocess.check_output(["git","show",f"{ORIGINAL_SHA}:{ORIGINAL_PATH}"],text=True)
     module=types.ModuleType("zip_gcot.pre_edit_alignment")
     module.__package__="zip_gcot"
+    # dataclasses inspects sys.modules[cls.__module__] during class creation.
+    sys.modules[module.__name__]=module
     exec(compile(txt,f"{ORIGINAL_SHA}:{ORIGINAL_PATH}","exec"),module.__dict__)
     return module,txt
 
