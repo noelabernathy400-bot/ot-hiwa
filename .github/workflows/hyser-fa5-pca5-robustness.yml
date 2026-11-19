@@ -1,0 +1,78 @@
+name: Hyser FA5-vs-PCA5 optimization 120-iteration robustness check
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-fa5-pca5-robustness.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hyser-fa5-pca5-120step-robustness
+  cancel-in-progress: false
+
+jobs:
+  robust:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Download immutable trial-only factor embeddings
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_fa120"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip \
+            --dir "$RUNNER_TEMP/hyser_fa120"
+          unzip -q "$RUNNER_TEMP/hyser_fa120/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
+            -d "$RUNNER_TEMP/hyser_fa120"
+      - name: Refit global-orthogonal-R Hard/Soft with identical 120-step limits
+        run: |
+          python experiments/hyser/expanded_five_trials/run_pca_fa_ot_ablation.py \
+            --data-dir "$RUNNER_TEMP/hyser_fa120" \
+            --out experiments/hyser/expanded_five_trials/results_PCA_FA_5D_robust120 \
+            --configs PCA5_RAW5 FA5_RAW5 \
+            --seeds 42 43 --folds 1 2 3 4 5 --anchors 96 --outer 120
+      - name: Validate 40 runs and all five trial folds
+        run: |
+          python - <<'PY'
+          import json,pathlib,numpy as np
+          p=pathlib.Path("experiments/hyser/expanded_five_trials/results_PCA_FA_5D_robust120")
+          o=json.loads((p/"OT_results_all.json").read_text())
+          assert len(o["runs"])==40,len(o["runs"])
+          assert len(o["summaries"])==4
+          assert len(o["paired_differences"])==20
+          assert {(r["representation"],r["fold"],r["seed"],r["method"]) for r in o["runs"]} == {
+            (rep,fold,seed,m) for rep in ("PCA5_RAW5","FA5_RAW5") for fold in range(1,6) for seed in (42,43) for m in ("hard","soft05")}
+          assert all(r["train"]["num_iterations"]<=120 for r in o["runs"])
+          assert all(np.array(r["P"]).shape==(4,4) for r in o["runs"])
+          print("Validated 5D robustness check: 40 independent runs")
+          PY
+      - name: Record robustness evidence in separate directory
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_PCA_FA_5D_robust120
+          if ! git diff --cached --quiet; then
+            git commit -m "Add FA5/PCA5 120-iteration stability audit of unpaired K4 Hard-vs-Soft Hyser"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-fa5-pca5-120step-robustness
+          path: experiments/hyser/expanded_five_trials/results_PCA_FA_5D_robust120
+          if-no-files-found: warn
+          retention-days: 90
