@@ -1,0 +1,71 @@
+name: CitiBike preflight - validate real historical stock time series availability
+on:
+  push:
+    branches:
+      - experiment/citibike-large-data-preflight-20261119
+    paths:
+      - .github/workflows/citibike-citybikes-historical-inventory-probe.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  identify-real-historical-station-status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Probe CityBikes historical Parquet monthly files via headers no bulk downloads
+        run: |
+          python -u - <<'PY'
+          import urllib.request, urllib.error, json, datetime
+          from pathlib import Path
+          roots=['https://data.citybik.es/']
+          months=['202604','202605','202606','202607','202608','202609']
+          networks=['citi-bike-nyc','citi-bike','citibike-nyc','nyc']
+          checks=[]
+          for m in months:
+              for net in networks:
+                  link=f'https://data.citybik.es/{m}-{net}-stats.parquet'
+                  req=urllib.request.Request(link,method='HEAD',
+                    headers={'User-Agent':'academic-noncommercial-citybike-OT-dataset-screening/1.0'})
+                  try:
+                      with urllib.request.urlopen(req,timeout=24) as r:
+                          obj={'month':m,'network':net,'url':link,'status':r.status,
+                                'content_type':r.headers.get('Content-Type'),
+                                'content_length':r.headers.get('Content-Length'),
+                                'last_modified':r.headers.get('Last-Modified')}
+                  except urllib.error.HTTPError as e:
+                      obj={'month':m,'network':net,'url':link,'status':e.code}
+                  except Exception as e:
+                      obj={'month':m,'network':net,'url':link,'error':str(e)[:200]}
+                  checks.append(obj)
+                  print('STATION_HISTORY_PROBE',json.dumps(obj),flush=True)
+          out=Path('projects/citibike-hierarchical-ot/results/data_source_audit')
+          out.mkdir(parents=True,exist_ok=True)
+          (out/'CITYBIKES_HISTORICAL_STATUS_FILE_AVAILABILITY.json').write_text(
+              json.dumps({'source':'https://data.citybik.es/','terms':'CityBikes historical station status; citation required',
+                          'interpretation':'Only HTTP file availability; station inventory not yet parsed or used for OT',
+                          'checks':checks},ensure_ascii=False,indent=2)+'\n')
+          print('HISTORICAL_AVAILABILITY_VALID',sum(c.get('status')==200 for c in checks),flush=True)
+          PY
+      - name: Commit non-raw meta audit to new CitiBike project only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/citibike-hierarchical-ot/results/data_source_audit
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record verifiable CityBikes historical NYC station stock source availability for real dispatch data'
+            git pull --rebase origin experiment/citibike-large-data-preflight-20261119
+            git push origin HEAD:experiment/citibike-large-data-preflight-20261119
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: CITIBIKE-REAL-STOCK-HISTORY-AVAILABILITY-AUDIT
+          path: projects/citibike-hierarchical-ot/results/data_source_audit
+          if-no-files-found: warn
