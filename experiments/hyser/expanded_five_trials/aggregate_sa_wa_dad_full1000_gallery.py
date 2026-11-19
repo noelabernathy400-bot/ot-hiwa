@@ -430,7 +430,7 @@ def main():
       "- DAD-like 仅对3D实现 DANDI 的 k=5 对称密度KL代理、128网格加Powell局部优化，明确不是KordingLab原版DAD；不编造5D DAD。",
       "- Hard/Soft HiWA使用先前冻结的每折全1000训练点局部P/Q/Rkl模型。",
       "- 匹配成功是五指原始物理力量距离低于各外折训练内非对应力距离的5%或20%分位。Fisher二维只用于可视化，不影响评价。",
-      "- 1000个点是每个域的真正训练点数；每张叠加图展示1000源点和1000目标点，不进行稀疏采样。",
+      "- 每个方法各有独立的目标域和变换后源域散点图，左右统一轴范围，每张图包含真正1000点；PCA3/FA3另绘制完整三维（不是Fisher二维）散点，不进行稀疏采样。",
       "",
       "## 全五折物理评价（越高越好；L2越低越好）",
       "",
@@ -440,23 +440,38 @@ def main():
         def fnum(x,fmt):return "NA" if x is None else format(x,fmt)
         lines.append(f"|{z['representation']}|{z['method']}|{z['n_qualified']}/{z['n_runs']}|"+
           f"{fnum(z['hit5'],'.2%')}|{fnum(z['hit20'],'.2%')}|{fnum(z['physical_mean_L2'],'.5f')}|")
-    lines+=["","## 所有真实1000点Fisher散点图",
-       "原始两域各自用训练组独立训练Fisher子空间；对齐后都投到目标域训练Fisher子空间。四种颜色代表源域独立训练的四个伪簇，灰色代表目标域背景点。颜色不意味着真实动作类别/跨域真配对。评分使用完整d维与五指原始力量。",
+    lines+=["","## 五折1000点分离散点图（二维 Fisher；三维完整坐标）",
+       "源域和目标域分别由训练数据拟合独立KMeans与Fisher；对齐后源域统一投到目标训练Fisher平面。**绝不重叠绘制两个域**：每个方法左图仅目标1000点，右图仅变换后的源1000点，二者和其它方法统一使用相同xlim/ylim及等轴尺度。目标与源各自独立的四簇着色只表达本域伪簇，不隐含真实簇对应关系。对于PCA3/FA3，另有原始全三维1000点左右并排视图，使用同一XYZ范围和相同相机视角。所有数值评价仍在完整d维和原始五指力量中。",
        ""]
     for rep in REPS:
         lines.append(f"### {rep}：五折每个方法全部1000点")
         for fold in range(1,6):
             fn=f"figures/{rep}_FOLD{fold}_ALL1000_Fisher_METHODS.png"
-            lines.append(f"- [留出试次 {fold}：全部方法 Fisher 1000+1000 对照]({fn})")
+            lines.append(f"- [留出试次 {fold}：全部方法 Fisher 左右分离、同尺度1000+1000对照]({fn})")
+        if rep.endswith(("PCA3","FA3")):
+            for fold in range(1,6):
+                fn=(f"figures/native3D_allmethods/"
+                    f"{rep}_FOLD{fold}_ALL1000_NATIVE3D_SEPARATE_METHODS.png")
+                lines.append(
+                    f"- [留出试次 {fold}：完整三维1000点，所有方法左右分离同XYZ尺度]({fn})"
+                )
         lines.append(f"- [该表示多方法严格Hit@5%图](figures/{rep}_Hit5_all_methods.png)")
         lines.append(f"- [该表示真实距离阈值曲线](figures/{rep}_eps_curves_all_methods.png)")
         lines.append("")
-    lines+=["## 单独散点图（Fold1，显示全部1000个训练样本/域）",""]
+    lines+=["## 二维单独双面板散点图（Fold1，每个域各1000点，绝不重叠）",""]
     for rep in REPS:
         for method in METHODS:
             if method=="DAD_like_3D" and rep.endswith("RAW5"):continue
             fn=f"figures/individual_fold1/{rep}_FOLD1_{method.replace(' ','_')}_ALL1000_Fisher.png"
             lines.append(f"- [{rep} / {method} / 1000源+1000目标]({fn})")
+    lines+=["","## 额外完整三维分离图：PCA3/FA3 每个方法、每一折",""]
+    for rep in ("PCA3_PCA3","FA3_FA3"):
+        for fold in range(1,6):
+            for method in METHODS:
+                fn=(f"figures/native3D_individual_allfolds/"
+                    f"{rep}_FOLD{fold}_{method.replace(' ','_')}"
+                    "_NATIVE3D_SEPARATE1000.png")
+                lines.append(f"- [{rep} / trial {fold} / {method}：3D目标1000与源1000独立同尺度]({fn})")
     lines+=["","## 数值存档和严谨性",
         "全部新模型的正交R、每条测试样本真实五指误差、训练配置和数值状态都在下列JSON。上表按相同试次折比较，不能把同一被试的两种子当独立受试者；也不能将事后阈值70%作为预注册泛化准确率。",
         "",
@@ -464,7 +479,7 @@ def main():
         "- [逐试次完整对照CSV](all_fivefold_methods.csv)",
         "- [汇总表CSV](summary_SA_WA_DAD_HiWA.csv)",
         "- [实际物理误差阈值曲线CSV](dense_physical_tolerance_all_methods.csv)",
-        "- [1000点图像数目及K4颜色审计](scatter_count_audit.json)",
+        "- [1000点图像数目、XYZ轴一致性及独立分簇审计](scatter_count_audit.json)",
         "- [此前额外Identity/ICP/单层OT](../additional_baselines/ADDITIONAL_UNSUPERVISED_BASELINES_ZH.md)",
         "- [此前80次HiWA共享P/Q层级目标](../shared_hierarchical_full250/SHARED_HIERARCHICAL_EVALUATION_ZH.md)",
         "- [DANDI原迁移代码源分支](https://github.com/noelabernathy400-bot/ot-hiwa/blob/experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119/projects/dandi-000138-hiwa-4d/code/closeout_dandi_sa_wa_dad_baselines.py)",
