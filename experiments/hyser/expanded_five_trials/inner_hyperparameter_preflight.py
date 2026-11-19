@@ -99,7 +99,7 @@ def main():
     eps,_=quantiles_for_training(rawtr,training_tid) if len(set(training_tid))==4 else (None,None)
     # 3 training trials; use exclusively those disjoint real trial IDs.
     rng=np.random.default_rng(20261119)
-    dd=[];trials=sorted(set(training_tid))
+    dd=[];trials=[int(x) for x in sorted(set(training_tid))]
     for _ in range(7500):
         i,j=rng.choice(trials,size=2,replace=False)
         ii=rng.choice(np.flatnonzero(training_tid==i))
