@@ -62,8 +62,12 @@ jobs:
         run: |
           cd "$RUNNER_TEMP/hyser5/new5d"
           zip -q -r "$RUNNER_TEMP/hyser5/hyser_s01_s1_5fingers_5D_folds_v1.zip" .
-          gh release upload --repo "$GITHUB_REPOSITORY" hyser-s01-s1-random-5trials-v1 \
-            "$RUNNER_TEMP/hyser5/hyser_s01_s1_5fingers_5D_folds_v1.zip"
+          if gh release view --repo "$GITHUB_REPOSITORY" hyser-s01-s1-random-5trials-v1 --json assets --jq '.assets[].name' | grep -Fxq "hyser_s01_s1_5fingers_5D_folds_v1.zip"; then
+            echo "Existing 5D feature asset verified; no overwriting"
+          else
+            gh release upload --repo "$GITHUB_REPOSITORY" hyser-s01-s1-random-5trials-v1 \
+              "$RUNNER_TEMP/hyser5/hyser_s01_s1_5fingers_5D_folds_v1.zip"
+          fi
       - name: Commit verified channel-name provenance, not 125 MB raw waveforms
         run: |
           cp "$RUNNER_TEMP/hyser5/new5d/FIVE_FINGER_SOURCE_CHECK.json" \
@@ -73,6 +77,7 @@ jobs:
           git add experiments/hyser/expanded_five_trials/FIVE_FINGER_SOURCE_CHECK.json
           if ! git diff --cached --quiet; then
             git commit -m "Record physical five-finger WFDB channel identities and 5D heldout splits"
+            git pull --rebase origin main
             git push origin HEAD:main
           fi
       - uses: actions/upload-artifact@v4
