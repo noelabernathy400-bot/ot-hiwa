@@ -37,7 +37,7 @@ jobs:
             --out experiments/hyser/expanded_five_trials/results_full1000_positive_Q_fold3 \
             --configs PCA5_RAW5 --folds 3 --seeds 42 \
             --maxiter 300 --sa-maxiter 40 --mu 0.05 --warm-start-local \
-            --full-training --exact-positive-support
+            --full-training --exact-positive-support --numerically-stable-Q
       - name: Verify exact conditional Q support sizes and marginal balance
         run: |
           python - <<'PY'
