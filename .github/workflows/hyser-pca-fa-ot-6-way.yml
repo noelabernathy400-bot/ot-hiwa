@@ -1,0 +1,89 @@
+name: Hyser six-way PCA versus FA K4 Hard-Soft OT physical ablation
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-pca-fa-ot-6-way.yml"
+      - "experiments/hyser/expanded_five_trials/run_pca_fa_ot_ablation.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hyser-pca-fa-ot-6-way
+  cancel-in-progress: false
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install reproducible numerical OT dependencies
+        run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Load already validated 5-fold FA/PCA feature embeddings, never re-fit on testing trials
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_pca_fa_ot"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip \
+            --dir "$RUNNER_TEMP/hyser_pca_fa_ot"
+          unzip -q "$RUNNER_TEMP/hyser_pca_fa_ot/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
+            -d "$RUNNER_TEMP/hyser_pca_fa_ot"
+          test -f "$RUNNER_TEMP/hyser_pca_fa_ot/FA3_FA3/trial_heldout_5.npz"
+          test -f "$RUNNER_TEMP/hyser_pca_fa_ot/FA5_RAW5/trial_heldout_5_5d.npz"
+      - name: 120 K4 Hard-Soft numerical pilots on six factor/PCA representations
+        run: |
+          python experiments/hyser/expanded_five_trials/run_pca_fa_ot_ablation.py \
+            --data-dir "$RUNNER_TEMP/hyser_pca_fa_ot" \
+            --out experiments/hyser/expanded_five_trials/results_PCA_FA_OT \
+            --seeds 42 43 --folds 1 2 3 4 5 --anchors 96 --outer 45
+      - name: Verify all groups, train-only controls, diagnostics and no paired transport fitting
+        run: |
+          python - <<'PY'
+          import json,pathlib,numpy as np
+          p=pathlib.Path("experiments/hyser/expanded_five_trials/results_PCA_FA_OT")
+          o=json.loads((p/"OT_results_all.json").read_text())
+          rr=o["runs"]
+          assert len(rr)==120,len(rr)
+          assert len(o["summaries"])==12
+          assert len(o["paired_differences"])==60
+          assert len({(x["representation"],x["fold"],x["seed"],x["method"]) for x in rr})==120
+          for r in rr:
+            assert r["K"]==4 and r["n_train"]==1000 and r["n_test"]==250
+            d=r["dimension"]
+            assert np.array(r["R"]).shape==(d,d) and np.array(r["P"]).shape==(4,4)
+            assert r["paired_force_labels_and_true_times_NOT_USED_FOR_TRAINING"]
+            assert r["train"]["training_result_at_final_global_R"]["marginal_max"]<1e-5
+            assert r["train"]["max_rotation_orthogonality_error"]<1e-8
+            assert r["physical_evaluation"]["paired_force_RMSE_EVAL_ONLY"]>=0
+          assert (p/"OT_6config_paired_differences.png").exists()
+          assert (p/"OT_true_fivefinger_physical_transfer_R2.png").exists()
+          print("Verified complete 120-run PCA/FA ablation and model checks")
+          PY
+      - name: Commit isolated ablation report and figures without modifying past experiments
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_PCA_FA_OT
+          if ! git diff --cached --quiet; then
+            git commit -m "Record 120 heldout K4 Hard-Soft PCA/FA OT ablations and physical force tests"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-PCA-FA-sixway-OT-physical-evidence
+          path: experiments/hyser/expanded_five_trials/results_PCA_FA_OT
+          if-no-files-found: warn
+          retention-days: 90
