@@ -1,0 +1,72 @@
+name: Hyser heldout trial5 original force-bank random oracle drift diagnostic
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-trial5-physical-bank-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "matplotlib>=3.8,<4"
+      - name: Download trial-disjoint five-finger force arrays
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_trial5"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip \
+            --dir "$RUNNER_TEMP/hyser_trial5"
+          unzip -q "$RUNNER_TEMP/hyser_trial5/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
+            -d "$RUNNER_TEMP/hyser_trial5"
+      - name: Audit each trial physical-force training-library coverage and random baseline
+        run: |
+          python experiments/hyser/expanded_five_trials/diagnose_heldout_force_bank_and_trial5.py \
+            --features "$RUNNER_TEMP/hyser_trial5" \
+            --results-root experiments/hyser/expanded_five_trials/results_3D_5D_unified \
+            --out experiments/hyser/expanded_five_trials/results_3D_5D_unified/trial5_physical_bank_diagnostic
+      - name: Validate complete five-fold comparison
+        run: |
+          python - <<'PY'
+          import csv,pathlib
+          p=pathlib.Path("experiments/hyser/expanded_five_trials/results_3D_5D_unified/trial5_physical_bank_diagnostic")
+          rows=list(csv.DictReader((p/"physical_bank_drift_oracle_random_by_fold.csv").open()))
+          assert len(rows)==5 and {int(x["fold"]) for x in rows}==set(range(1,6))
+          assert all(float(x["oracle_train_bank_hit_at_epsilon_0_325"]) >= float(x["random_train_bank_hit_at_epsilon_0_325"]) for x in rows)
+          assert (p/"trial5_bank_oracle_random_control.png").stat().st_size>10000
+          PY
+      - name: Save strictly within Hyser
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_3D_5D_unified/trial5_physical_bank_diagnostic
+          if ! git diff --cached --quiet; then
+            git commit -m "Audit Hyser trial5 physical train-bank coverage, force shift and oracle"
+            for attempt in 1 2 3 4 5 6; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then exit 0; fi
+              sleep 2
+            done
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-trial5-force-bank-diagnostic
+          path: experiments/hyser/expanded_five_trials/results_3D_5D_unified/trial5_physical_bank_diagnostic
+          retention-days: 90
+          if-no-files-found: warn
