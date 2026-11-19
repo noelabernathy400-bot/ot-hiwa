@@ -1,0 +1,106 @@
+name: Hyser regenerate all 1000-point separate target source Fisher2D and native3D figures
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-regenerate-separate-full1000-fisher-native3d.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  replace-overlays-with-paired-panels-and-3d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+
+      - name: Verify all previously trained models are in frozen Hyser directory
+        run: |
+          for rep in PCA3_PCA3 FA3_FA3 PCA5_RAW5 FA5_RAW5; do
+            test -f "experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000/by_rep/$rep/runs_bundle.json"
+          done
+
+      - name: Download original full1000 train-only Hyser 3D and 5D representations
+        env:
+          GH_TOKEN: \${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser1000_visuals"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip \
+            --dir "$RUNNER_TEMP/hyser1000_visuals"
+          unzip -q "$RUNNER_TEMP/hyser1000_visuals/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
+            -d "$RUNNER_TEMP/hyser1000_visuals"
+          test -f "$RUNNER_TEMP/hyser1000_visuals/PCA3_PCA3/trial_heldout_1.npz"
+          test -f "$RUNNER_TEMP/hyser1000_visuals/FA3_FA3/trial_heldout_5.npz"
+
+      - name: Regenerate 20 separate 2D montages and native original 3D views for both 3D representations
+        run: |
+          python -u experiments/hyser/expanded_five_trials/aggregate_sa_wa_dad_full1000_gallery.py \
+            --features "$RUNNER_TEMP/hyser1000_visuals" \
+            --baselines-dir experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000/by_rep \
+            --frozen experiments/hyser/expanded_five_trials \
+            --out experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000
+
+      - name: Audit real all1000 points, no overlays, same-scale target vs source and true 3D
+        run: |
+          python - <<'PY'
+          import json, pathlib, csv
+          p=pathlib.Path("experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000")
+          aud=json.loads((p/"scatter_count_audit.json").read_text())
+          assert aud["target_and_aligned_source_never_overlaid"]
+          assert aud["each_method_draws_all_1000_source_and_all_1000_target"]
+          assert len(aud["figures"])==20
+          assert aud["n_fold_gallery_3d"]==10
+          assert aud["n_single_method_3d_allfold"]==80
+          assert aud["n_single_method_2d_fold1"]==30
+          for r in aud["figures"]:
+              assert r["source_points_each_method"]==r["target_points_each_method"]==1000
+              assert r["target_and_source_in_separate_2d_panels"]
+              assert r["exact_same_2d_axes_across_target_and_methods"]
+              if r["rep"].endswith(("PCA3","FA3")):
+                  assert r["native3d_separate_scatter_original_feature_coordinates"]
+                  assert r["exact_same_xyz_limits_all_methods"]
+                  assert len(r["native3d_xlim_ylim_zlim"]) == 3
+          assert len(list((p/"figures").glob("*_FOLD*_ALL1000_Fisher_METHODS.png")))==20
+          assert len(list((p/"figures"/"individual_fold1").glob("*.png")))==30
+          assert len(list((p/"figures"/"native3D_allmethods").glob("*.png")))==10
+          assert len(list((p/"figures"/"native3D_individual_allfolds").glob("*.png")))==80
+          assert len(list((p/"figures").rglob("*.png")))==148
+          summary=list(csv.DictReader((p/"summary_SA_WA_DAD_HiWA.csv").open()))
+          assert len(summary)==18 and all(a["n_runs"]==a["n_qualified"] for a in summary)
+          report=(p/"SA_WA_DAD_HYSER_1000_FINAL_REPORT_ZH.md").read_text()
+          assert "绝不重叠" in report and "原始全三维" in report
+          print("PASSED: 148 figures, 20 2D, 10 native3D montages, 80 native3D individual, 30 2D individual, 8 metrics")
+          PY
+
+      - name: Save image replacements and native3D within Hyser exclusively
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000
+          if ! git diff --cached --quiet; then
+            git commit -m "Replace Hyser full1000 overlay scatters with separate same-axis 2D and native3D"
+            for attempt in 1 2 3 4 5 6; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then exit 0; fi
+              sleep 2
+            done
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-real1000-separate-2D-and-native3D-all-folds
+          path: experiments/hyser/expanded_five_trials/results_3D_5D_unified/sa_wa_dad_full1000
+          retention-days: 90
+          if-no-files-found: warn
