@@ -1,0 +1,66 @@
+name: DANDI138 real pretrained PQR read-only spectral orientation and physical matching preflight
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-real-spectral-preflight.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  real-spectral-geometry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Select 4D covariance orientation on train-only marginals and postfit score against original 3500 test movement
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/preflight_real_spectral_orientation.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --archive projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_RESULTS.json \
+            --clustering-report projects/dandi-000138-hiwa-4d/results/clustering/clustering_report.json \
+            --preflight projects/dandi-000138-hiwa-4d/results/phase1_preflight/PREFLIGHT_DATA_AND_EVALUATION_AUDIT.json \
+            --output projects/dandi-000138-hiwa-4d/results/phase1_real_spectral_control
+      - name: Independent validations of 16 actual candidates and test-leakage firewall
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/phase1_real_spectral_control')
+          d=json.loads((p/'DANDI_TRAIN_ONLY_SPECTRAL_GEOMETRY_PREFLIGHT.json').read_text())
+          assert not d['fitting_uses_synchronized_pairs'] and not d['training_selection_uses_test_labels']
+          assert not d['training_selection_uses_true_group_labels'] and d['strict_no_R_P_Q_refit']
+          assert d['method_is_new_rigid_initializer_not_HiWA_or_Soft']
+          assert len(d['all_candidates_train_W2sq'])==16
+          assert d['selected_train_W2sq']<=min(d['all_candidates_train_W2sq'])+1e-11
+          for m in ['hard','soft']:
+              assert len(d['original_hard_soft_methods'][m])==5
+          assert (p/'DANDI_SPECTRAL_VS_HARD_SOFT_PHYSICAL_MATCHING.png').stat().st_size>50000
+          print('PASS train-only geometry orientation selected, no real behavior/physical labels in fitting')
+          PY
+      - name: Publish real-domain 4D spectral orientation results
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/phase1_real_spectral_control
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish read-only DANDI training-marginal geometry initializer physical test against frozen Hard Soft'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-train-only-spectral-initialization-preflight
+          path: projects/dandi-000138-hiwa-4d/results/phase1_real_spectral_control
+          if-no-files-found: warn
