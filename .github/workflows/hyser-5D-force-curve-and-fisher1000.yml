@@ -1,0 +1,86 @@
+name: Hyser 5D real five-finger tolerance curves and 1000-train Fisher-only plots
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-5D-force-curve-and-fisher1000.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  derive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Retrieve original force data and train-only latent representations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_common"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip \
+            --dir "$RUNNER_TEMP/hyser_common"
+          unzip -q "$RUNNER_TEMP/hyser_common/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
+            -d "$RUNNER_TEMP/hyser_common"
+      - name: Recalculate 5D physical-force nearest-neighbor tolerances 1pct to 20pct without touching R
+        run: |
+          python experiments/hyser/expanded_five_trials/common_force_distance_curves.py \
+            --features "$RUNNER_TEMP/hyser_common" \
+            --frozen-runs experiments/hyser/expanded_five_trials/results_formal_full1000_Qfixed/individual_runs \
+            --configs PCA5_RAW5 FA5_RAW5 \
+            --out experiments/hyser/expanded_five_trials/results_3D_5D_unified/5D
+      - name: Draw all 1000 TRAIN samples in Fisher 2D and show separate 250 holdout Hard/Soft
+        run: |
+          python experiments/hyser/expanded_five_trials/fisher_train1000_test250.py \
+            --features "$RUNNER_TEMP/hyser_common" \
+            --runs-dir experiments/hyser/expanded_five_trials/results_formal_full1000_Qfixed/individual_runs \
+            --configs PCA5_RAW5 FA5_RAW5 \
+            --fold 1 --seed 42 \
+            --out experiments/hyser/expanded_five_trials/results_3D_5D_unified/5D/Fisher1000
+      - name: Assert all frozen results and all figures exist
+        run: |
+          python - <<'PY'
+          import json,pathlib,csv
+          p=pathlib.Path("experiments/hyser/expanded_five_trials/results_3D_5D_unified/5D")
+          a=json.loads((p/"full_physical_distance_curves.json").read_text())
+          assert a["n_runs"]==40 and len(a["records"])==40
+          assert all(len(r["results"]["physical_errors_250"])==250 for r in a["records"])
+          with (p/"all_fivefold_physical_hit_threshold_curve.csv").open() as f:
+            assert len(list(csv.DictReader(f)))==200
+          ff=p/"Fisher1000"
+          assert len(list(ff.glob("*_TRAIN_1000_Fisher2D.png")))==2
+          assert len(list(ff.glob("*_TEST_250_Fisher2D_Hard_Soft.png")))==2
+          print("SUCCESS: 5D 40 full1000 frozen models, 200 threshold evaluations, all 1000-train/250-test Fisher charts")
+          PY
+      - name: Commit complete source-backed curve data and Fisher-only plots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_3D_5D_unified/5D
+          if ! git diff --cached --quiet; then
+            git commit -m "Analyze five-dimensional physical distance calibrated Hit curves and plot 1000 training samples in Fisher 2D"
+            for attempt in 1 2 3 4 5 6; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then exit 0; fi
+              sleep 2
+            done
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-5D-fivefinger-physical-curves-fisher1000
+          path: experiments/hyser/expanded_five_trials/results_3D_5D_unified/5D
+          retention-days: 90
+          if-no-files-found: warn
