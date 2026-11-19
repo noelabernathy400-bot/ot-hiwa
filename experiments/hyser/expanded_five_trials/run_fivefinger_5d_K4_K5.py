@@ -179,7 +179,8 @@ def test_shared_reference(Xtr,Ytr,Xte,Yte,R,reference_centers_x,reference_center
         for k in range(K):
             ids=np.flatnonzero(membership[:,k]>.5)
             if len(ids)==0:
-                return {"error":f"Empty heldout cluster {k}"}
+                return {"error":f"Empty heldout cluster {k}: heldout empirical conditional measure undefined",
+                        "reference_defined":False,"before_identity":{},"after":{}}
             out.append((sample[ids],np.ones(len(ids))/len(ids)))
     def one(r):
         P=np.full((K,K),1/(K*K))
@@ -302,9 +303,12 @@ def main():
             ("heldout_shared_J",lambda r:r["heldout_common_hard_K_reference"].get("after",{}).get("J",float("nan"))),
             ("anchor_train_T",lambda r:r["train"]["training_result_at_final_global_R"]["T"])]:
             v=np.array([get(r) for r in a],float)
+            good=v[np.isfinite(v)]
             summary.append({"method":m,"metric":key,"n":len(v),
-                            "mean":float(np.mean(v)),"std":float(np.std(v,ddof=1)) if len(v)>1 else None,
-                            "median":float(np.median(v))})
+                            "n_defined":int(len(good)),
+                            "mean":float(np.mean(good)) if len(good)>0 else None,
+                            "std":float(np.std(good,ddof=1)) if len(good)>1 else None,
+                            "median":float(np.median(good)) if len(good)>0 else None})
     (z.out/"summary.json").write_text(json.dumps(summary,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
     # Per-fold average results, not a pooled independent iid variance estimate
     fig,axes=plt.subplots(1,2,figsize=(12,4.7),constrained_layout=True)
@@ -335,7 +339,7 @@ def main():
         "每折训练4次试次，每域1000点；测试完全留出1个试次，每域250点。预处理通过先前数据发布脚本仅在训练试次拟合。",
         "Hard/Soft 使用相同K-means中心、相同锚点、相同优化器和随机种子。Soft固定τ=0.5，无结果筛选。",
         "评价以同一训练簇中心预测的留出样本**共享Hard K簇参考**重求P、Q的T/J为主，全部250个测试样本整体W2²为辅。",
-        "自家组测度不同，不能直接比原生训练T；本实验在同一个共享参考上评价其R。","",
+        "自家组测度不同，不能直接比原生训练T；本实验在同一个共享参考上评价其R。若留出试次的K-means预测簇为空，层级T/J不定义，明确记为N/A，不得强行赋值。","",
         "## 关键数值（按折和初始化展开）",
         "",
         "| Heldout | Seed | Hard T | Soft T | Hard W2² | Soft W2² |",
