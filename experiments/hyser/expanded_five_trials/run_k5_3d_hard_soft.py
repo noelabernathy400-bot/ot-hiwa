@@ -22,6 +22,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import cdist
+from scipy.optimize import root
 from scipy.special import softmax,xlogy
 from scipy.optimize import linear_sum_assignment
 from sklearn.cluster import KMeans
@@ -32,13 +33,31 @@ sys.path.insert(0,str(HERE.parent/"scripts"))
 from solver import sinkhorn,polar
 
 def precise_group_entropic_OT(cost,eps=.2):
-    """General K=5 group entropic OT via numerically checked Sinkhorn."""
-    marg=np.full(K,1.0/K)
-    p=sinkhorn(marg,marg,cost,eps,10000,1e-12)
-    e=max(np.max(abs(p.sum(0)-marg)),np.max(abs(p.sum(1)-marg)))
-    if not np.isfinite(p).all() or e>1e-7:
-        raise ArithmeticError(f"Group-level P infeasible: {e}")
+    # Dual root for the SAME entropy-regularized 4x4 transportation problem.
+    c=cost-cost.min(axis=1,keepdims=True)
+    c=c-c.min(axis=0,keepdims=True)
+    def plan(z):
+        f=z[:K];g=np.r_[z[K:],0]
+        return np.exp(np.clip((f[:,None]+g[None,:]-c)/eps,-700,700))
+    def res(z):
+        p=plan(z)
+        return np.r_[p.sum(axis=1)-1/K,p.sum(axis=0)[:K-1]-1/K]
+    def jac(z):
+        p=plan(z);J=np.zeros((2*K-1,2*K-1))
+        J[:K,:K]=np.diag(p.sum(axis=1)/eps)
+        J[:K,K:]=p[:,:K-1]/eps
+        J[K:,:K]=p[:,:K-1].T/eps
+        J[K:,K:]=np.diag(p.sum(axis=0)[:K-1]/eps)
+        return J
+    sol=root(res,np.zeros(2*K-1),jac=jac,method='hybr',options={'xtol':1e-12,'maxfev':400})
+    p=plan(sol.x)
+    if np.max(np.abs(res(sol.x)))>5e-8 or not np.isfinite(p).all():
+        p=sinkhorn(np.full(K,1/K),np.full(K,1/K),c,eps,100000,1e-10)
+    err=max(np.abs(p.sum(0)-1/K).max(),np.abs(p.sum(1)-1/K).max())
+    if err>1e-6: raise ArithmeticError(f'P infeasible {err}')
     return p
+
+
 
 K=5
 ES=.1
