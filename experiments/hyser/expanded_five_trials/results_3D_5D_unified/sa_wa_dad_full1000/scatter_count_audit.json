@@ -1,0 +1,617 @@
+{
+  "figures": [
+    {
+      "rep": "PCA3_PCA3",
+      "fold": 1,
+      "file": "PCA3_PCA3_FOLD1_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "DAD_like_3D",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        519,
+        152,
+        154,
+        175
+      ],
+      "target_cluster_counts": [
+        237,
+        469,
+        145,
+        149
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "PCA3_PCA3",
+      "fold": 2,
+      "file": "PCA3_PCA3_FOLD2_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "DAD_like_3D",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        538,
+        180,
+        134,
+        148
+      ],
+      "target_cluster_counts": [
+        221,
+        166,
+        484,
+        129
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "PCA3_PCA3",
+      "fold": 3,
+      "file": "PCA3_PCA3_FOLD3_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "DAD_like_3D",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        555,
+        141,
+        147,
+        157
+      ],
+      "target_cluster_counts": [
+        240,
+        164,
+        472,
+        124
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "PCA3_PCA3",
+      "fold": 4,
+      "file": "PCA3_PCA3_FOLD4_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "DAD_like_3D",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        539,
+        165,
+        175,
+        121
+      ],
+      "target_cluster_counts": [
+        482,
+        268,
+        124,
+        126
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "PCA3_PCA3",
+      "fold": 5,
+      "file": "PCA3_PCA3_FOLD5_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "DAD_like_3D",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        570,
+        146,
+        159,
+        125
+      ],
+      "target_cluster_counts": [
+        415,
+        246,
+        178,
+        161
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "FA3_FA3",
+      "fold": 1,
+      "file": "FA3_FA3_FOLD1_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "DAD_like_3D",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        302,
+        81,
+        459,
+        158
+      ],
+      "target_cluster_counts": [
+        173,
+        235,
+        135,
+        457
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "FA3_FA3",
+      "fold": 2,
+      "file": "FA3_FA3_FOLD2_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "DAD_like_3D",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        289,
+        494,
+        158,
+        59
+      ],
+      "target_cluster_counts": [
+        174,
+        360,
+        323,
+        143
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "FA3_FA3",
+      "fold": 3,
+      "file": "FA3_FA3_FOLD3_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "DAD_like_3D",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        530,
+        70,
+        262,
+        138
+      ],
+      "target_cluster_counts": [
+        537,
+        166,
+        179,
+        118
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "FA3_FA3",
+      "fold": 4,
+      "file": "FA3_FA3_FOLD4_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "DAD_like_3D",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        61,
+        163,
+        571,
+        205
+      ],
+      "target_cluster_counts": [
+        115,
+        584,
+        137,
+        164
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "FA3_FA3",
+      "fold": 5,
+      "file": "FA3_FA3_FOLD5_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "DAD_like_3D",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        281,
+        523,
+        63,
+        133
+      ],
+      "target_cluster_counts": [
+        451,
+        193,
+        153,
+        203
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "PCA5_RAW5",
+      "fold": 1,
+      "file": "PCA5_RAW5_FOLD1_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        232,
+        137,
+        159,
+        472
+      ],
+      "target_cluster_counts": [
+        483,
+        282,
+        143,
+        92
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "PCA5_RAW5",
+      "fold": 2,
+      "file": "PCA5_RAW5_FOLD2_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        56,
+        688,
+        133,
+        123
+      ],
+      "target_cluster_counts": [
+        567,
+        207,
+        142,
+        84
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "PCA5_RAW5",
+      "fold": 3,
+      "file": "PCA5_RAW5_FOLD3_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        509,
+        133,
+        143,
+        215
+      ],
+      "target_cluster_counts": [
+        145,
+        84,
+        290,
+        481
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "PCA5_RAW5",
+      "fold": 4,
+      "file": "PCA5_RAW5_FOLD4_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        151,
+        511,
+        149,
+        189
+      ],
+      "target_cluster_counts": [
+        311,
+        106,
+        510,
+        73
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "PCA5_RAW5",
+      "fold": 5,
+      "file": "PCA5_RAW5_FOLD5_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        158,
+        224,
+        499,
+        119
+      ],
+      "target_cluster_counts": [
+        76,
+        263,
+        113,
+        548
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "FA5_RAW5",
+      "fold": 1,
+      "file": "FA5_RAW5_FOLD1_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        169,
+        75,
+        612,
+        144
+      ],
+      "target_cluster_counts": [
+        483,
+        282,
+        143,
+        92
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "FA5_RAW5",
+      "fold": 2,
+      "file": "FA5_RAW5_FOLD2_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        119,
+        151,
+        672,
+        58
+      ],
+      "target_cluster_counts": [
+        567,
+        207,
+        142,
+        84
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "FA5_RAW5",
+      "fold": 3,
+      "file": "FA5_RAW5_FOLD3_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        196,
+        66,
+        589,
+        149
+      ],
+      "target_cluster_counts": [
+        145,
+        84,
+        290,
+        481
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "FA5_RAW5",
+      "fold": 4,
+      "file": "FA5_RAW5_FOLD4_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        665,
+        165,
+        46,
+        124
+      ],
+      "target_cluster_counts": [
+        311,
+        106,
+        510,
+        73
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    },
+    {
+      "rep": "FA5_RAW5",
+      "fold": 5,
+      "file": "FA5_RAW5_FOLD5_ALL1000_Fisher_METHODS.png",
+      "source_points_each_method": 1000,
+      "target_points_each_method": 1000,
+      "method_names": [
+        "Identity",
+        "ICP",
+        "SingleOT",
+        "SA",
+        "WA",
+        "Hard HiWA",
+        "Soft HiWA"
+      ],
+      "source_cluster_counts": [
+        132,
+        629,
+        177,
+        62
+      ],
+      "target_cluster_counts": [
+        76,
+        263,
+        113,
+        548
+      ],
+      "test_not_used_to_fit_fisher": true,
+      "source_target_labels_independent": true
+    }
+  ],
+  "Fisher2D_only_for_plotting": true,
+  "each_overlay_contains_1000_source_and_1000_target": true,
+  "n_fold_gallery": 20
+}
