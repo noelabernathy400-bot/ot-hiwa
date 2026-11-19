@@ -115,7 +115,8 @@ def probe(Ztr,Zte,Ytr,Yte):
 def csvout(path,rows):
     if not rows:return
     with path.open("w",newline="",encoding="utf-8") as f:
-        writer=csv.DictWriter(f,fieldnames=list(rows[0]))
+        fields=list(dict.fromkeys(key for row in rows for key in row))
+        writer=csv.DictWriter(f,fieldnames=fields)
         writer.writeheader();writer.writerows(rows)
 
 def main():
