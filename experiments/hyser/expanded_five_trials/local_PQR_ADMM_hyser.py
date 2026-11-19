@@ -18,7 +18,7 @@ from pathlib import Path
 import numpy as np
 from scipy.spatial.distance import cdist
 from sklearn.cluster import KMeans
-from scipy.special import softmax
+from scipy.special import softmax,logsumexp
 
 HERE=Path(__file__).resolve().parent
 REPO=HERE.parents[2] # expanded_five_trials -> hyser -> experiments -> repo
@@ -39,6 +39,70 @@ def stable_group_P(C,gamma,maxiter):
     beta=np.full(m,1./m)
     return group_entropic_transport(C,alpha,beta,eps=gamma,tol=1e-9)
 
+
+# Exact same entropic conditional OT objective and gamma as old kernel scaling.
+# Use the original fast solver whenever it satisfies marginal constraints;
+# on pathological/imbalanced weights recompute with log-domain Sinkhorn
+# without EPS-flooring denominators or violating zero-probability support.
+_old_conditional_sinkhorn=sh.sinkhorn_weighted
+
+def stable_conditional_Q(p,q,X,Y,gamma,maxiter,extra_cost=None,extra_cost_weight=0.):
+    pa=np.asarray(p,float).ravel();qb=np.asarray(q,float).ravel()
+    pa=pa/pa.sum();qb=qb/qb.sum()
+    # Fast legacy route: identical objective and exact parameters.
+    try:
+        plan,cost,err=_old_conditional_sinkhorn(
+           pa,qb,X,Y,gamma,maxiter,
+           extra_cost=extra_cost,extra_cost_weight=extra_cost_weight)
+        if np.isfinite(err) and err<=1e-8 and np.isfinite(plan).all():
+            return plan,cost,err
+    except (ArithmeticError,FloatingPointError,ValueError,ZeroDivisionError):
+        pass
+    active_x=np.flatnonzero(pa>0)
+    active_y=np.flatnonzero(qb>0)
+    if not len(active_x) or not len(active_y):
+        raise ArithmeticError("Empty positive point support in conditional Sinkhorn")
+    xx=np.asarray(X,float)[:,active_x]
+    yy=np.asarray(Y,float)[:,active_y]
+    ca=np.maximum(
+        np.sum(xx**2,axis=0)[:,None]+
+        np.sum(yy**2,axis=0)[None,:]-
+        2*(xx.T@yy),0.)
+    if extra_cost is not None and extra_cost_weight>0:
+        ca=ca+extra_cost_weight*np.asarray(extra_cost,float)[np.ix_(active_x,active_y)]
+    temperature=max(float(gamma),1e-8)
+    log_kernel=-(ca-ca.min())/temperature
+    loga=np.log(pa[active_x])
+    logb=np.log(qb[active_y])
+    logv=np.zeros(len(active_y))
+    logu=np.zeros(len(active_x))
+    # Iteration cap is a NUMERICAL accuracy safeguard, not a new regularizer.
+    # For difficult Q it may exceed the original fast 80 scaling iterations.
+    max_adaptive=max(400,20*int(maxiter))
+    err=float("inf")
+    for step in range(max_adaptive):
+        logu=loga-logsumexp(log_kernel+logv[None,:],axis=1)
+        logv=logb-logsumexp(log_kernel+logu[:,None],axis=0)
+        if step%25==24 or step==max_adaptive-1:
+            row=np.exp(logu+logsumexp(log_kernel+logv[None,:],axis=1))
+            col=np.exp(logv+logsumexp(log_kernel+logu[:,None],axis=0))
+            err=max(float(np.max(np.abs(row-pa[active_x]))),
+                    float(np.max(np.abs(col-qb[active_y]))))
+            if err<=1e-8:break
+    logQ=logkernel_prob=log_kernel+logu[:,None]+logv[None,:]
+    active_Q=np.exp(np.clip(logQ,-745.,700.))
+    # Preserve real positive support and exact zero-mass entries.
+    Q=np.zeros((len(pa),len(qb)),dtype=float)
+    Q[np.ix_(active_x,active_y)]=active_Q
+    err=max(float(np.max(np.abs(Q.sum(axis=1)-pa))),
+            float(np.max(np.abs(Q.sum(axis=0)-qb))))
+    C=np.maximum(
+        np.sum(np.asarray(X,float)**2,axis=0)[:,None]+
+        np.sum(np.asarray(Y,float)**2,axis=0)[None,:]-
+        2*(np.asarray(X,float).T@np.asarray(Y,float)),0.)
+    if extra_cost is not None and extra_cost_weight>0:
+        C=C+extra_cost_weight*np.asarray(extra_cost,float)
+    return Q,float(np.sum(C*Q)),err
 
 K=4
 D=5
@@ -135,6 +199,8 @@ def main():
     p.add_argument("--save-first-Q",action="store_true")
     p.add_argument("--full-training",action="store_true",
                    help="Fit on all 1000 train windows in both domains, independently permuted.")
+    p.add_argument("--numerically-stable-Q",action="store_true",
+                   help="Use mathematically identical entropic conditional-Q log-Sinkhorn fallback when legacy scaling violates marginals.")
     p.add_argument("--exact-positive-support",action="store_true",
                    help="Exact zero-mass removal for each Q block, same mathematical OT, applied to BOTH Hard and Soft.")
     p.add_argument("--warm-start-local",action="store_true",
@@ -146,6 +212,8 @@ def main():
     args=p.parse_args()
     args.out.mkdir(parents=True,exist_ok=True)
     sh.sinkhorn_groups=stable_group_P
+    if args.numerically_stable_Q:
+        sh.sinkhorn_weighted=stable_conditional_Q
     rows=[]
     for conf in args.configs:
         for fold in args.folds:
@@ -243,6 +311,7 @@ def main():
                         "full_Q_matrices_learned_for_each_16_pairs":True,
                         "numeric_convergence_ADMM_primal_and_rotation":False,
                         "exact_nonzero_support_no_mass_removed":bool(args.exact_positive_support),
+                        "stable_conditional_Q_solver_if_needed":bool(args.numerically_stable_Q),
                         "diagnostics":{
                            name:stats_or_null(diagnostic,name)
                            for name in ("Rg_norm","admm_primal_residual",
@@ -302,6 +371,7 @@ def main():
        "local_solver":"repo.src.cc_hiwa.soft_hiwa.SoftHiWA full support with hard one-hot vs soft K-means",
        "numerical_P_solver":"stable dual-root/log-Sinkhorn for same entropic group OT objective and same gamma; original direct-kernel solver underflowed",
        "exact_zero_mass_support_mode":args.exact_positive_support,
+       "numerically_stable_conditional_Q":args.numerically_stable_Q,
        "physical_correspondence_only_evaluation":True,
        "runs":rows},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     summary=[]
@@ -339,7 +409,7 @@ def main():
        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for r in summary:
         report.append(f"|{r['config']}|{r['method']}|{r['n_runs']}|{r['coverage']:.3%}|{r['physical_hit']:.3%}|{r['random_hit']:.3%}|{r['train_bank_physical_hit']:.3%}|{r['train_bank_random_hit']:.3%}|{r['test_W2_squared']:.5f}|{r['test_physical_force_RMSE']:.5f}|{r['exact_index']:.3%}|")
-    report+=["",f"Solver initialization: warm_start_local={args.warm_start_local}; ADMM mu={args.mu}; outer limit={args.maxiter}; per-pair inner limit={args.sa_maxiter}; exact positive mass support={args.exact_positive_support}.",
+    report+=["",f"Solver initialization: warm_start_local={args.warm_start_local}; ADMM mu={args.mu}; outer limit={args.maxiter}; per-pair inner limit={args.sa_maxiter}; exact positive mass support={args.exact_positive_support}; stable conditional log-Sinkhorn fallback={args.numerically_stable_Q}.",
         "**Do not interpret a local-ADMM run with nonconverged primal residual as a successfully converged full HiWA model.** The numerical history, P/Q block statistics and group marginal errors are saved for review.",
       "No inherited source cluster labels have been given to target. No synchronized row pair enters OT fitting."]
     (args.out/"README_ZH.md").write_text("\n".join(report)+"\n",encoding="utf-8")
