@@ -6,12 +6,12 @@ HARD group assignment is one-hot, SOFT group assignment is independent temperatu
 Holdout is the entire remaining 250 windows, never used to train PCA/FA/ADMM.
 Nearest target accuracy includes BOTH transductive 250-target heldout pool retrieval and INDUCTIVE 1000-point training-target bank retrieval; labels are used only AFTER nearest selection to judge physical correctness. Train-only 5% inter-trial quantile radius; geometry coverage is not physical correctness.
 
-|Feature|Method|n|TEST-cloud coverage|TEST-cloud physical hit|TEST-cloud random hit|TRAIN-bank physical hit|TRAIN-bank random hit|exact time index|
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-|PCA5_RAW5|hard|1|42.400%|2.400%|5.790%|0.000%|4.410%|0.400%|
-|PCA5_RAW5|soft05|1|43.200%|2.400%|5.790%|1.600%|4.410%|0.400%|
-|FA5_RAW5|hard|1|52.400%|3.600%|5.790%|3.200%|4.410%|0.800%|
-|FA5_RAW5|soft05|1|50.000%|4.400%|5.790%|2.800%|4.410%|0.400%|
+|Feature|Method|n|TEST-cloud coverage|TEST-cloud physical hit|TEST-cloud random hit|TRAIN-bank physical hit|TRAIN-bank random hit|W2²|physical RMSE|exact time index|
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+|PCA5_RAW5|hard|1|42.400%|2.400%|5.790%|0.000%|4.410%|0.43525|0.13997|0.400%|
+|PCA5_RAW5|soft05|1|43.200%|2.400%|5.790%|1.600%|4.410%|0.49143|0.14240|0.400%|
+|FA5_RAW5|hard|1|52.400%|3.600%|5.790%|3.200%|4.410%|0.37999|0.11560|0.800%|
+|FA5_RAW5|soft05|1|50.000%|4.400%|5.790%|2.800%|4.410%|0.40007|0.12264|0.400%|
 
 Solver initialization: warm_start_local=False; ADMM mu=0.005; outer limit=60; per-pair inner limit=40.
 **Do not interpret a local-ADMM run with nonconverged primal residual as a successfully converged full HiWA model.** The numerical history, P/Q block statistics and group marginal errors are saved for review.

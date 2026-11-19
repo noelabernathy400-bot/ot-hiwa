@@ -2140,14 +2140,13 @@
           "min": 0.0019355746829094783,
           "length": 60
         },
-        "transport_objective": {
-          "first": 0.8244982370346912,
+        "transport_objective_history": {
+          "first": 1.176514470748543,
           "last": 0.8244982370346912,
-          "max": 0.8244982370346912,
-          "min": 0.8244982370346912,
-          "length": 1
+          "max": 1.176514470748543,
+          "min": 0.7841339593396794,
+          "length": 60
         },
-        "group_sinkhorn_marginal_error": null,
         "max_sinkhorn_marginal_error": {
           "first": 5.551115123125783e-17,
           "last": 7.130005198786871e-07,
@@ -2168,6 +2167,21 @@
         "paired_aligned_distance_lt_r_fraction": 0.0,
         "paired_aligned_distance_mean": 1.15036683275098,
         "n_test": 250
+      },
+      "heldout_W2_squared": 0.4352472854697885,
+      "heldout_physical_force_prediction_POSTHOC": {
+        "paired_force_R2_vs_trainmean_EVAL_ONLY": -1.222138025663977,
+        "paired_force_RMSE_EVAL_ONLY": 0.1399651088027254,
+        "paired_force_MAE_EVAL_ONLY": 0.09185330491510925,
+        "paired_force_RMSE_each_finger_EVAL_ONLY": [
+          0.18069204734037903,
+          0.1658826856862256,
+          0.18073865475517678,
+          0.055146331038042465,
+          0.045572995058395536
+        ],
+        "physical_train_mean_RMSE_baseline": 0.09389322807965869,
+        "raw_target_in_domain_decoder_RMSE_EVAL_ONLY": null
       },
       "train_bank_inductive_nearest": {
         "train_bank_NN_geometric_coverage": 0.82,
@@ -4340,14 +4354,13 @@
           "min": 0.0001998553739135557,
           "length": 60
         },
-        "transport_objective": {
-          "first": 0.885913195203299,
+        "transport_objective_history": {
+          "first": 1.3563589099532605,
           "last": 0.885913195203299,
-          "max": 0.885913195203299,
-          "min": 0.885913195203299,
-          "length": 1
+          "max": 1.3563589099532605,
+          "min": 0.8632227598661013,
+          "length": 60
         },
-        "group_sinkhorn_marginal_error": null,
         "max_sinkhorn_marginal_error": {
           "first": 9.020562075079397e-17,
           "last": 1.6556513104948323e-12,
@@ -4368,6 +4381,21 @@
         "paired_aligned_distance_lt_r_fraction": 0.004,
         "paired_aligned_distance_mean": 1.0520307326532974,
         "n_test": 250
+      },
+      "heldout_W2_squared": 0.491431793884673,
+      "heldout_physical_force_prediction_POSTHOC": {
+        "paired_force_R2_vs_trainmean_EVAL_ONLY": -1.3000145931532576,
+        "paired_force_RMSE_EVAL_ONLY": 0.14239658245386957,
+        "paired_force_MAE_EVAL_ONLY": 0.09257575698215365,
+        "paired_force_RMSE_each_finger_EVAL_ONLY": [
+          0.17246152770493214,
+          0.12162604086217711,
+          0.2251703275220279,
+          0.06520538084641726,
+          0.043527497411150536
+        ],
+        "physical_train_mean_RMSE_baseline": 0.09389322807965869,
+        "raw_target_in_domain_decoder_RMSE_EVAL_ONLY": null
       },
       "train_bank_inductive_nearest": {
         "train_bank_NN_geometric_coverage": 0.788,
@@ -6540,14 +6568,13 @@
           "min": 0.0036121470723454196,
           "length": 60
         },
-        "transport_objective": {
-          "first": 0.8914116175621178,
+        "transport_objective_history": {
+          "first": 1.2153926910600559,
           "last": 0.8914116175621178,
-          "max": 0.8914116175621178,
-          "min": 0.8914116175621178,
-          "length": 1
+          "max": 1.2153926910600559,
+          "min": 0.8494342175000189,
+          "length": 60
         },
-        "group_sinkhorn_marginal_error": null,
         "max_sinkhorn_marginal_error": {
           "first": 5.551115123125783e-17,
           "last": 3.7296554733501353e-16,
@@ -6568,6 +6595,21 @@
         "paired_aligned_distance_lt_r_fraction": 0.012,
         "paired_aligned_distance_mean": 0.9304834532887818,
         "n_test": 250
+      },
+      "heldout_W2_squared": 0.3799931705175879,
+      "heldout_physical_force_prediction_POSTHOC": {
+        "paired_force_R2_vs_trainmean_EVAL_ONLY": -0.5159361525755386,
+        "paired_force_RMSE_EVAL_ONLY": 0.1156044962635207,
+        "paired_force_MAE_EVAL_ONLY": 0.07463591598999264,
+        "paired_force_RMSE_each_finger_EVAL_ONLY": [
+          0.19757151278811977,
+          0.10159695045709963,
+          0.1168764178460758,
+          0.05134274410879943,
+          0.03419620378040744
+        ],
+        "physical_train_mean_RMSE_baseline": 0.09389322807965869,
+        "raw_target_in_domain_decoder_RMSE_EVAL_ONLY": null
       },
       "train_bank_inductive_nearest": {
         "train_bank_NN_geometric_coverage": 0.832,
@@ -8740,14 +8782,13 @@
           "min": 0.000618670782239207,
           "length": 60
         },
-        "transport_objective": {
-          "first": 0.9306343128120456,
+        "transport_objective_history": {
+          "first": 1.3851968459625534,
           "last": 0.9306343128120456,
-          "max": 0.9306343128120456,
-          "min": 0.9306343128120456,
-          "length": 1
+          "max": 1.3851968459625534,
+          "min": 0.9085200946529508,
+          "length": 60
         },
-        "group_sinkhorn_marginal_error": null,
         "max_sinkhorn_marginal_error": {
           "first": 6.938893903907228e-17,
           "last": 1.4788170688007085e-13,
@@ -8768,6 +8809,21 @@
         "paired_aligned_distance_lt_r_fraction": 0.008,
         "paired_aligned_distance_mean": 0.9499585811382558,
         "n_test": 250
+      },
+      "heldout_W2_squared": 0.40007249876969886,
+      "heldout_physical_force_prediction_POSTHOC": {
+        "paired_force_R2_vs_trainmean_EVAL_ONLY": -0.7059805816037992,
+        "paired_force_RMSE_EVAL_ONLY": 0.1226369418770906,
+        "paired_force_MAE_EVAL_ONLY": 0.07826642367194016,
+        "paired_force_RMSE_each_finger_EVAL_ONLY": [
+          0.20430444325372557,
+          0.1048683796060742,
+          0.13891736859752118,
+          0.04714757874579753,
+          0.03066733621877281
+        ],
+        "physical_train_mean_RMSE_baseline": 0.09389322807965869,
+        "raw_target_in_domain_decoder_RMSE_EVAL_ONLY": null
       },
       "train_bank_inductive_nearest": {
         "train_bank_NN_geometric_coverage": 0.804,
