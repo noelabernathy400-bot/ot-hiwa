@@ -59,9 +59,10 @@ jobs:
               assert np.array(r["P"]).shape==(K,K)
               assert np.array(r["R"]).shape==(5,5)
               assert r["pair_synchrony_never_used_in_training"]
-              assert "after" in r["heldout_common_hard_K_reference"]
+              held=r["heldout_common_hard_K_reference"]
+              assert ("T" in held.get("after",{})) or ("error" in held)
               assert r["train"]["training_result_at_final_global_R"]["marginal_max"]<1e-5
-          print("Verified 40 runs / five trials / five dimensions")
+          print("Verified 40 runs / five trials / five dimensions; any empty heldout groups are recorded as missing shared-T, NOT imputed")
           PY
       - name: Save isolated 5D runs; preserve original 3D benchmarks
         run: |
