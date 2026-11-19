@@ -1,0 +1,60 @@
+name: Hyser fiveD true optimal Fisher 2D plotting diagnostic
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-fisher-optimal-2d.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fisher:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Acquire frozen FA5 train-only embeddings
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/fisher"
+          gh release download hyser-s01-s1-random-5trials-v1 --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip --dir "$RUNNER_TEMP/fisher"
+          unzip -q "$RUNNER_TEMP/fisher/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" -d "$RUNNER_TEMP/fisher"
+      - name: Learn 2D Fisher discriminant planes only from train KMeans and draw heldout source/target
+        run: |
+          python experiments/hyser/expanded_five_trials/best_fisher_2d.py \
+            --fold "$RUNNER_TEMP/fisher/FA5_RAW5/trial_heldout_1_5d.npz" \
+            --frozen-results experiments/hyser/expanded_five_trials/results_PCA_FA_5D_robust120/OT_results_all.json \
+            --out experiments/hyser/expanded_five_trials/results_best2D_NN/fisher_subspace
+      - name: Verify supervised-by-pseudolabel visualization provenance
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("experiments/hyser/expanded_five_trials/results_best2D_NN/fisher_subspace")
+          o=json.loads((p/"fisher_2D_basis_training_only.json").read_text())
+          assert o["trained_only_on_four_training_trials"]
+          assert o["used_pseudo_labels_for_visualization_ONLY"]
+          assert (p/"fiveD_to_fisher_optimal_2D_independent.png").exists()
+          print("Verified train-only 2D Fisher projection with 5D source/target")
+          PY
+      - name: Commit visualization basis and image
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_best2D_NN/fisher_subspace
+          if ! git diff --cached --quiet; then
+            git commit -m "Visualize Hyser five-dimensional independent clusters using train-only optimized Fisher two-plane"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
