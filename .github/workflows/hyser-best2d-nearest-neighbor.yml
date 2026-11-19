@@ -1,0 +1,74 @@
+name: Hyser five-dimensional best 2D views and heldout nearest-neighbor tests
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-best2d-nearest-neighbor.yml"
+      - "experiments/hyser/expanded_five_trials/heldout_best2d_and_nn.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  figures_and_nn:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Obtain immutable FA5/PCA5 training-only fold data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_nn"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip \
+            --dir "$RUNNER_TEMP/hyser_nn"
+          unzip -q "$RUNNER_TEMP/hyser_nn/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
+            -d "$RUNNER_TEMP/hyser_nn"
+      - name: Compute 40 frozen-run five-dimensional nearest-neighbor evaluations and best 2D views
+        run: |
+          python experiments/hyser/expanded_five_trials/heldout_best2d_and_nn.py \
+            --features "$RUNNER_TEMP/hyser_nn" \
+            --frozen-results experiments/hyser/expanded_five_trials/results_PCA_FA_5D_robust120/OT_results_all.json \
+            --out experiments/hyser/expanded_five_trials/results_best2D_NN
+      - name: Validate calibrated thresholds and all 40 real heldout evaluations
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          base=pathlib.Path("experiments/hyser/expanded_five_trials/results_best2D_NN")
+          d=json.loads((base/"nearest_neighbor_evaluation_all.json").read_text())
+          assert len(d["runs"])==40
+          assert len(d["runs"])==len({(r["config"],r["heldout_trial"],r["seed"],r["method"]) for r in d["runs"]})
+          assert all(r["fiveD_train_only_threshold"]["quantile"]==.05 for r in d["runs"])
+          assert all(r["training_never_uses_test_synchrony"] for r in d["runs"])
+          assert len(list((base/"figures").glob("*.png")))>=5
+          assert len(json.loads((base/"nearest_neighbor_summary.json").read_text()))==4
+          print("PASS 40 heldout physical nearest-neighbor checks and train-only plots")
+          PY
+      - name: Store validated plots and statistics in git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_best2D_NN
+          if ! git diff --cached --quiet; then
+            git commit -m "Archive real five-dimensional train-selected 2D views and heldout physical nearest-neighbor test"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-best2D-5D-nearest-neighbor
+          path: experiments/hyser/expanded_five_trials/results_best2D_NN
+          retention-days: 90
+          if-no-files-found: warn
