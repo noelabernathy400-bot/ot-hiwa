@@ -1,0 +1,109 @@
+name: DANDI138 REAL corrected four-color Hard and Soft cluster Fisher gallery
+on:
+  push:
+    branches:
+      - experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119
+    paths:
+      - .github/workflows/dandi138-real-3d-4d-fisher-gallery-fourgroups.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  real-kinematic-fisher-plots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      NUMEXPR_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install plotting and NWB dependencies
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8" "h5py>=3.10"
+      - name: Download the ORIGINAL original DANDI 000138 asset, check bytes and SHA
+        run: |
+          python -u - <<'PY'
+          import hashlib,json,urllib.request
+          from pathlib import Path
+          api='https://api.dandiarchive.org/api'
+          url=f'{api}/dandisets/000138/versions/0.220113.0407/assets/?page_size=100'
+          name='sub-Jenkins_ses-large_desc-train_behavior+ecephys.nwb'
+          wanted=None
+          while url:
+              with urllib.request.urlopen(url,timeout=120) as f:
+                  page=json.load(f)
+              for a in page['results']:
+                  if a.get('path','').endswith('/'+name) or a.get('path')==name:
+                      wanted=a;break
+              if wanted:break
+              url=page.get('next')
+          assert wanted is not None
+          out=Path('/tmp')/name
+          request=urllib.request.Request(
+              f"{api}/assets/{wanted['asset_id']}/download/",
+              headers={'User-Agent':'ot-hiwa-dandi3d-fisher-gallery/1.0'})
+          hash=hashlib.sha256()
+          total=0
+          with urllib.request.urlopen(request,timeout=480) as response,out.open('wb') as f:
+              while True:
+                  block=response.read(8<<20)
+                  if not block:break
+                  f.write(block);hash.update(block);total+=len(block)
+          assert total==wanted['size']==148590536
+          assert hash.hexdigest()=='1188ddf5b822dd9ac49afb8916f4b42a85867613cf7f169d0b04a1d1aeecd700'
+          Path('/tmp/dandi_fisher_gallery_nwb').write_text(str(out))
+          print('VERIFIED_NWB',hash.hexdigest(),total,flush=True)
+          PY
+      - name: Plot 3D native and 3D/4D Fisher2/Fisher3 from train-only embedding, on 2800 validation windows
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/plot_real_3d_4d_fisher_gallery.py \
+            --nwb "$(cat /tmp/dandi_fisher_gallery_nwb)" \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --four-d-results projects/dandi-000138-hiwa-4d/results/PCA4_FA4_inner_validation/DANDI_PCA4_FA4_INNER_VALIDATION_RESULTS.json \
+            --three-d-results projects/dandi-000138-hiwa-4d/results/PCA3_FA3_vs_PCA4_FA4_inner_validation/DANDI_3D_VS_4D_RESULTS.json \
+            --output projects/dandi-000138-hiwa-4d/results/real3d4d_fisher_gallery_fourgroups
+      - name: Validate that all 9 real figures use only the original internal 80-trial set
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/real3d4d_fisher_gallery_fourgroups')
+          d=json.loads((p/'PHYSICAL_SEMANTICS_AND_FISHER.json').read_text())
+          assert d['no_old_test_used']
+          assert d['all_postfit_overlays_preserve_four_source_colors']
+          assert d['postfit_target_overlay_gray_background_only']
+          assert d['soft_argmax_colors_visual_only_full_probabilities_train']
+          assert d['all_figures_validation_trials']==80 and d['validation_windows']==2800
+          assert d['R_seed']==42 and d['R_selection'].startswith('fixed')
+          assert len(d['plots'])==10,len(d['plots'])
+          assert len(d['fisher_diagnostics'])==8
+          assert len(d['target_train_explained_variance_ratio_each_pc'])==3
+          assert abs(d['target_explained_variance_ratio_sum']-.83614794876228)<1e-6
+          for x in d['plots'].values():
+              assert (p/x).is_file()
+              assert (p/x).stat().st_size>40000
+          assert (p/'HAND_TARGET_PCA3_PHYSICAL_LOADINGS.png').stat().st_size>15000
+          print('PASS: all 10 source/target/aligned plots, 8 training Fisher bases, exact PCA3 loadings, original internal validation only')
+          PY
+      - name: Commit corrected six-panel four-color Fisher images without overwriting prior two-domain-color audit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/real3d4d_fisher_gallery_fourgroups
+          if ! git diff --cached --quiet; then
+            git commit -m 'Correct DANDI 3D/4D Fisher views: show four source groups after Hard Soft alignment'
+            git pull --rebase origin experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119
+            git push origin HEAD:experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-real-3d4d-FOUR-COLOR-Fisher2-Fisher3-gallery
+          path: projects/dandi-000138-hiwa-4d/results/real3d4d_fisher_gallery_fourgroups
+          if-no-files-found: warn
