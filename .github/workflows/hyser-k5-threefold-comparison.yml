@@ -1,0 +1,69 @@
+name: Hyser K5 versus K4 controlled three-dimensional comparison
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-k5-threefold-comparison.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  k5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Dependencies
+        run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Download unchanged 3D feature folds
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_in"
+          gh release download hyser-s01-s1-random-5trials-v1 --pattern hyser_s01_s1_random_5trials_features_cv.zip --dir "$RUNNER_TEMP/hyser_in"
+          unzip -q "$RUNNER_TEMP/hyser_in/hyser_s01_s1_random_5trials_features_cv.zip" -d "$RUNNER_TEMP/hyser_in"
+      - name: Independent Hard/Soft five-cluster 3D models
+        run: |
+          python experiments/hyser/expanded_five_trials/run_k5_3d_hard_soft.py \
+            --data-dir "$RUNNER_TEMP/hyser_in/derived" \
+            --out experiments/hyser/expanded_five_trials/results_K5_3D \
+            --seeds 42 43 --folds 1 2 3 4 5 --anchors 96 --outer 45
+      - name: Validate K5/heldout counts
+        run: |
+          python - <<'PY'
+          import json,pathlib,numpy as np
+          out=pathlib.Path("experiments/hyser/expanded_five_trials/results_K5_3D")
+          o=json.loads((out/"results_all.json").read_text())
+          assert len(o["runs"])==20
+          for r in o["runs"]:
+            assert r["K"]==5 and len(r["P"])==5 and len(r["P"][0])==5
+            P=np.array(r["P"])
+            assert np.max(abs(P.sum(0)-.2))<1e-6 and np.max(abs(P.sum(1)-.2))<1e-6
+            assert r["pair_synchrony_never_used_in_training"]
+            assert "after" in r["heldout_common_hard_K4_reference"]
+          print("K5 3D verified: 20 runs")
+          PY
+      - name: Commit isolated K5 evidence without modifying K4 baseline
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_K5_3D
+          if ! git diff --cached --quiet; then
+            git commit -m "Record 3D Hyser fivefold K5 Hard/Soft independent cluster results"
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-k5-3d-independent-hard-soft
+          path: experiments/hyser/expanded_five_trials/results_K5_3D/
+          if-no-files-found: warn
