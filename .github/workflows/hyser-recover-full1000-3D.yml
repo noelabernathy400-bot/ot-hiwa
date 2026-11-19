@@ -1,0 +1,77 @@
+name: Hyser recover actual 40 full1000 3D local-HiWA results from successful 20 jobs
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-recover-full1000-3D.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "matplotlib>=3.8,<4"
+      - name: Download the 20 SUCCESSFUL frozen three-dimensional full1000 P/Q/Rkl ADMM jobs, no retraining
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser-threeD-runs"
+          gh run download 44515032379 --repo "$GITHUB_REPOSITORY" \
+            --pattern 'hyser-threeD-*' --dir "$RUNNER_TEMP/hyser-threeD-runs"
+          echo "Count of actual task result files:"
+          find "$RUNNER_TEMP/hyser-threeD-runs" -name local_ADMM_results.json | tee "$RUNNER_TEMP/threeD-files.txt" | wc -l
+          test "$(wc -l < "$RUNNER_TEMP/threeD-files.txt")" -eq 20
+      - name: Strictly audit 40 actual three-dimensional local Q/P/R ADMM fits, both seeds and all five folds
+        run: |
+          python experiments/hyser/expanded_five_trials/aggregate_full1000_local_admm_3D.py \
+            --artifacts-dir "$RUNNER_TEMP/hyser-threeD-runs" \
+            --support-mode positive \
+            --out experiments/hyser/expanded_five_trials/results_formal_full1000_3D/summary
+      - name: Verify no missing / duplicated 3D experimental sample
+        run: |
+          python - <<'PY'
+          import pathlib,json
+          p=pathlib.Path("experiments/hyser/expanded_five_trials/results_formal_full1000_3D/summary")
+          d=json.loads((p/"full1000_summary.json").read_text())
+          assert d["runs_observed"]==40
+          assert len(d["qualified_matches"])==20
+          print("3D original 40 numeric runs, full 1000+250, strict qualified matched pairs:",d["eligible_matched_pairs"],"/20")
+          print("STATUS",d["status"])
+          print("ISSUES",d["issues"])
+          PY
+      - name: Archive EACH complete original 3D Hard/Soft run and report in repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p experiments/hyser/expanded_five_trials/results_formal_full1000_3D/individual_runs
+          cp -R "$RUNNER_TEMP/hyser-threeD-runs/"* \
+            experiments/hyser/expanded_five_trials/results_formal_full1000_3D/individual_runs/
+          git add experiments/hyser/expanded_five_trials/results_formal_full1000_3D
+          if ! git diff --cached --quiet; then
+            git commit -m "Recover every genuine PCA3 and FA3 full1000 fivefold local HiWA run and strict numerical audit"
+            for k in 1 2 3 4 5 6 7 8; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then exit 0; fi
+              sleep 2
+            done
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-3D-original-40-runs-full-audit
+          path: experiments/hyser/expanded_five_trials/results_formal_full1000_3D/summary/
+          if-no-files-found: warn
