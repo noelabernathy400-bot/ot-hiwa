@@ -652,6 +652,10 @@ class SoftHiWA:
         )
         self.Rg = global_rotation
         self.P = group_transport
+        # Audit-only diagnostics: save the actual final local rotations and
+        # ADMM dual variables, without changing any optimization step.
+        self.local_rotations = np.asarray(local_rotations, dtype=float).copy()
+        self.admm_dual_multipliers = np.asarray(multipliers, dtype=float).copy()
         self.local_couplings = tuple(
             tuple(coupling for coupling in row) for row in local_couplings
         )
