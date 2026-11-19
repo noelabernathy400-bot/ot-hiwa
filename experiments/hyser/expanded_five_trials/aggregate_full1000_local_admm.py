@@ -59,6 +59,7 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--artifacts-dir",type=Path,required=True)
     p.add_argument("--out",type=Path,required=True)
+    p.add_argument("--support-mode",choices=["full","positive"],default="full")
     z=p.parse_args();z.out.mkdir(exist_ok=True,parents=True)
     files=sorted(z.artifacts_dir.rglob("local_ADMM_results.json"))
     runs=[];issues=[]
@@ -95,7 +96,7 @@ def main():
                     np.linalg.norm(R@R.T-np.eye(5))<1e-7 and
                     max(abs(P.sum(axis=0)-.25).max(),
                         abs(P.sum(axis=1)-.25).max())<1e-7 and
-                    par["mu"]==.05 and par["support_mode"]=="full" and
+                    par["mu"]==.05 and par["support_mode"]==z.support_mode and
                     par["sa_shorn_gamma"]==.1 and par["shorn_gamma"]==.2 and
                     par["warm_start_local"] and
                     r["heldout_trial"] in FOLDS and
@@ -151,6 +152,7 @@ def main():
             summary.append(row)
     (z.out/"full1000_summary.json").write_text(json.dumps({
        "expectation":"40 full-data runs; five trials x two seeds x two features x Hard/Soft",
+       "exact_support_mode":z.support_mode,
        "runs_observed":len(runs),"runs_expected":40,
        "eligible_matched_pairs":sum(x["both_solver_converged"] for x in paired),
        "paired_expected":20,
@@ -195,8 +197,8 @@ def main():
         "Study: Hyser S01 S1 Random Task, 5 actual trials x 250 time windows, 5-fold leave-one-trial-out.",
         "X=256-channel EMG mapped to 5D PCA or FA (train-only); Y=all 5 actual finger forces whitened train-only, with physical channels retained.",
         "Train 1000 source + 1000 target windows, separately shuffled, no synchronized row pair used to fit R/P/Q. Holdout intact 250 windows.",
-        "K4 both domains independently; Hard one-hot vs Soft τ=0.5; dense 1000x1000 local Q for all 16 block pairs, local Rkl, P, ADMM; no anchors.",
-        "Original author default μ=.005 did NOT numerically converge on Hyser after 300 iterations. The predeclared numeric repair here uses *the same μ=.05 and local warm-start for BOTH methods*, selected using inner training-only ADMM primal/rotation convergence, not test success. The actual method remains the same local PQR/entropic constraints and γ1=.2, γ2=.1/P, max outer=300, inner=40, group Sinkhorn same mathematical objective computed stably.",
+        "K4 independently in both domains; Hard one-hot vs Soft τ=0.5; local Q uses the EXACT positive-mass group support (no probability mass dropped). For Soft normally all 1000 per group; for Hard only actual member points; local Rkl, P, ADMM; NO anchors.",
+        "Original author default μ=.005 did NOT numerically converge on Hyser after 300 iterations. Training-subset solver checks predeclared μ=.05 and the SAME local warm-start for BOTH groups using numerical convergence only, not heldout test scores. K4, γ1=.2, γ2=.1/P, outer max300, inner max40, both domains independently grouped. Stable log-domain Q is used only when the identical entropic objective's legacy kernel scaling violates mass marginals.",
         "Fisher 2D subspaces are presentation only, selected by TRAIN pseudolabels; no 2D coordinate plane or 2D transport metric is used.",
         "",
         f"Number of full runs found: {len(runs)}/40. Eligible matched Hard/Soft seed-fold pairs: {sum(x['both_solver_converged'] for x in paired)}/20.",
