@@ -72,3 +72,5 @@ jobs:
           name: dandi138-HiWA-source-repair-bitwise-regression-and-warmstart
           path: projects/dandi-000138-hiwa-4d/results/hiwa_source_code_repair
           if-no-files-found: warn
+
+# source regression rerun after fixing dynamic module registration for dataclasses
