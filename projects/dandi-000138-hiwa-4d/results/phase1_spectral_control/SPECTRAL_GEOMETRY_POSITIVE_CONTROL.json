@@ -1,0 +1,204 @@
+{
+  "training_uses_synchronized_pairing": false,
+  "training_uses_true_rotation": false,
+  "labels_used_only_postfit": true,
+  "candidates": "16 signs of independently train-fitted source-target covariance eigenbasis orthogonal mapping",
+  "candidate_selection": "minimum exact Hungarian empirical W2sq on 240+240 UNPAIRED train samples",
+  "old_solver_selected_by_same_unsupervised_240x240_training_W2_not_test_labels": true,
+  "regimes": {
+    "well_separated": {
+      "eigen_sign_alignment": {
+        "sign": [
+          1,
+          -1,
+          1,
+          1
+        ],
+        "training_W2sq": 0.11955944911686914,
+        "heldout_group_1NN_accuracy": 1.0,
+        "heldout_Rgt_Frob_error": 0.041402096977698054,
+        "all_sign_candidate_train_W2sq": [
+          0.8196420510233384,
+          0.8194052630055284,
+          0.6514930372742611,
+          0.6507390719448687,
+          1.022174172623999,
+          1.0227698191132835,
+          0.7223991084258705,
+          0.7229257289741222,
+          0.28822674837468676,
+          0.2882683908394025,
+          0.12034363305364953,
+          0.11955944911686914,
+          0.5306260980648853,
+          0.5308693040389234,
+          0.22364838204682544,
+          0.22385480153586867
+        ]
+      },
+      "true_rotation_oracle_POSTFIT_ONLY": {
+        "train_W2sq": 0.11824244029341206,
+        "test_group_accuracy": 1.0
+      },
+      "identity_baseline": {
+        "train_W2sq": 0.9574132901768299,
+        "test_group_accuracy": 0.25555555555555554
+      },
+      "original_Hard_Soft_solver": {
+        "hard": {
+          "select_by_lowest_train_W2sq": {
+            "seed": 44,
+            "train_W2sq": 0.08670578644789283,
+            "test_group_accuracy": 0.25,
+            "rotation_error": 3.183099426831963
+          },
+          "all_original_solver_runs": [
+            {
+              "seed": 42,
+              "train_W2sq": 0.16931384425959242,
+              "test_group_accuracy": 0.0,
+              "rotation_error": 3.480448631676825
+            },
+            {
+              "seed": 43,
+              "train_W2sq": 0.12229885251277223,
+              "test_group_accuracy": 0.5,
+              "rotation_error": 2.828429777026977
+            },
+            {
+              "seed": 44,
+              "train_W2sq": 0.08670578644789283,
+              "test_group_accuracy": 0.25,
+              "rotation_error": 3.183099426831963
+            }
+          ]
+        },
+        "soft": {
+          "select_by_lowest_train_W2sq": {
+            "seed": 44,
+            "train_W2sq": 0.0955401970739002,
+            "test_group_accuracy": 0.25,
+            "rotation_error": 3.2341127298656365
+          },
+          "all_original_solver_runs": [
+            {
+              "seed": 42,
+              "train_W2sq": 0.09954910096127151,
+              "test_group_accuracy": 0.5,
+              "rotation_error": 2.828462308463153
+            },
+            {
+              "seed": 43,
+              "train_W2sq": 0.1241374110619382,
+              "test_group_accuracy": 0.5,
+              "rotation_error": 2.8284431268687253
+            },
+            {
+              "seed": 44,
+              "train_W2sq": 0.0955401970739002,
+              "test_group_accuracy": 0.25,
+              "rotation_error": 3.2341127298656365
+            }
+          ]
+        }
+      }
+    },
+    "overlapping": {
+      "eigen_sign_alignment": {
+        "sign": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "training_W2sq": 0.09099797703827342,
+        "heldout_group_1NN_accuracy": 0.9916666666666667,
+        "heldout_Rgt_Frob_error": 0.3077673227903915,
+        "all_sign_candidate_train_W2sq": [
+          0.5202362909701025,
+          0.5197725221675668,
+          0.400316409802951,
+          0.4024432026644774,
+          0.4399187526025397,
+          0.4421704114586435,
+          0.3234090369189303,
+          0.31869899114486117,
+          0.3447065143157034,
+          0.34567211392606384,
+          0.20511242039011252,
+          0.20893864236612755,
+          0.23836289307970673,
+          0.23258486003073062,
+          0.09652917090773468,
+          0.09099797703827342
+        ]
+      },
+      "true_rotation_oracle_POSTFIT_ONLY": {
+        "train_W2sq": 0.08221754262704982,
+        "test_group_accuracy": 0.9916666666666667
+      },
+      "identity_baseline": {
+        "train_W2sq": 0.5727078962393584,
+        "test_group_accuracy": 0.3416666666666667
+      },
+      "original_Hard_Soft_solver": {
+        "hard": {
+          "select_by_lowest_train_W2sq": {
+            "seed": 43,
+            "train_W2sq": 0.10724297604368004,
+            "test_group_accuracy": 0.5027777777777778,
+            "rotation_error": 2.827402631666047
+          },
+          "all_original_solver_runs": [
+            {
+              "seed": 42,
+              "train_W2sq": 0.15297186208581862,
+              "test_group_accuracy": 0.002777777777777778,
+              "rotation_error": 3.4976047939153743
+            },
+            {
+              "seed": 43,
+              "train_W2sq": 0.10724297604368004,
+              "test_group_accuracy": 0.5027777777777778,
+              "rotation_error": 2.827402631666047
+            },
+            {
+              "seed": 44,
+              "train_W2sq": 0.11457722812053624,
+              "test_group_accuracy": 0.25,
+              "rotation_error": 3.187975747549205
+            }
+          ]
+        },
+        "soft": {
+          "select_by_lowest_train_W2sq": {
+            "seed": 43,
+            "train_W2sq": 0.10992933596521831,
+            "test_group_accuracy": 0.5111111111111111,
+            "rotation_error": 2.827791834856506
+          },
+          "all_original_solver_runs": [
+            {
+              "seed": 42,
+              "train_W2sq": 0.11255212105214873,
+              "test_group_accuracy": 0.5,
+              "rotation_error": 2.829069702580242
+            },
+            {
+              "seed": 43,
+              "train_W2sq": 0.10992933596521831,
+              "test_group_accuracy": 0.5111111111111111,
+              "rotation_error": 2.827791834856506
+            },
+            {
+              "seed": 44,
+              "train_W2sq": 0.11977400347875129,
+              "test_group_accuracy": 0.25,
+              "rotation_error": 3.2377162877225847
+            }
+          ]
+        }
+      }
+    }
+  }
+}
