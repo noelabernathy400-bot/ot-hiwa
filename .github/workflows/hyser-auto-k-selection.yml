@@ -1,0 +1,79 @@
+name: Hyser training-only automatic K selection on 3D and 5D
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-auto-k-selection.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  select-k:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Get source-verified 3D and five-finger 5D trials
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_auto_k/3d" "$RUNNER_TEMP/hyser_auto_k/5d"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_s01_s1_random_5trials_features_cv.zip \
+            --dir "$RUNNER_TEMP/hyser_auto_k/3d"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_s01_s1_5fingers_5D_folds_v1.zip \
+            --dir "$RUNNER_TEMP/hyser_auto_k/5d"
+          unzip -q "$RUNNER_TEMP/hyser_auto_k/3d/hyser_s01_s1_random_5trials_features_cv.zip" \
+            -d "$RUNNER_TEMP/hyser_auto_k/3d"
+          unzip -q "$RUNNER_TEMP/hyser_auto_k/5d/hyser_s01_s1_5fingers_5D_folds_v1.zip" \
+            -d "$RUNNER_TEMP/hyser_auto_k/5d"
+          test -f "$RUNNER_TEMP/hyser_auto_k/3d/derived/trial_heldout_1.npz"
+          test -f "$RUNNER_TEMP/hyser_auto_k/5d/trial_heldout_1_5d.npz"
+      - name: Independently select K from TRAINING trials of both domains for each fold
+        run: |
+          python experiments/hyser/expanded_five_trials/automatic_k_selection.py \
+            --three-d-dir "$RUNNER_TEMP/hyser_auto_k/3d/derived" \
+            --five-d-dir "$RUNNER_TEMP/hyser_auto_k/5d" \
+            --out experiments/hyser/expanded_five_trials/results_automatic_K
+      - name: Verify ten independent train-only choices per dimension
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("experiments/hyser/expanded_five_trials/results_automatic_K/automatic_K_selection.json")
+          a=json.loads(p.read_text())
+          assert len(a["decisions"])==20
+          assert all(2<=x["auto_selected_K"]<=8 for x in a["decisions"])
+          assert {(x["dimension"],x["heldout_trial"],x["domain"]) for x in a["decisions"]} == {
+            (d,f,t) for d in (3,5) for f in range(1,6) for t in ("source_EMG","target_force")}
+          print("Auto-K: 20 decisions verified")
+          PY
+      - name: Commit selection and diagnostic figures
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_automatic_K
+          if ! git diff --cached --quiet; then
+            git commit -m "Record train-only automatic K choice and K4/K5 geometric evidence on 3D and five-finger 5D"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-trial-heldout-auto-K-scan
+          path: experiments/hyser/expanded_five_trials/results_automatic_K/
+          if-no-files-found: warn
+          retention-days: 90
