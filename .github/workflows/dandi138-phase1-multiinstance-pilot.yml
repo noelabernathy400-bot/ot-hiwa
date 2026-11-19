@@ -1,0 +1,66 @@
+name: DANDI138 Phase1A Hard-HiWA independent-instance recoverability pilot
+on:
+  push:
+    branches:
+      - experiment/dandi-phase1-multiinstance-pilot-20261119
+    paths:
+      - .github/workflows/dandi138-phase1-multiinstance-pilot.yml
+      - projects/dandi-000138-hiwa-4d/code/phase1_multiinstance_hard_pilot.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-instances:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      NUMEXPR_NUM_THREADS: '1'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install solver and synthetic benchmark dependencies
+        run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Run 4D-K4 independent-instance random-vs-spectral complete PQR pilot
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/phase1_multiinstance_hard_pilot.py \
+            --output projects/dandi-000138-hiwa-4d/results/phase1_multiinstance_pilot \
+            --instances 0 1 --seeds 42 43 \
+            --outer 180 --inner 20 --per-cluster 24
+      - name: Verify exact run-count, independent-instance design and complete Q archive
+        run: |
+          python - <<'PY'
+          import json, numpy as np
+          from pathlib import Path
+          root=Path("projects/dandi-000138-hiwa-4d/results/phase1_multiinstance_pilot")
+          d=json.loads((root/"RESULTS.json").read_text())
+          assert not d["real_dandi_used"]
+          assert len(d["runs"])==16, len(d["runs"])
+          assert set(r["method"] for r in d["runs"])=={"Hard-HiWA"}
+          assert set(r["initialization"] for r in d["runs"])=={"random","spectral"}
+          assert set(r["instance"] for r in d["runs"])=={0,1}
+          assert set(r["regime"] for r in d["runs"])=={"separated","overlapping"}
+          files=list((root/"plans").glob("*.npz"))
+          assert len(files)==16, len(files)
+          for p in files:
+              with np.load(p) as item:
+                  keys=[k for k in item.files if k.startswith("Q_")]
+                  assert len(keys)==16
+                  assert item["P"].shape==(4,4)
+                  assert item["R"].shape==(4,4)
+                  assert item["source_sample_ids"].shape==(96,)
+                  assert item["target_sample_ids"].shape==(96,)
+          assert (root/"REPORT.md").stat().st_size>250
+          print("PASS: 16 full P/Q/R runs, truth withheld in fitting, no real DANDI data.")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-phase1A-multiinstance-hard-PQR
+          path: projects/dandi-000138-hiwa-4d/results/phase1_multiinstance_pilot
+          if-no-files-found: warn
