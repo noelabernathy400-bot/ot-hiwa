@@ -135,6 +135,8 @@ def main():
     p.add_argument("--save-first-Q",action="store_true")
     p.add_argument("--full-training",action="store_true",
                    help="Fit on all 1000 train windows in both domains, independently permuted.")
+    p.add_argument("--exact-positive-support",action="store_true",
+                   help="Exact zero-mass removal for each Q block, same mathematical OT, applied to BOTH Hard and Soft.")
     p.add_argument("--warm-start-local",action="store_true",
                    help="Opt-in common numerical warm start for Hard & Soft (sensitivity, not historical default).")
     p.add_argument("--mu",type=float,default=.005,
@@ -177,6 +179,7 @@ def main():
                     params.update(random_state=seed,maxiter=args.maxiter,
                                   sa_maxiter=args.sa_maxiter,
                                   warm_start_local=args.warm_start_local,
+                                  support_mode=("positive" if args.exact_positive_support else "full"),
                                   mu=args.mu)
                     model=SoftHiWA(**params).fit(x,aa,y,bb,
                               X_transform=np.eye(5),Y_transform=np.eye(5))
@@ -202,15 +205,17 @@ def main():
                     for i in range(K):
                         for j in range(K):
                             arr=np.asarray(q[i][j],float)
-                            if arr.shape!=(nfit,nfit) or not np.isfinite(arr).all():
-                                raise ValueError("Unexpected full-Q local block")
+                            expected_x=int(np.count_nonzero(aa[:,i])) if args.exact_positive_support else nfit
+                            expected_y=int(np.count_nonzero(bb[:,j])) if args.exact_positive_support else nfit
+                            if arr.shape!=(expected_x,expected_y) or not np.isfinite(arr).all():
+                                raise ValueError(f"Unexpected exact local-Q block shape {arr.shape} vs {(expected_x,expected_y)}")
                             qstats.append({"i":i,"j":j,
-                                 "shape":[nfit,nfit],"total_mass":float(arr.sum()),
+                                 "shape":[expected_x,expected_y],"total_mass":float(arr.sum()),
                                  "nonzero_fraction":float(np.mean(arr>1e-14)),
                                  "max_entry":float(np.max(arr))})
                     row={
                         "config":conf,"heldout_trial":fold,"seed":seed,"method":mode,
-                        "fitting":("Full 1000 unpaired TRAINING points each domain; exact dense local Q, no anchors"
+                        "fitting":("Full 1000 unpaired TRAINING points each domain; exact conditional-support local Q, no anchors"
                                    if args.full_training else "250 preselected unpaired training points; exact local Q, no anchors"),
                         "n_full_representation_training":1000,
                         "n_OT_train_source":nfit,"n_OT_train_target":nfit,
@@ -237,6 +242,7 @@ def main():
                         "local_R_matrices_learned":True,
                         "full_Q_matrices_learned_for_each_16_pairs":True,
                         "numeric_convergence_ADMM_primal_and_rotation":False,
+                        "exact_nonzero_support_no_mass_removed":bool(args.exact_positive_support),
                         "diagnostics":{
                            name:stats_or_null(diagnostic,name)
                            for name in ("Rg_norm","admm_primal_residual",
@@ -295,6 +301,7 @@ def main():
        "source_and_target_sampled_independently":True,
        "local_solver":"repo.src.cc_hiwa.soft_hiwa.SoftHiWA full support with hard one-hot vs soft K-means",
        "numerical_P_solver":"stable dual-root/log-Sinkhorn for same entropic group OT objective and same gamma; original direct-kernel solver underflowed",
+       "exact_zero_mass_support_mode":args.exact_positive_support,
        "physical_correspondence_only_evaluation":True,
        "runs":rows},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     summary=[]
@@ -332,7 +339,7 @@ def main():
        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for r in summary:
         report.append(f"|{r['config']}|{r['method']}|{r['n_runs']}|{r['coverage']:.3%}|{r['physical_hit']:.3%}|{r['random_hit']:.3%}|{r['train_bank_physical_hit']:.3%}|{r['train_bank_random_hit']:.3%}|{r['test_W2_squared']:.5f}|{r['test_physical_force_RMSE']:.5f}|{r['exact_index']:.3%}|")
-    report+=["",f"Solver initialization: warm_start_local={args.warm_start_local}; ADMM mu={args.mu}; outer limit={args.maxiter}; per-pair inner limit={args.sa_maxiter}.",
+    report+=["",f"Solver initialization: warm_start_local={args.warm_start_local}; ADMM mu={args.mu}; outer limit={args.maxiter}; per-pair inner limit={args.sa_maxiter}; exact positive mass support={args.exact_positive_support}.",
         "**Do not interpret a local-ADMM run with nonconverged primal residual as a successfully converged full HiWA model.** The numerical history, P/Q block statistics and group marginal errors are saved for review.",
       "No inherited source cluster labels have been given to target. No synchronized row pair enters OT fitting."]
     (args.out/"README_ZH.md").write_text("\n".join(report)+"\n",encoding="utf-8")
