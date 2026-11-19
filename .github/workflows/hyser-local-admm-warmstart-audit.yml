@@ -1,0 +1,77 @@
+name: Hyser local ADMM warm-start convergence audit at frozen mu
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-local-admm-warmstart-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      matrix:
+        embedding: ["PCA5_RAW5","FA5_RAW5"]
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Download immutable train-fitted PCA5/FA5 folds
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip \
+            --dir "$RUNNER_TEMP/hyser"
+          unzip -q "$RUNNER_TEMP/hyser/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
+            -d "$RUNNER_TEMP/hyser"
+      - name: Verify 300 original-parameter outer iterations with matched warm-start for both groups
+        run: |
+          python experiments/hyser/expanded_five_trials/local_PQR_ADMM_hyser.py \
+            --features "$RUNNER_TEMP/hyser" \
+            --out "experiments/hyser/expanded_five_trials/results_local_ADMM_warm300_${{ matrix.embedding }}" \
+            --folds 1 --seeds 42 \
+            --configs "${{ matrix.embedding }}" \
+            --maxiter 300 --sa-maxiter 40 --warm-start-local --mu 0.005
+      - name: Assert valid matrices and disclose convergence (not suppress failure)
+        run: |
+          python - <<'PY'
+          import json,os,pathlib,numpy as np
+          p=pathlib.Path("experiments/hyser/expanded_five_trials")/("results_local_ADMM_warm300_"+os.environ["EMBEDDING"])
+          data=json.loads((p/"local_ADMM_results.json").read_text())
+          assert len(data["runs"])==2
+          for a in data["runs"]:
+            assert a["Q_constraints_passed"]
+            assert np.array(a["local_rotations_Rkl"]).shape==(5,5,4,4)
+            print(a["config"],a["method"],"converged",a["numeric_convergence_ADMM_primal_and_rotation"],"primal",a["diagnostics"]["admm_primal_residual"]["last"],"rotation_change",a["diagnostics"]["Rg_norm"]["last"])
+          PY
+        env:
+          EMBEDDING: ${{ matrix.embedding }}
+      - name: Commit numeric hard-soft convergence diagnosis
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "experiments/hyser/expanded_five_trials/results_local_ADMM_warm300_${{ matrix.embedding }}"
+          if ! git diff --cached --quiet; then
+            git commit -m "Audit original-mu ADMM warm-start convergence for ${{ matrix.embedding }} on real Hyser"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "hyser-local-warm300-${{ matrix.embedding }}"
+          path: "experiments/hyser/expanded_five_trials/results_local_ADMM_warm300_${{ matrix.embedding }}/"
+          if-no-files-found: warn
