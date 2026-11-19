@@ -93,6 +93,8 @@ def main():
                         **{k:(json.dumps(v) if isinstance(v,list) else v) for k,v in s.items()}))
                 decisions.append(dict(dimension=dimension,heldout_trial=heldout,
                     domain=domain,auto_selected_K=selected,selection_fallback=fallback,
+                    deployable_K=(None if fallback else int(selected)),
+                    selection_status=("ABSTAIN_UNSTABLE" if fallback else "STABLE_CANDIDATE"),
                     best_silhouette_K=max(rows,key=lambda s:s["silhouette"])["K"],
                     silhouette_K4=next(s["silhouette"] for s in rows if s["K"]==4),
                     silhouette_K5=next(s["silhouette"] for s in rows if s["K"]==5),
@@ -162,6 +164,7 @@ def main():
            "- 如果X/Y选择出不同K，层级OT必须支持**非方形 P (Kx×Ky)**、各自边缘1/Kx和1/Ky。",
            "- 不可以强迫另一个域继承源域K，也不能用真实同步组标签选择K。",
            "- 自动K只是无监督结构启发式，不保证动作标签个数、物理可解释性或OT最优值。",
+           "- fallback=True 是数值最高轮廓系数的审计候选，不是可靠可部署结果；此时 deployable_K=null，并自动弃权。",
            "- 没有正式训练自动K HiWA的部分不得写成“自动K模型已经优于固定K模型”。"]
     (args.out/"AUTO_K_METHOD_ZH.md").write_text("\n".join(lines)+"\n",encoding="utf-8")
     print(json.dumps({"status":"success","selected3D":chosen3,"selected5D":chosen5},ensure_ascii=False),flush=True)
