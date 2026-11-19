@@ -1,0 +1,78 @@
+name: Verified Hard Soft REAL P Q global-matrix and alluvial visualizations
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-reconstruct-PQ-visuals.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  reconstruct-visualize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original ZIP dependencies
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: EXACT deterministic seed-42 replay and 16 local Q plots
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/plot_reconstructed_hard_soft_PQ.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --archive projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_RESULTS.json \
+            --output projects/dandi-000138-hiwa-4d/results/strict_unsupervised_PQ_visualizations \
+            --seed 42 --outer 500 --inner 20 --sample-sinkhorn 45 \
+            --group-sinkhorn 200 --mu .05 --epsilon-group .2 --epsilon-sample .1
+      - name: Check actual P Q provenance and 160x160 mass, true source/target ids
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import numpy as np
+          p=Path('projects/dandi-000138-hiwa-4d/results/strict_unsupervised_PQ_visualizations')
+          m=json.loads((p/'VISUALIZATION_AUDIT.json').read_text())
+          assert m['actual_data'] and m['original_solver_code_unchanged']
+          assert m['source_training_labels_independent_of_target']
+          assert m['source_soft_prototypes_independent_of_target']
+          assert m['true_paired_sample_ids_used_for_training'] is False
+          assert m['same_original_train_sample_ids_in_hard_soft']
+          assert m['source_N']==m['target_N']==160
+          with np.load(p/'actual_sample_level_P_Q_and_indices.npz') as z:
+              assert z['hard_Gamma'].shape==z['soft_Gamma'].shape==(160,160)
+              assert all(abs(z[q].sum()-1)<1e-6 for q in ['hard_Gamma','soft_Gamma'])
+              assert not np.array_equal(z['source_training_hard_labels'],z['target_training_hard_labels'])
+              assert len(z.files)>=40
+              for method in ['hard','soft']:
+                  assert max(m['reproduction_audit'][method]['comparison_max_P_error'],
+                             m['reproduction_audit'][method]['comparison_max_R_error'])<1e-9
+                  assert max(m['reproduction_audit'][method]['checks']['gamma_row_error'],
+                             m['reproduction_audit'][method]['checks']['gamma_col_error'])<1e-5
+          for f in m['visualization_outputs'][:4]:
+              assert (p/f).stat().st_size>40000, f
+          print('PASS actual original archived P/R and local 16 Q per method, marginal and index audit')
+          PY
+      - name: Commit real figures and fully reproducible indexed P Q arrays
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/strict_unsupervised_PQ_visualizations
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish exact unpaired Hard Soft 160x160 P-Q transport heatmaps, Sankey and linked real points'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-real-unsupervised-Hard-Soft-PQ-figures
+          path: projects/dandi-000138-hiwa-4d/results/strict_unsupervised_PQ_visualizations
+          if-no-files-found: warn

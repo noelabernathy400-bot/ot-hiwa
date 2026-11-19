@@ -1,0 +1,112 @@
+name: DANDI138 actual closeout SA WA and modified DAD FA3 FA4 baselines
+on:
+  push:
+    branches:
+      - experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119
+    paths:
+      - .github/workflows/dandi138-closeout-sa-wa-dad-baselines.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  dandi-only-baselines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      NUMEXPR_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8" "h5py>=3.10"
+      - name: Download and SHA-check original raw DANDI NWB exactly once
+        run: |
+          python -u - <<'PY'
+          from pathlib import Path
+          import hashlib,json,urllib.request
+          root='https://api.dandiarchive.org/api'
+          url=root+'/dandisets/000138/versions/0.220113.0407/assets/?page_size=100'
+          target='sub-Jenkins_ses-large_desc-train_behavior+ecephys.nwb'
+          asset=None
+          while url:
+              with urllib.request.urlopen(url,timeout=120) as f:
+                  page=json.load(f)
+              for a in page['results']:
+                  if a.get('path','').endswith('/'+target) or a.get('path')==target:
+                      asset=a;break
+              if asset:break
+              url=page.get('next')
+          assert asset is not None
+          out=Path('/tmp')/target
+          req=urllib.request.Request(root+'/assets/'+asset['asset_id']+'/download/',
+                                      headers={'User-Agent':'ot-hiwa-dandi-archive-baselines/1.0'})
+          sha=hashlib.sha256();total=0
+          with urllib.request.urlopen(req,timeout=480) as data,out.open('wb') as f:
+              while True:
+                  b=data.read(8<<20)
+                  if not b:break
+                  f.write(b);sha.update(b);total+=len(b)
+          assert total==asset['size']==148590536
+          assert sha.hexdigest()=='1188ddf5b822dd9ac49afb8916f4b42a85867613cf7f169d0b04a1d1aeecd700'
+          Path('/tmp/dandi_baselines_raw_nwb').write_text(str(out))
+          print('NWB_SHA_VERIFIED',total,sha.hexdigest(),flush=True)
+          PY
+      - name: Run FA3 SA WA and adapted density DAD plus FA4 SA WA on same train samples and validation
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/closeout_dandi_sa_wa_dad_baselines.py \
+            --nwb "$(cat /tmp/dandi_baselines_raw_nwb)" \
+            --three-d-results projects/dandi-000138-hiwa-4d/results/PCA3_FA3_vs_PCA4_FA4_inner_validation/DANDI_3D_VS_4D_RESULTS.json \
+            --four-d-results projects/dandi-000138-hiwa-4d/results/PCA4_FA4_inner_validation/DANDI_PCA4_FA4_INNER_VALIDATION_RESULTS.json \
+            --three-d-plan-dir projects/dandi-000138-hiwa-4d/results/PCA3_FA3_vs_PCA4_FA4_inner_validation \
+            --four-d-plan-dir projects/dandi-000138-hiwa-4d/results/PCA4_FA4_inner_validation \
+            --output projects/dandi-000138-hiwa-4d/results/closeout_baselines_real_DANDI
+      - name: Audit real training, 5 baseline families/representations and no fake DAD label
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/closeout_baselines_real_DANDI/DANDI_SA_WA_DAD_ADAPTED_RESULTS.json')
+          d=json.loads(p.read_text())
+          assert d['original_test100_not_used']
+          assert d['original_physical_4d_labels_used_only_after_train']
+          assert d['all_baseline_training_unpaired']
+          assert d['inner_train_trials']==320 and d['inner_val_trials']==80
+          assert set(d['results'])=={'FA3','FA4'}
+          for representation in ('FA3','FA4'):
+              methods=d['results'][representation]
+              assert set(methods)==({'SA','WA','DAD_like_3D'} if representation=='FA3' else {'SA','WA'})
+              for name,rows in methods.items():
+                  assert [r['seed'] for r in rows]==([42] if name=='SA' else [42,43,44])
+                  for r in rows:
+                      D=3 if representation=='FA3' else 4
+                      R=np.array(r['R'])
+                      assert R.shape==(D,D)
+                      assert np.linalg.norm(R.T@R-np.eye(D))<1e-7
+                      assert 0<=r['validation_physical_cross_trial']['pos_hit10pct']<=1
+                      assert 0<=r['validation_physical_cross_trial']['direction_hit30deg']<=1
+                      assert r['group_hierarchy_PQ']==False
+          assert d['results']['FA3']['DAD_like_3D'][0]['config']['original_DAD_exact_reproduction']==False
+          print('PASS real SA WA and DAD-adapted only no new supervised model')
+          PY
+      - name: Commit DANDI-only baseline evidence, no Hyser edits
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/closeout_baselines_real_DANDI
+          if ! git diff --cached --quiet; then
+            git commit -m 'Archive actual DANDI FA3 FA4 SA WA and DAD-adapted 3D baseline scores'
+            git pull --rebase origin experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119
+            git push origin HEAD:experiment/dandi-pca3-fa3-vs-pca4-fa4-20261119
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-real-closeout-SA-WA-DAD-adapted
+          path: projects/dandi-000138-hiwa-4d/results/closeout_baselines_real_DANDI
+          if-no-files-found: warn

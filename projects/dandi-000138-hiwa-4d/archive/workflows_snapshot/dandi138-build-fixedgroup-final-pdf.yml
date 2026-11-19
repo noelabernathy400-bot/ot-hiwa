@@ -1,0 +1,63 @@
+name: Build FINAL DANDI 000138 single-source-group fully-audited PDF
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/dandi138-build-fixedgroup-final-pdf.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  compile-frozen-converged:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Derive canonical table only from 500-iteration saved metrics
+        run: |
+          python projects/dandi-000138-hiwa-4d/code/write_converged_summary.py
+      - name: Install Unicode XeLaTeX and required fonts
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            texlive-xetex texlive-lang-chinese texlive-latex-extra texlive-fonts-recommended \
+            fonts-noto-cjk fonts-liberation fonts-dejavu-core poppler-utils
+      - name: Compile official XeLaTeX report with final 5 of 5 audited runs
+        run: |
+          cd projects/dandi-000138-hiwa-4d
+          mkdir -p _latex_build
+          xelatex -interaction=nonstopmode -halt-on-error -file-line-error \
+            -output-directory=_latex_build '四维HiWA统一源域分组实验.tex'
+          xelatex -interaction=nonstopmode -halt-on-error -file-line-error \
+            -output-directory=_latex_build '四维HiWA统一源域分组实验.tex'
+          cp '_latex_build/四维HiWA统一源域分组实验.pdf' '四维HiWA统一源域分组实验.pdf'
+          test -s '四维HiWA统一源域分组实验.pdf'
+          pdfinfo '四维HiWA统一源域分组实验.pdf' | grep Pages
+      - name: Commit official report and reproducible final score rows
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- 'projects/dandi-000138-hiwa-4d/四维HiWA统一源域分组实验.pdf' \
+             'projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/metrics_rows.tex' \
+             'projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/FINAL_RESULTS.md'
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish final audited HiWA source-group PDF after 500 iterations and five seeds'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Upload PDF and final tabulated metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DANDI138-single-source-fixed-group-FINAL-PDF
+          path: |
+            projects/dandi-000138-hiwa-4d/四维HiWA统一源域分组实验.pdf
+            projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/FINAL_RESULTS.md
+            projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/metrics_rows.tex
+          if-no-files-found: warn

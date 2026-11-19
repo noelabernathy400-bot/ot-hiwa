@@ -1,0 +1,114 @@
+name: DANDI138 evaluate frozen HiWA optimal transport
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/dandi138-evaluate-hierarchical-ot.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  evaluate-heldout-ot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install evaluation-only dependencies
+        run: python -m pip install numpy scipy matplotlib
+      - name: Compute held-out exact assignment optimal transport costs
+        run: |
+          python projects/dandi-000138-hiwa-4d/code/evaluate_hierarchical_ot.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups/fixed_groups_4d.npz \
+            --alignment projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/hard_hiwa_results.json \
+            --output projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/ot_evaluation \
+            --per-group 128
+      - name: Validate all error definitions and model/data invariants
+        run: |
+          python - <<'PY'
+          import json
+          import numpy as np
+          from pathlib import Path
+          root=Path('projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/ot_evaluation')
+          x=json.loads((root/'OT_HELDOUT_METRICS.json').read_text())
+          assert x['one_source_kmeans'] and x['target_labels_inherited_by_paired_index']
+          assert x['no_reclustering'] and x['no_refitting']
+          assert len(x['by_seed'])==5
+          assert all(v['converged'] for v in x['by_seed'])
+          assert x['baseline']['unrestricted_W2_squared']>0
+          for row in x['by_seed']:
+              assert row['unrestricted_W2_squared']>0
+              assert row['same_group_W2_squared_empirical_masses']>0
+              assert row['P_weighted_W2_squared_after']>0
+              assert abs(sum(sum(z) for z in row['learned_P'])-1)<1e-7
+          for f in ['ot_three_costs_before_after.png','ot_group_cost_and_P_seed42.png']:
+              assert (root/f).stat().st_size>20000
+          print('OT METRICS VERIFIED')
+          PY
+      - name: Write research progress into the project experiment log
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          base=Path('projects/dandi-000138-hiwa-4d')
+          report=base/'results/source_only_fixed_groups_outer500/ot_evaluation/OT_HELDOUT_METRICS.json'
+          data=json.loads(report.read_text(encoding='utf-8'))
+          s=data['mean_sd']
+          baseline=data['baseline']
+          target="## 2026-11-17 · 冻结模型最优传输代价重新评价"
+          lines=[
+            target,
+            '',
+            '在同一次唯一源域 KMeans、固定组标签与外迭代 500 次的原版 HiWA 上，只读取已存 R、P 而不重新训练。',
+            '计算全域无约束精确 OT、同编号组精确 OT、学得 P 的跨组加权 OT；详见 [OT_EVALUATION.md](results/source_only_fixed_groups_outer500/ot_evaluation/OT_EVALUATION.md)。',
+            '',
+            '| 检验 | 原始 | HiWA 后五次平均 |',
+            '|---|---:|---:|']
+          pairs=[
+            ('全域自由 W2²','unrestricted_W2_squared'),
+            ('固定同组 W2²','same_group_W2_squared_empirical_masses')]
+          for label,key in pairs:
+              lines.append(f"| {label} | {baseline[key]:.6f} | {s[key]['mean']:.6f} |")
+          lines+=['',
+                  '第三项使用原版已学习 P 对各组间测试 OT 代价加权，但不是原版训练精确目标：旧文件没有局部 R_ij、Q_ij、C_ij。',
+                  '同编号组 OT 不允许跨组，而原版 P 往往仍有非对角质量；这两个问题应当分开评价。',
+                  '',
+                  '![OT 代价对比](results/source_only_fixed_groups_outer500/ot_evaluation/ot_three_costs_before_after.png)',
+                  '',
+                  '---','','']
+          log=base/'EXPERIMENT_LOG.md'
+          text=log.read_text(encoding='utf-8')
+          if target not in text:
+              text=text.replace('# 实验日志（持续更新）\n',
+                                '# 实验日志（持续更新）\n\n'+'\n'.join(lines),1)
+              log.write_text(text,encoding='utf-8')
+          PY
+      - name: Publish verified OT data and visuals to current project
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/ot_evaluation \
+            projects/dandi-000138-hiwa-4d/EXPERIMENT_LOG.md
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish three distinct OT evaluation costs on frozen source-only-group HiWA and visual diagnostics'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Preserve all data as reproducible artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dandi138-frozen-HiWA-heldout-OT-errors
+          path: projects/dandi-000138-hiwa-4d/results/source_only_fixed_groups_outer500/ot_evaluation
+          if-no-files-found: warn

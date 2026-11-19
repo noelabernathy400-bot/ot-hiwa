@@ -1,0 +1,60 @@
+name: Three-way strict unpaired PyHiWA / same-kernel Hard / Soft postfit metrics
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-strict-threeway-postfit.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  compare-saved-models:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install numpy scipy
+      - name: ONLY postfit same-test-sample eval; no model refitting or hyperparameter selection
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/compare_postfit_original_hiwa_gcot.py \
+            --original projects/dandi-000138-hiwa-4d/results/strict_unsupervised_original_hiwa500/hard_hiwa_results.json \
+            --same-solver projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_RESULTS.json \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --output projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft
+      - name: Confirm original PyHiWA and same-solver models share original 4D input
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=Path('projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/THREE_WAY_POSTFIT.json')
+          j=json.loads(r.read_text())
+          assert j['all_methods_trained_without_true_pairing']
+          assert j['same_test_indices_and_scale']
+          assert j['test_used_only_postfit']
+          assert len(j['results'])==3
+          assert all(len(v['all_convergence_flags'])==5 for v in j['results'].values())
+          print('THREE-WAY EVALUATION VERIFIED')
+          PY
+      - name: Save new report alongside strictly independent Hard/Soft fits
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/THREE_WAY_POSTFIT.json \
+             projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/THREE_WAY_POSTFIT.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish exact original PyHiWA vs same-kernel independently grouped Hard/Soft postfit metrics'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-STRICT-UNPAIRED-THREE-WAY-POSTFIT
+          path: |
+            projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/THREE_WAY_POSTFIT.json
+            projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/THREE_WAY_POSTFIT.md
+          if-no-files-found: warn

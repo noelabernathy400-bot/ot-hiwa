@@ -1,0 +1,5 @@
+tau,method,nested_transport,global_free_W2sq,legacy_1NN,numerical_audit_passed,WARNING
+0.0,hard,1.6525692623627244,0.4185423173494439,0.3619428571428572,5,GROUP-SUPERVISED: target labels copied using time pairing
+0.2,tau0.20,1.6588334201437704,0.4209221559119456,0.3648,5,GROUP-SUPERVISED: target labels copied using time pairing
+0.4,tau0.40,1.7292505137512264,0.4278627370968682,0.34571428571428575,5,GROUP-SUPERVISED: target labels copied using time pairing
+0.8,tau0.80,1.9062075355462376,0.4171005955351624,0.26942857142857146,5,GROUP-SUPERVISED: target labels copied using time pairing

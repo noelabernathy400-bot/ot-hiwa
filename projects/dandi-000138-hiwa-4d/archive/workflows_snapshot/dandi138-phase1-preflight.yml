@@ -1,0 +1,73 @@
+name: DANDI138 PHASE-I preflight semantics + genuine physical position and velocity retrieval
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-phase1-preflight.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  phase1-readonly-frozen-model-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install analysis packages
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Preflight frozen 4D geometry physical semantics and physical NN retrieval with same trials
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/preflight_geometry_semantics_retrieval.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --archive projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_RESULTS.json \
+            --clustering-report projects/dandi-000138-hiwa-4d/results/clustering/clustering_report.json \
+            --output projects/dandi-000138-hiwa-4d/results/phase1_preflight
+      - name: Machine-check no model refit, labels postfit only, full original sample counts, all test and baseline scores
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/phase1_preflight')
+          a=json.loads((p/'PREFLIGHT_DATA_AND_EVALUATION_AUDIT.json').read_text())
+          assert a['model_retraining_occurred'] is False
+          assert a['test_labels_used_in_fitting_or_matching'] is False
+          assert a['data_layers']=={'all':17500,'train':14000,'heldout':3500,'OT':160,'train_trials':400,'test_trials':100}
+          assert len(a['semantic'])==4
+          assert len(a['retrieval']['methods']['hard'])==len(a['retrieval']['methods']['soft'])==5
+          for pool in ['full_pool','cross_trial_pool']:
+              for name in ['identity','random']:
+                  e=a['retrieval']['baseline'][pool][name]
+                  assert all(np.isfinite(v) for v in e.values())
+                  assert 0<=e['pos_hit10pct']<=1 and 0<=e['direction_hit30deg']<=1
+              for name in ['hard','soft']:
+                  for run in a['retrieval']['methods'][name]:
+                      assert all(np.isfinite(v) for v in run[pool].values())
+          for name in ['PREFLIGHT_CLUSTER_SEMANTICS.png','PREFLIGHT_POSITION_SPEED_RETRIEVAL.png']:
+              assert (p/name).stat().st_size>60000,(name,(p/name).stat().st_size)
+          print('PASS: 17500/14000/3500/160 data, genuine behavioral metrics, trial-shuffle null, five frozen seed R, independent test label firewall')
+          PY
+      - name: Publish only audit outputs; leave all original R/P/Q and models unchanged
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/phase1_preflight
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish phase1 read-only HiWA geometry feasibility: real cluster semantics and physical retrieval'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dandi138-preflight-physical-geometry
+          path: projects/dandi-000138-hiwa-4d/results/phase1_preflight
+          if-no-files-found: warn

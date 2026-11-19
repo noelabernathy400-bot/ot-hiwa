@@ -1,0 +1,133 @@
+name: DANDI138 REAL PCA4-vs-FA4 neural representation 320-80 inner trial validation and full Hard/Soft PQR
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-PCA4-vs-FA4-innertrial.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  compare-original-neural-PCA-vs-FA:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      NUMEXPR_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install scientific dependencies (no synthetic data substitute)
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8" "h5py>=3.10"
+      - name: Obtain exact historical NWB via DANDI public version API (not fake PCA transformed features)
+        run: |
+          python -u - <<'PY'
+          from pathlib import Path
+          import json, urllib.request, hashlib
+          root='https://api.dandiarchive.org/api'
+          url=f'{root}/dandisets/000138/versions/0.220113.0407/assets/?page_size=100'
+          name='sub-Jenkins_ses-large_desc-train_behavior+ecephys.nwb'
+          asset=None
+          while url:
+              print('Listing',url,flush=True)
+              with urllib.request.urlopen(url,timeout=120) as f:
+                  data=json.load(f)
+              for entry in data['results']:
+                  if entry.get('path','').endswith('/'+name) or entry.get('path')==name:
+                      asset=entry
+                      break
+              if asset:break
+              url=data.get('next')
+          assert asset is not None,'Original DANDI asset not found in version 0.220113.0407'
+          print('Exact DANDI asset path',asset['path'],'expected size',asset['size'],'asset ID',asset['asset_id'],flush=True)
+          output=Path('/tmp')/name
+          request=urllib.request.Request(f"{root}/assets/{asset['asset_id']}/download/",
+                  headers={'User-Agent':'ot-hiwa-research-audit/1.0'})
+          sha=hashlib.sha256()
+          with urllib.request.urlopen(request,timeout=480) as res,output.open('wb') as fp:
+              total=0
+              while True:
+                  block=res.read(8<<20)
+                  if not block:break
+                  fp.write(block);sha.update(block);total+=len(block)
+                  if total%(256<<20)<len(block):print('Downloaded megabytes',round(total/1048576),flush=True)
+          print('Downloaded',total,'bytes, SHA256',sha.hexdigest(),flush=True)
+          assert total==asset['size']
+          assert sha.hexdigest()=='1188ddf5b822dd9ac49afb8916f4b42a85867613cf7f169d0b04a1d1aeecd700'
+          with open('/tmp/dandi_pca_fa_raw_ready.flag','w') as f:f.write(str(output))
+          PY
+      - name: Run PCA4 and FactorAnalysis4 from original 162 channels, 320 train / 80 val, full Hard/Soft PQR
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/compare_pca4_fa4_inner_train_ot.py \
+            --nwb "$(cat /tmp/dandi_pca_fa_raw_ready.flag)" \
+            --original-clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --clustering-report projects/dandi-000138-hiwa-4d/results/clustering/clustering_report.json \
+            --output projects/dandi-000138-hiwa-4d/results/PCA4_FA4_inner_validation \
+            --seeds 42 43 44 --outer 500 --inner 20 --fa-max-iter 120
+      - name: Audit DANDI source, full trial isolation, all original 4D P/Q/R budgets and physical metrics
+        run: |
+          python - <<'PY'
+          import json, numpy as np
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/PCA4_FA4_inner_validation')
+          r=json.loads((p/'DANDI_PCA4_FA4_INNER_VALIDATION_RESULTS.json').read_text())
+          h=r['original_data_hierarchy']
+          assert h==dict(full_trials=500,full_windows=17500,original_train_trials=400,original_train_windows=14000,untouched_original_test_trials=100,untouched_original_test_windows=3500,internal_fit_trials=320,internal_fit_windows=11200,internal_validation_trials=80,internal_validation_windows=2800,OT_sample_windows_per_domain=160)
+          assert r['file_sha256']=='1188ddf5b822dd9ac49afb8916f4b42a85867613cf7f169d0b04a1d1aeecd700'
+          assert r['no_original_test_evaluated_or_optimized']
+          assert not r['physical_ground_truth_in_training']
+          assert not r['true_cross_domain_sample_pairing_in_alignment']
+          assert r['source_group_labels_computed_from_source_only'] and r['target_group_labels_computed_from_target_only']
+          assert set(r['methods'])=={'PCA4','FA4'}
+          for dim in ('PCA4','FA4'):
+              assert np.isfinite(r['neural_pca_fa'][dim]['four_factor_validation_reconstruction_MSE_standardized_neuron_space'])
+              for cluster in ('Hard','Soft'):
+                  rows=r['methods'][dim][cluster]
+                  assert [row['seed'] for row in rows]==[42,43,44]
+                  for row in rows:
+                      R=np.array(row['R']);P=np.array(row['P'])
+                      assert np.linalg.norm(R.T@R-np.eye(4))<1e-7
+                      assert max(abs(P.sum(0)-.25).max(),abs(P.sum(1)-.25).max())<1e-5
+                      assert row['train_Q_marginal_error']<1e-5
+                      assert row['validation_nested_PQ_max_marginal_error']<1e-5
+                      assert np.isfinite(row['validation_free_W2sq'])
+                      assert np.isfinite(row['validation_nested_PQ_transport_W2sq'])
+                      assert 0<=row['validation_cross_trial_physical_retrieval']['pos_hit10pct']<=1
+                      plan_path=p/f"DANDI_{dim}_{cluster}_seed{row['seed']}_FULL_P_Q_R.npz"
+                      assert plan_path.stat().st_size>20000,plan_path
+                      with np.load(plan_path,allow_pickle=False) as plan:
+                          assert 'P' in plan.files and 'R' in plan.files
+                          assert 'local_R' in plan.files and 'dual' in plan.files
+                          assert len(plan['source_train_row_indices'])==160
+                          assert len(plan['target_train_row_indices'])==160
+                          for ii in range(4):
+                              for jj in range(4):
+                                  assert f'Q_{ii}_{jj}' in plan.files
+                                  assert np.isfinite(plan[f'Q_{ii}_{jj}']).all()
+                      assert 0<=row['validation_cross_trial_physical_retrieval']['direction_hit30deg']<=1
+          assert (p/'DANDI_PCA4_FA4_REPORT_ZH.md').stat().st_size>1000
+          assert (p/'DANDI_PCA4_FA4_HARD_SOFT_PHYSICAL_OT.png').stat().st_size>60000
+          assert (p/'DANDI_PCA4_FA4_FEATURE_CLUSTER_COMPARISON.png').stat().st_size>50000
+          print('PASS real NWB SHA, exactly 500/400/100 and inner 320/80 isolated trials, all original PQR models and physical metrics')
+          PY
+      - name: Publish strict real PCA4-FA4 result without committing NWB or overwriting old baseline
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/PCA4_FA4_inner_validation
+          if ! git diff --cached --quiet; then
+            git commit -m 'Compare raw DANDI neural PCA4 vs FA4 with isolated 320/80 trial full original Hard Soft PQR train-only validation'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-real-162-neural-PCA4-FA4-Hard-Soft-PQR
+          path: projects/dandi-000138-hiwa-4d/results/PCA4_FA4_inner_validation
+          if-no-files-found: warn

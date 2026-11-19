@@ -1,0 +1,117 @@
+name: DANDI138 4D target-only geometry 4-variant STRICT unpaired 5-seed full
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dandi138-target-only-geometry-full.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  full-target-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original-source dependent libraries
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Four target-only transforms, five original seeds, original full GCOT
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/run_target_only_geometry_ablation.py \
+            --clusters projects/dandi-000138-hiwa-4d/results/clustering/clustered_4d.npz \
+            --baseline projects/dandi-000138-hiwa-4d/results/strict_unsupervised_hard_soft/STRICT_UNSUPERVISED_RESULTS.json \
+            --output projects/dandi-000138-hiwa-4d/results/target_only_geometry_full \
+            --modes identity block_zca full_zca arcsinh \
+            --seeds 42 43 44 45 46 \
+            --outer 500 --inner 20 --sample-sinkhorn 45 \
+            --group-sinkhorn 200 --eval-Q-iters 120 --prototype-iters 300
+      - name: Verify no train-test pairing leakage, exact original baseline and common original-scale scores
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          p=Path('projects/dandi-000138-hiwa-4d/results/target_only_geometry_full')
+          data=json.loads((p/'TARGET_TRANSFORM_RESULTS.json').read_text())
+          assert data['same_original_source'] and data['hard_X_groups_fixed']
+          assert data['soft_target_prototypes_independently_fitted']
+          assert data['target_groups_refit_from_TARGET_FEATURES_only']
+          assert data['true_synchronous_pairing_is_postfit_evaluation_only']
+          assert data['no_test_hyperparameter_selection'] and data['modes_are_predeclared']
+          assert data['training_windows']==14000 and data['test_windows']==3500
+          assert len(data['variants'])==4
+          for m,v in data['variants'].items():
+              assert sum(v['independent_target_group_counts_train'])==14000
+              for method in ('hard','soft'):
+                  seeds=v['runs'][method]
+                  assert [r['seed'] for r in seeds]==[42,43,44,45,46]
+                  for z in seeds:
+                      assert np.isfinite(list(z['shared_original_eval'].values())).all()
+                      assert z['transport']['max_Q_marginal_error']<1e-5
+                      assert z['marginal_error']<1e-5
+                      assert np.linalg.norm(np.asarray(z['R']).T@np.asarray(z['R'])-np.eye(4))<1e-7
+          assert len(list(p.glob('*.png')))==4
+          print('PASS all four target features x two memberships x five seeds; exact saved identity and postfit original-target scoring')
+          PY
+      - name: Promote new target representation diagnostic to project journal
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,numpy as np
+          root=Path('projects/dandi-000138-hiwa-4d')
+          path=root/'EXPERIMENT_LOG.md'
+          raw=path.read_text(encoding='utf8')
+          anchor='## 2026-11-18 · 目标域独立几何处理实验（无配对）'
+          r=json.loads((root/'results/target_only_geometry_full/TARGET_TRANSFORM_RESULTS.json').read_text())
+          if anchor not in raw:
+              lines=[anchor,'',
+                '**研究问题**：不借助真实样本对应，能否仅以目标域训练特征的尺度/相关性调整使4D神经—运动无监督分层OT的对齐更有效？',
+                '保持原来的500 trials×35窗、400/100 trial划分、源域 PCA4、K=4、每域40×4的GCOT样本预算。'
+                '预先固定四个目标处理：identity、位置/速度block_zca、全协方差full_zca、可逆arcsinh非线性边际长尾压缩。'
+                '每变换重新在目标域独立KMeans和Soft原型；Hard/Soft使用同一原ZIP求解器和五随机种子，P自由优化，绝不通过同步样本指定目标簇。'
+                '所有变换参数仅由训练目标分布拟合，绝不按最终测试R²选参。',
+                '',
+                '| 目标处理 | 训练无配对协方差谱差L2↓ | 方法 | 原始目标R²↑ | 原始目标自由W2²↓ | 严格ADMM通过 |',
+                '|---|---:|---|---:|---:|---:|']
+              for name,entry in r['variants'].items():
+                  for method,rs in entry['runs'].items():
+                      v1=np.array([s['shared_original_eval']['original_target_sync_R2'] for s in rs])
+                      v2=np.array([s['shared_original_eval']['original_target_free_W2sq'] for s in rs])
+                      lines.append(f"| {name} | {entry['geometry_shape_diagnostic_train_only']['covariance_spectrum_L2']:.5f} | {method} | {v1.mean():.5f}±{v1.std(ddof=1):.5f} | {v2.mean():.5f}±{v2.std(ddof=1):.5f} | {sum(s['strict_admm_pass'] for s in rs)}/5 |")
+              lines+=['',
+                '注意完整分层P-Q几何代价在不同目标变换下使用不同距离几何，不能仅按跨变换代价数字排名；逆变换后共同原始4D目标空间的自由OT和同步R²才有同一度量。',
+                '离散PCA谱、点内距离分位数只能诊断分布形状，不能证明非线性关系已消除。Soft必须独立确认严格数值收敛。',
+                '',
+                '[实际完整报告](results/target_only_geometry_full/TARGET_TRANSFORM_REPORT.md) · [逐种子原始结果](results/target_only_geometry_full/TARGET_TRANSFORM_RESULTS.json)',
+                '',
+                '![4种目标域变换3500点六投影](results/target_only_geometry_full/TARGET_TRANSFORMS_TEST_3500_six_projections.png)',
+                '',
+                '---','']
+              raw='\n'.join(lines)+'\n\n'+raw
+              path.write_text(raw,encoding='utf8')
+          PY
+      - name: Commit real transformed source-free target feature trials and charts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/dandi-000138-hiwa-4d/results/target_only_geometry_full \
+              projects/dandi-000138-hiwa-4d/EXPERIMENT_LOG.md
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish original DANDI strict unpaired target-only whitening and nonlinear arcsinh geometry 5-seed controlled comparison'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-target-only-train-fitted-4variants-five-seeds
+          path: projects/dandi-000138-hiwa-4d/results/target_only_geometry_full
+          if-no-files-found: warn
