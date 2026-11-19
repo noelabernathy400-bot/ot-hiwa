@@ -21,7 +21,7 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import normalized_mutual_info_score, confusion_matrix
 from sklearn.preprocessing import StandardScaler
 
-FINGERS = ["thumb", "index", "middle"]
+FINGERS = ["thumb", "middle", "index"]
 COLORS = ["#2776ae", "#dc9456", "#4f9c83", "#9062b0"]
 from diagnose_five_trials import whiten
 
@@ -78,7 +78,7 @@ def one_domain(domain, labs, force, physical_state, z, trial, out):
     fig,ax=plt.subplots(figsize=(9,5.4))
     im=ax.imshow(tab,aspect="auto",cmap="Blues")
     ax.set(xticks=range(4), yticks=range(4),
-        xticklabels=["low-relative-force","thumb deviation","index deviation","middle deviation"],
+        xticklabels=["low-relative-force","thumb deviation","middle deviation","index deviation"],
         yticklabels=[f"cluster {k+1}" for k in range(4)],
         xlabel="Post-hoc physical force proxy only (not a training label)",
         ylabel=f"{domain} independently fitted K-means 4 clusters",
@@ -129,11 +129,11 @@ def main():
     # These labels are POSTHOC descriptive metadata only, NOT ground-truth
     # actions and NEVER model fitting, tuning, or classifier supervision.
     names=["low_relative_force","thumb_deviation_dominant",
-           "index_deviation_dominant","middle_deviation_dominant"]
+           "middle_deviation_dominant","index_deviation_dominant"]
     with (out/"physical_force_labels_POSTHOC_ONLY.csv").open("w",newline="",encoding="utf-8") as f:
         writer=csv.writer(f)
         writer.writerow(["trial_id","window_start_seconds","force_thumb","force_index",
-                         "force_middle","force_proxy_state","force_proxy_code",
+                         "force_index","force_proxy_state","force_proxy_code",
                          "source_kmeans_cluster_POSTHOC","target_kmeans_cluster_POSTHOC",
                          "REAL_ACTION_GROUND_TRUTH"])
         for i in range(len(Y)):
@@ -143,7 +143,7 @@ def main():
 
     result={"status":"post_hoc_only","n":1250,"physics_label_is_ground_truth":False,
             "dataset_known_semantics":"Random contractions of arbitrary finger combinations; no prescribed four directions",
-            "force_channel_order":"thumb,index,middle (from official Hyser five-channel thumb,index,middle,ring,little)",
+            "force_channel_order":"thumb,middle,index (old 3D extraction uses columns 0,2,1 from official thumb,index,middle,ring,little header)",
             "force_summary":{"mins":Y.min(0).tolist(),"p10":np.percentile(Y,10,axis=0).tolist(),
                              "median":np.median(Y,axis=0).tolist(),"p90":np.percentile(Y,90,axis=0).tolist(),
                              "maxs":Y.max(0).tolist()},
