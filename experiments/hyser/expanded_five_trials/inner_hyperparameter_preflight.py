@@ -25,7 +25,7 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA,FactorAnalysis
 HERE=Path(__file__).resolve().parent
-sys.path.insert(0,str(HERE))
+sys.path.insert(0,str(HERE.parents[2]))
 import src.cc_hiwa.soft_hiwa as sh
 from src.cc_hiwa.soft_hiwa import SoftHiWA
 from local_PQR_ADMM_hyser import stable_group_P,stable_conditional_Q,PARAMS
