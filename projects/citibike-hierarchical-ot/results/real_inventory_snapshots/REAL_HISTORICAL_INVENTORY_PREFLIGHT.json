@@ -1,0 +1,82 @@
+{
+  "source": "CityBikes NYC historical station status, not monthly ride file",
+  "source_license": "CityBikes ODbL, attribution required, underlying operator policy applies",
+  "source_details": "https://data.citybik.es/dumps/by-network/2026/202606-citi-bike-nyc-stats.parquet",
+  "snapshots": [
+    "2026-06-15 13:00:00",
+    "2026-06-15 20:00:00"
+  ],
+  "timestamp_note": "Parquet timestamp lacks timezone marker; report literal stored timestamp, NOT inferred local hour",
+  "window_each": "Nearest true observation within +/- 12 minutes of fixed timestamp",
+  "target_inventory_rule": "ILLUSTRATIVE policy target floor(slots/2), NOT real operator target and NOT a demand measurement",
+  "no_hiwa_or_soft_model_fit": true,
+  "true_observed_bikes_and_free_vs_hypothetical_target_distinguished": true,
+  "no_historical_operator_relations_claim": true,
+  "metadata": {
+    "total_parquet_rows_read": 12258719,
+    "rows_around_two_time_slices": 19955,
+    "row_groups": 100,
+    "source_file_bytes": 109289362,
+    "screening_errors": {
+      "invalid_stock": 0,
+      "no_status": 16,
+      "invalid_coords": 0,
+      "missing_or_invalid_slots": 0
+    },
+    "approx_max_age_seconds": 720.0
+  },
+  "slices": [
+    {
+      "timestamp_raw": "2026-06-15 13:00:00",
+      "real_station_statuses": 1599,
+      "observed_bikes_total": 23426,
+      "observed_free_docks_total": 25720,
+      "observed_slots_from_metadata_total": 55137,
+      "observed_bikes_station_p10_p50_p90": [
+        1.0,
+        11.0,
+        33.0
+      ],
+      "observed_fill_ratio_station_p10_p50_p90": [
+        0.047619047619047616,
+        0.47619047619047616,
+        0.9545454545454546
+      ],
+      "illustrative_policy_target_fraction_of_slots": 0.5,
+      "policy_scenario_surplus_station_count": 666,
+      "policy_scenario_deficit_station_count": 875,
+      "policy_scenario_surplus_bikes": 5777,
+      "policy_scenario_deficit_bikes": 9392,
+      "mass_difference_not_silently_normalized": -3615,
+      "not_actual_bike_relocation_demand": true
+    },
+    {
+      "timestamp_raw": "2026-06-15 20:00:00",
+      "real_station_statuses": 1721,
+      "observed_bikes_total": 24637,
+      "observed_free_docks_total": 26685,
+      "observed_slots_from_metadata_total": 57962,
+      "observed_bikes_station_p10_p50_p90": [
+        2.0,
+        10.0,
+        33.0
+      ],
+      "observed_fill_ratio_station_p10_p50_p90": [
+        0.0625,
+        0.4375,
+        0.9285714285714286
+      ],
+      "illustrative_policy_target_fraction_of_slots": 0.5,
+      "policy_scenario_surplus_station_count": 670,
+      "policy_scenario_deficit_station_count": 997,
+      "policy_scenario_surplus_bikes": 5953,
+      "policy_scenario_deficit_bikes": 9724,
+      "mass_difference_not_silently_normalized": -3771,
+      "not_actual_bike_relocation_demand": true
+    }
+  ],
+  "same_station_between_snapshot_count": 1343,
+  "absolute_stock_change_median": 4.0,
+  "absolute_stock_change_p90": 14.0,
+  "total_abs_stock_change": 8178
+}
