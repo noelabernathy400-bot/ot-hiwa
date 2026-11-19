@@ -1,0 +1,63 @@
+name: Hyser final common physical-force 3D vs 5D matched comparison
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-compare-3D-5D-shared-physical-force.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "matplotlib>=3.8,<4"
+      - name: Match 3D and 5D truly physical five-finger errors using same folds and seeds
+        run: |
+          python experiments/hyser/expanded_five_trials/compare_3d_5d_physical_curves.py \
+            --results-root experiments/hyser/expanded_five_trials/results_3D_5D_unified \
+            --out experiments/hyser/expanded_five_trials/results_3D_5D_unified/combined
+      - name: Verify paired physical criteria and all four dimensional comparisons
+        run: |
+          python - <<'PY'
+          import csv,json,pathlib
+          p=pathlib.Path("experiments/hyser/expanded_five_trials/results_3D_5D_unified/combined")
+          d=json.loads((p/"matched_dim_effects.json").read_text())
+          assert len(d["summary"])==4
+          assert d["no_cross_latent_W2_comparison"]
+          with (p/"matched_3D_vs_5D_fivefinger_physical_distances.csv").open() as f:
+            assert len(list(csv.DictReader(f)))==200
+          assert (p/"combined_3D_5D_physical_hit_curves.png").exists()
+          print("Verified 200 pairwise raw-five-finger distance quantile records")
+          PY
+      - name: Commit fivefold quantitative comparison charts and Chinese explanation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_3D_5D_unified/combined
+          if ! git diff --cached --quiet; then
+            git commit -m "Compare true original five-finger force 3D and 5D HiWA predictions at identical train-derived tolerances"
+            for attempt in 1 2 3 4 5 6; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then exit 0; fi
+              sleep 2
+            done
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-combined-3D-5D-shared-physical-force
+          path: experiments/hyser/expanded_five_trials/results_3D_5D_unified/combined
+          if-no-files-found: warn
