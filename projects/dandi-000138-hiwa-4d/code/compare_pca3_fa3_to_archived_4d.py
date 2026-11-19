@@ -377,7 +377,7 @@ def main():
             for method in ("Hard","Soft")}
     # Persist the complete final summary, including the last FA3 block.
     (args.output/"DANDI_3D_VS_4D_RESULTS.json").write_text(
-        json.dumps(plain(result),ensure_ascii=False,indent=2)+"\\n",
+        json.dumps(plain(result),ensure_ascii=False,indent=2)+"\n",
         encoding="utf8")
     lines=[
         "# DANDI 3D vs archived 4D: real neural–hand matching and OT errors",
