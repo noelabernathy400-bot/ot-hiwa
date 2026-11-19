@@ -1,0 +1,81 @@
+name: Hyser formal full-1000-training-window local PQR ADMM preflight
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-full1000-local-admm-preflight.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  full_1000:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        representation: ["PCA5_RAW5","FA5_RAW5"]
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install independent linear algebra dependencies
+        run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Retrieve full 1,000 train + 250 heldout point arrays with independent train-only PCA5/FA5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser1000"
+          gh release download hyser-s01-s1-random-5trials-v1 --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip --dir "$RUNNER_TEMP/hyser1000"
+          unzip -q "$RUNNER_TEMP/hyser1000/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" -d "$RUNNER_TEMP/hyser1000"
+      - name: Formal exact dense Q/P/local-R ADMM on all 1,000 TRAINING samples for both Hard/Soft
+        run: |
+          python experiments/hyser/expanded_five_trials/local_PQR_ADMM_hyser.py \
+            --features "$RUNNER_TEMP/hyser1000" \
+            --out "experiments/hyser/expanded_five_trials/results_full1000_preflight_${{ matrix.representation }}" \
+            --folds 1 --seeds 42 --configs "${{ matrix.representation }}" \
+            --maxiter 60 --sa-maxiter 40 --mu 0.005 \
+            --warm-start-local --full-training
+      - name: Verify 1000-by-1000 ALL SIXTEEN local Q blocks and disclose ADMM residuals
+        env:
+          REPRESENTATION: ${{ matrix.representation }}
+        run: |
+          python - <<'PY'
+          import pathlib,json,os,numpy as np
+          p=pathlib.Path("experiments/hyser/expanded_five_trials")/("results_full1000_preflight_"+os.environ["REPRESENTATION"])
+          a=json.loads((p/"local_ADMM_results.json").read_text())
+          assert len(a["runs"])==2 and not a["not_full_1000_point_OT"]
+          for r in a["runs"]:
+            assert r["n_OT_train_source"]==r["n_OT_train_target"]==1000
+            assert len(r["q_stats"])==16
+            assert all(q["shape"]==[1000,1000] for q in r["q_stats"])
+            assert r["Q_constraints_passed"], "Sample Q did not satisfy conditions"
+            assert max(abs(np.array(r["P"]).sum(0)-.25).max(),abs(np.array(r["P"]).sum(1)-.25).max())<1e-7
+            print(r["config"],r["method"],"CONVERGED",r["numeric_convergence_ADMM_primal_and_rotation"],
+              "primal",r["diagnostics"]["admm_primal_residual"]["last"],
+              "rotation_change",r["diagnostics"]["Rg_norm"]["last"])
+          print("Validated both 1,000-window exact dense local Q ADMM trials without claiming convergence")
+          PY
+      - name: Persist valid and non-converged full-training experiments separately
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "experiments/hyser/expanded_five_trials/results_full1000_preflight_${{ matrix.representation }}"
+          if ! git diff --cached --quiet; then
+            git commit -m "Audit full1000 dense-Q original-structure K4 Hard/Soft Hyser ${{ matrix.representation }}"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "hyser-full1000-admm-${{ matrix.representation }}"
+          path: "experiments/hyser/expanded_five_trials/results_full1000_preflight_${{ matrix.representation }}/"
+          if-no-files-found: warn
