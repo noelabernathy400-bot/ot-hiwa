@@ -1,0 +1,101 @@
+name: Hyser PCA vs FactorAnalysis both domains information audit
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-pca-fa-both-domains.yml"
+      - "experiments/hyser/expanded_five_trials/pca_vs_fa_representations.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hyser-pca-fa-both-domains
+  cancel-in-progress: false
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deterministic numerical libraries
+        run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Retrieve the verified five-finger source and target time-window features
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_fa"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_s01_s1_5fingers_5D_folds_v1.zip --dir "$RUNNER_TEMP/hyser_fa"
+          unzip -q "$RUNNER_TEMP/hyser_fa/hyser_s01_s1_5fingers_5D_folds_v1.zip" \
+            -d "$RUNNER_TEMP/hyser_fa"
+          test -f "$RUNNER_TEMP/hyser_fa/all_five_trials_fivefinger_raw_and_emg.npz"
+      - name: Run training-only PCA/FA for EMG and full five-finger force, five complete heldout trials
+        run: |
+          python experiments/hyser/expanded_five_trials/pca_vs_fa_representations.py \
+            --input "$RUNNER_TEMP/hyser_fa/all_five_trials_fivefinger_raw_and_emg.npz" \
+            --ot-input-dir "$RUNNER_TEMP/hyser_fa/ot_fold_features" \
+            --out experiments/hyser/expanded_five_trials/results_PCA_FA_representation
+      - name: Validate all original fingers and all dimensionality/FA conditions
+        run: |
+          python - <<'PY'
+          import json,pathlib,os,numpy as np
+          root=pathlib.Path("experiments/hyser/expanded_five_trials/results_PCA_FA_representation")
+          x=json.loads((root/"PCA_FA_diagnostics_full.json").read_text())
+          assert len(x["PCA_FA_fits"])==5*(3+3)*2
+          assert len(x["supervised_physical_probes_POSTHOC"])==5*3*2
+          assert len(x["fivefinger_physical_reconstruction_POSTHOC"])==5*3*2
+          assert len(x["OT_configs"])==6
+          assert x["physical_force_channel_order"]==["thumb","index","middle","ring","little"]
+          src=pathlib.Path(os.environ["RUNNER_TEMP"])/"hyser_fa/ot_fold_features"
+          for cond,setting in x["OT_configs"].items():
+            for fold in range(1,6):
+              name=f"trial_heldout_{fold}"+("_5d" if setting["d"]==5 else "")+".npz"
+              with np.load(src/cond/name) as z:
+                d=setting["d"]
+                assert z["X_train"].shape==z["Y_train"].shape==(1000,d)
+                assert z["X_test"].shape==z["Y_test"].shape==(250,d)
+                assert np.array_equal(np.unique(z["test_trial_id"]),[fold])
+                assert fold not in z["train_trial_id"]
+          print("PASS: 60 PCA/FA fits, 30 supervised probes and 30 unsupervised OT feature folds")
+          PY
+      - name: Archive all newly generated trial-specific PCA/FA embeddings in GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd "$RUNNER_TEMP/hyser_fa/ot_fold_features"
+          zip -q -r "$RUNNER_TEMP/hyser_fa/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" .
+          ASSET="hyser_pca_fa_both_domains_trainonly_6configs_v1.zip"
+          if gh release view --repo "$GITHUB_REPOSITORY" hyser-s01-s1-random-5trials-v1 --json assets --jq '.assets[].name' | grep -Fxq "$ASSET"; then
+            echo "Previously published $ASSET; refuse to overwrite silently."
+          else
+            gh release upload --repo "$GITHUB_REPOSITORY" \
+              hyser-s01-s1-random-5trials-v1 \
+              "$RUNNER_TEMP/hyser_fa/$ASSET"
+          fi
+      - name: Commit auditable tables, paper provenance and actual comparison plots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_PCA_FA_representation
+          if ! git diff --cached --quiet; then
+            git commit -m "Record 5-fold PCA vs FA source/target information retention and physical force tests"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-PCA-vs-FA-training-only-evidence
+          path: experiments/hyser/expanded_five_trials/results_PCA_FA_representation/
+          if-no-files-found: warn
+          retention-days: 90
