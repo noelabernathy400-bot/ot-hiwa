@@ -33,7 +33,7 @@ jobs:
             --pattern hyser_s01_s1_random_5trials_features_cv.zip \
             --dir "$RUNNER_TEMP/hyser5"
           unzip -q "$RUNNER_TEMP/hyser5/hyser_s01_s1_random_5trials_raw_wfdb.zip" -d "$RUNNER_TEMP/hyser5"
-          unzip -q "$RUNNER_TEMP/hyser5/hyser_s01_s1_random_5trials_features_cv.zip" -d "$RUNNER_TEMP/hyser5"
+          unzip -oq "$RUNNER_TEMP/hyser5/hyser_s01_s1_random_5trials_features_cv.zip" -d "$RUNNER_TEMP/hyser5"
           ls -l "$RUNNER_TEMP/hyser5/raw_wfdb/" | head
       - name: Verify signal header finger names, extract all five, build new 5D folds
         run: |
