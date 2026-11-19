@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - ".github/workflows/hyser-inner-hyperparam-preflight.yml"
+      - "experiments/hyser/expanded_five_trials/inner_hyperparameter_preflight.py"
   workflow_dispatch:
 
 permissions:
