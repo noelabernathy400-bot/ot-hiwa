@@ -1,0 +1,97 @@
+{
+  "n_candidates": 96,
+  "inner_trial": 2,
+  "outer_trial_entirely_untouched": 1,
+  "candidate_numerical_validity_required": true,
+  "no_external_model_selection_or_claim_of_generalization": true,
+  "four_representations": [
+    {
+      "representation": "PCA3_PCA3",
+      "inner_n_qualified": 24,
+      "candidate_n": 24,
+      "baseline_random_hit": 0.031134,
+      "epsilon_original_force_units": 0.044850912194908436,
+      "best_hard_K": 4,
+      "best_hard_mu": 0.1,
+      "best_hard_hit": 0.012,
+      "best_soft_K": 5,
+      "best_soft_mu": 0.1,
+      "best_soft_tau": 0.5,
+      "best_soft_hit": 0.012,
+      "best_qualified_across_Hard_Soft": {
+        "method": "hard",
+        "K": 4,
+        "mu": 0.1,
+        "tau": null,
+        "inner_hit": 0.012,
+        "inner_mean_physical_error": 0.24132957705466063
+      }
+    },
+    {
+      "representation": "FA3_FA3",
+      "inner_n_qualified": 21,
+      "candidate_n": 24,
+      "baseline_random_hit": 0.031134,
+      "epsilon_original_force_units": 0.044850912194908436,
+      "best_hard_K": 5,
+      "best_hard_mu": 0.1,
+      "best_hard_hit": 0.008,
+      "best_soft_K": 4,
+      "best_soft_mu": 0.1,
+      "best_soft_tau": 0.5,
+      "best_soft_hit": 0.02,
+      "best_qualified_across_Hard_Soft": {
+        "method": "soft",
+        "K": 4,
+        "mu": 0.1,
+        "tau": 0.5,
+        "inner_hit": 0.02,
+        "inner_mean_physical_error": 0.23816415233587146
+      }
+    },
+    {
+      "representation": "PCA5_RAW5",
+      "inner_n_qualified": 18,
+      "candidate_n": 24,
+      "baseline_random_hit": 0.031134,
+      "epsilon_original_force_units": 0.044850912194908436,
+      "best_hard_K": 5,
+      "best_hard_mu": 0.1,
+      "best_hard_hit": 0.004,
+      "best_soft_K": 4,
+      "best_soft_mu": 0.02,
+      "best_soft_tau": 1.0,
+      "best_soft_hit": 0.012,
+      "best_qualified_across_Hard_Soft": {
+        "method": "soft",
+        "K": 4,
+        "mu": 0.02,
+        "tau": 1.0,
+        "inner_hit": 0.012,
+        "inner_mean_physical_error": 0.25952199803683446
+      }
+    },
+    {
+      "representation": "FA5_RAW5",
+      "inner_n_qualified": 20,
+      "candidate_n": 24,
+      "baseline_random_hit": 0.031134,
+      "epsilon_original_force_units": 0.044850912194908436,
+      "best_hard_K": 4,
+      "best_hard_mu": 0.1,
+      "best_hard_hit": 0.072,
+      "best_soft_K": 4,
+      "best_soft_mu": 0.05,
+      "best_soft_tau": 0.25,
+      "best_soft_hit": 0.032,
+      "best_qualified_across_Hard_Soft": {
+        "method": "hard",
+        "K": 4,
+        "mu": 0.1,
+        "tau": null,
+        "inner_hit": 0.072,
+        "inner_mean_physical_error": 0.22137094093931023
+      }
+    }
+  ]
+}
