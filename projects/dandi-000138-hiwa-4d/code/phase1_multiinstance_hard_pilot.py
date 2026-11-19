@@ -19,6 +19,7 @@ from scipy.optimize import linear_sum_assignment
 from sklearn.cluster import KMeans
 
 from zip_gcot.alignment import SolverConfig, hierarchical_alignment, hard_measures
+from zip_gcot.numerics import polar
 from zip_gcot.preprocessing import (
     independent_covariance_sign_candidates,
     select_spectral_candidate_train_ot,
@@ -142,7 +143,8 @@ def main():
             "sample_Sinkhorn": 45, "group_Sinkhorn": 200,
             "mu": .05, "epsilon_group": .2, "epsilon_sample": .1,
             "per_cluster_optimizer_sample": args.per_cluster,
-            "both_methods_same_local_start_from_global": False
+            "both_methods_same_local_start_from_global": False,
+            "both_methods_explicit_initial_R_to_match_local_rng_stream": True
         },
         "runs": [],
     }
@@ -170,12 +172,16 @@ def main():
                 sx = hard_measures(X[px], lx[px])
                 sy = hard_measures(Y[py], ly[py])
                 assert len(sx) == len(sy) == 4
+                # Explicit random R fixes the *same* local RNG stream for both
+                # variants. Otherwise the None branch consumes a random matrix
+                # first and subsequent local initializations differ.
+                random_initial_R = polar(np.random.default_rng(seed).random((4, 4)))
                 for mode in ["random", "spectral"]:
                     started = time.monotonic()
                     fit = hierarchical_alignment(
                         sx, sy, seed=seed, config=cfg,
                         scale=True, retain_plans=True,
-                        initial_R=(warm_R if mode == "spectral" else None),
+                        initial_R=(warm_R if mode == "spectral" else random_initial_R),
                         local_start_from_global=False,
                     )
                     R = np.asarray(fit["R"])
