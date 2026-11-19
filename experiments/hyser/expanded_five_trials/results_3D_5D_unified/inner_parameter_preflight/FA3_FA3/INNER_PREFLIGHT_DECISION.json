@@ -1,0 +1,39 @@
+{
+  "valid_candidates": 21,
+  "total": 24,
+  "best_inner_trial_only": {
+    "representation": "FA3_FA3",
+    "dimension": 3,
+    "outer_holdout_UNTOUCHED": 1,
+    "inner_validation_trial": 2,
+    "inner_training_trials": [
+      3,
+      4,
+      5
+    ],
+    "train_inner_available_n": 750,
+    "n_fit_source": 250,
+    "n_fit_target": 250,
+    "n_inner_validation": 250,
+    "K": 4,
+    "tau": 0.5,
+    "ADMM_mu": 0.1,
+    "method": "soft",
+    "gamma_group": 0.2,
+    "gamma_local_reference": 0.1,
+    "seed": 42,
+    "success": true,
+    "qualified": true,
+    "P_marginal_error": 1.1102230246251565e-16,
+    "Q_marginal_error": 3.469446951953614e-17,
+    "primal_residual": 0.08354315104165456,
+    "R_update": 0.03788375142295445,
+    "inner_physical_error_mean": 0.23816415233587146,
+    "inner_physical_Hit_at_5pct": 0.02,
+    "physical_training_only_epsilon_5pct": 0.044850912194908436,
+    "validation_only_used_postfit": true,
+    "full_750_point_PQR_NOT_run_in_this_pilot": true,
+    "elapsed_seconds": 2.1321918590000024
+  },
+  "warning": "NOT selected for outer test; full nested four-inner-trial evaluation required before selecting final hyperparameters. Do not infer improvement from test."
+}
