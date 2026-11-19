@@ -169,6 +169,7 @@ def main():
                         "q_stats":qstats,
                         "local_R_matrices_learned":True,
                         "full_Q_matrices_learned_for_each_16_pairs":True,
+                        "numeric_convergence_ADMM_primal_and_rotation":False,
                         "diagnostics":{
                            name:stats_or_null(diagnostic,name)
                            for name in ("Rg_norm","admm_primal_residual",
@@ -180,6 +181,11 @@ def main():
                         "random_baseline":rr,
                         "true_test_correspondence_held_out_from_training":True,
                     }
+                    dpr=row["diagnostics"].get("admm_primal_residual") or {}
+                    dr=row["diagnostics"].get("Rg_norm") or {}
+                    row["numeric_convergence_ADMM_primal_and_rotation"]=(
+                        dpr.get("last",float("inf"))<=.1 and
+                        dr.get("last",float("inf"))<=.1)
                     rows.append(row)
                     (args.out/"partial_results.json").write_text(
                         json.dumps({"status":"PARTIAL","runs":rows},ensure_ascii=False,indent=2)+"\n",
@@ -211,8 +217,10 @@ def main():
               "physical_hit":float(np.mean([r["nearest"]["nn_retrieval_physical_neighbor_fraction"] for r in rr])),
               "exact_index":float(np.mean([r["nearest"]["nn_retrieval_exact_time_index_fraction"] for r in rr])),
               "random_hit":float(np.mean([r["random_baseline"]["random_target_assignment_hit_mean"] for r in rr])),
-              "last_primal":float(np.mean([r["diagnostics"]["admm_primal_residual"]["last"] for r in rr])),
-              "last_group_marginal":float(np.mean([r["diagnostics"]["group_sinkhorn_marginal_error"]["last"] for r in rr]))
+              "last_primal":float(np.mean([(r["diagnostics"].get("admm_primal_residual") or {}).get("last",float("nan")) for r in rr])),
+              "converged_count":sum(r["numeric_convergence_ADMM_primal_and_rotation"] for r in rr),
+              "last_group_marginal":float(np.mean([max(np.abs(np.sum(r["P"],axis=0)-.25).max(),
+                                                          np.abs(np.sum(r["P"],axis=1)-.25).max()) for r in rr]))
             })
     (args.out/"local_ADMM_summary.json").write_text(
        json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
