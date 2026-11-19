@@ -27,6 +27,8 @@ import src.cc_hiwa.soft_hiwa as sh
 from src.cc_hiwa.soft_hiwa import SoftHiWA
 from rectangular_group_ot import group_entropic_transport
 from heldout_best2d_and_nn import train_radius,evaluate,random_baseline
+import run_fivefinger_5d_K4_K5 as pilot
+from run_pca_fa_ot_ablation import physical_eval
 
 # Equivalent cost + entropy + group marginals, numerically stable dual solution.
 # Scoped to this script; DOES NOT change the repository-wide solver behavior.
@@ -151,6 +153,8 @@ def main():
                 Xte=np.asarray(f["X_test"],float)/np.sqrt(5)
                 Yte=np.asarray(f["Y_test"],float)/np.sqrt(5)
                 traintrials=np.asarray(f["train_trial_id"],int)
+                Yphys_train=np.asarray(f["original_target_force_train"],float)
+                Yphys_test=np.asarray(f["original_target_force_test"],float)
             assert Xtr.shape==Ytr.shape==(1000,5)
             assert Xte.shape==Yte.shape==(250,5)
             # Different subsamples by domain: no synchronized pair ordering
@@ -185,6 +189,9 @@ def main():
                     if np.linalg.norm(R.T@R-np.eye(5))>1e-8:
                         raise ArithmeticError("R violates orthogonality")
                     pred=evaluate(Xte,Yte,R,rad["radius"])
+                    w2sq=pilot.w2(Xte,Yte,R)
+                    physical=physical_eval(Xte,Ytr/np.sqrt(D),
+                        Yphys_train,Yphys_test,R)
                     inductive=inductive_train_bank_retrieval(
                         Xte,Ytr/np.sqrt(5),Yte,R,rad["radius"])
                     diagnostic=model.diagnostics
@@ -221,9 +228,11 @@ def main():
                         "diagnostics":{
                            name:stats_or_null(diagnostic,name)
                            for name in ("Rg_norm","admm_primal_residual",
-                             "admm_dual_residual","transport_objective",
-                             "group_sinkhorn_marginal_error","max_sinkhorn_marginal_error")},
+                             "admm_dual_residual","transport_objective_history",
+                             "max_sinkhorn_marginal_error")},
                         "nearest":pred,
+                        "heldout_W2_squared":w2sq,
+                        "heldout_physical_force_prediction_POSTHOC":physical,
                         "train_bank_inductive_nearest":inductive,
                         "mean_threshold":rad["radius"],
                         "threshold_training_calibration":rad,
@@ -286,6 +295,9 @@ def main():
               "exact_index":float(np.mean([r["nearest"]["nn_retrieval_exact_time_index_fraction"] for r in rr])),
               "train_bank_physical_hit":float(np.mean([r["train_bank_inductive_nearest"]["train_bank_NN_physically_correct"] for r in rr])),
               "train_bank_random_hit":float(np.mean([r["train_bank_inductive_nearest"]["train_bank_random_hit_mean"] for r in rr])),
+              "test_W2_squared":float(np.mean([r["heldout_W2_squared"] for r in rr])),
+              "test_physical_force_RMSE":float(np.mean([r["heldout_physical_force_prediction_POSTHOC"]["paired_force_RMSE_EVAL_ONLY"] for r in rr])),
+              "test_physical_force_R2":float(np.mean([r["heldout_physical_force_prediction_POSTHOC"]["paired_force_R2_vs_trainmean_EVAL_ONLY"] for r in rr])),
               "random_hit":float(np.mean([r["random_baseline"]["random_target_assignment_hit_mean"] for r in rr])),
               "last_primal":float(np.mean([(r["diagnostics"].get("admm_primal_residual") or {}).get("last",float("nan")) for r in rr])),
               "converged_count":sum(r["numeric_convergence_ADMM_primal_and_rotation"] for r in rr),
@@ -304,10 +316,10 @@ def main():
        "Holdout is the entire remaining 250 windows, never used to train PCA/FA/ADMM.",
        "Nearest target accuracy includes BOTH transductive 250-target heldout pool retrieval and INDUCTIVE 1000-point training-target bank retrieval; labels are used only AFTER nearest selection to judge physical correctness. Train-only 5% inter-trial quantile radius; geometry coverage is not physical correctness.",
        "",
-       "|Feature|Method|n|TEST-cloud coverage|TEST-cloud physical hit|TEST-cloud random hit|TRAIN-bank physical hit|TRAIN-bank random hit|exact time index|",
-       "|---|---|---:|---:|---:|---:|---:|---:|---:|"]
+       "|Feature|Method|n|TEST-cloud coverage|TEST-cloud physical hit|TEST-cloud random hit|TRAIN-bank physical hit|TRAIN-bank random hit|W2²|physical RMSE|exact time index|",
+       "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for r in summary:
-        report.append(f"|{r['config']}|{r['method']}|{r['n_runs']}|{r['coverage']:.3%}|{r['physical_hit']:.3%}|{r['random_hit']:.3%}|{r['train_bank_physical_hit']:.3%}|{r['train_bank_random_hit']:.3%}|{r['exact_index']:.3%}|")
+        report.append(f"|{r['config']}|{r['method']}|{r['n_runs']}|{r['coverage']:.3%}|{r['physical_hit']:.3%}|{r['random_hit']:.3%}|{r['train_bank_physical_hit']:.3%}|{r['train_bank_random_hit']:.3%}|{r['test_W2_squared']:.5f}|{r['test_physical_force_RMSE']:.5f}|{r['exact_index']:.3%}|")
     report+=["",f"Solver initialization: warm_start_local={args.warm_start_local}; ADMM mu={args.mu}; outer limit={args.maxiter}; per-pair inner limit={args.sa_maxiter}.",
         "**Do not interpret a local-ADMM run with nonconverged primal residual as a successfully converged full HiWA model.** The numerical history, P/Q block statistics and group marginal errors are saved for review.",
       "No inherited source cluster labels have been given to target. No synchronized row pair enters OT fitting."]
