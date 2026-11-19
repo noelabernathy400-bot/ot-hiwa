@@ -1,0 +1,13 @@
+{
+  "source_SHA256": {
+    "3D": "2786b39b2a1a4da16e212ead01dce5a769ab78b4fd9bcdb20a49cd6ba80375f0",
+    "5D": "39f5a036da42b2aae9782755cd0fc2ae6abf2936713bf49adcc3d32f0b8b9a13"
+  },
+  "n_full1000_frozen_runs": 80,
+  "n_paired_fold_seed_points_per_model": 2500,
+  "folds_are_one_subject_one_session": true,
+  "random_baseline": "EXACT all heldout test target forces x all training target forces",
+  "calibration": "6000 random pairs sampled from four distinct training trials, seed=20261119",
+  "no_refitting_or_heldout_parameter_selection": true,
+  "meaning_of_70pct": "descriptive test-set distance CDF crossing; not a performance-validated threshold"
+}
