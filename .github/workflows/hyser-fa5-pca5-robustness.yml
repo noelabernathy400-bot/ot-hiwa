@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - ".github/workflows/hyser-fa5-pca5-robustness.yml"
+      - "experiments/hyser/expanded_five_trials/run_pca_fa_ot_ablation.py"
   workflow_dispatch:
 
 permissions:
