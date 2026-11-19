@@ -1,0 +1,70 @@
+{
+  "config": "FA5_RAW5",
+  "heldout_fold": 1,
+  "method": "hard",
+  "seed": 42,
+  "mathematical_criterion": "maximize between-cluster scatter / within-cluster scatter using top 2 generalized eigenvectors; not global silhouette maximization",
+  "trained_only_on_four_training_trials": true,
+  "used_pseudo_labels_for_visualization_ONLY": true,
+  "source": {
+    "train_fisher_eigenvalues": [
+      3.7859734942177803,
+      3.236445460145357
+    ],
+    "train_2D_silhouette": 0.4322548224730021,
+    "train_5D_silhouette": 0.3695738889207034,
+    "basis": [
+      [
+        1.2355055428947128,
+        -0.6651829612326794
+      ],
+      [
+        1.1924229153503412,
+        -4.359206117517036
+      ],
+      [
+        1.9493551918269127,
+        0.4418741070345805
+      ],
+      [
+        -3.6748348943639098,
+        -1.0425633029449017
+      ],
+      [
+        1.9237838397781144,
+        0.6899095862718795
+      ]
+    ]
+  },
+  "target": {
+    "train_fisher_eigenvalues": [
+      4.146036181002282,
+      2.789580823319285
+    ],
+    "train_2D_silhouette": 0.4647881716381526,
+    "train_5D_silhouette": 0.32621319654261915,
+    "basis": [
+      [
+        -2.3163829150546835,
+        1.578464284640967
+      ],
+      [
+        -1.9185397046026418,
+        -2.455181507113373
+      ],
+      [
+        3.2082938843407955,
+        1.7813944525211387
+      ],
+      [
+        1.8958559397040204,
+        -2.2412879416486824
+      ],
+      [
+        -1.6798659102717433,
+        1.5001872220203951
+      ]
+    ]
+  },
+  "validation": "plotting only, not training/OT metric; showing best view can visually exaggerate cluster separability."
+}
