@@ -1,0 +1,68 @@
+name: DANDI138 Phase1C genuine overlap Hard-HiWA full PQR pilot
+on:
+  push:
+    branches:
+      - experiment/dandi-phase1-multiinstance-pilot-20261119
+    paths:
+      - .github/workflows/dandi138-phase1c-genuine-overlap-hard-full.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  overlap-hard-pqr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      NUMEXPR_NUM_THREADS: '1'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Fit complete PQR on 3 independent instances x 2 overlap regimes x 2 optimizer seeds x 2 initializers
+        run: |
+          python -u projects/dandi-000138-hiwa-4d/code/phase1c_overlap_and_recovery.py \
+            --output projects/dandi-000138-hiwa-4d/results/phase1c_genuine_overlap_hard_pilot \
+            --regimes mild_overlap severe_overlap --instances 0 1 2 --seeds 42 43 \
+            --outer 500 --inner 20 --per-cluster 40
+      - name: Verify complete archived matrices, genuine overlap and strict provenance
+        run: |
+          python - <<'PY'
+          import json, numpy as np
+          from pathlib import Path
+          root=Path("projects/dandi-000138-hiwa-4d/results/phase1c_genuine_overlap_hard_pilot")
+          d=json.loads((root/"RESULTS.json").read_text())
+          assert len(d["overlap_preflight"])==6
+          assert len(d["fits"])==24, len(d["fits"])
+          assert d["budget"]["outer"]==500 and d["budget"]["per_cluster"]==40
+          assert set(x["method"] for x in d["fits"])=={"Hard-HiWA"}
+          assert set(x["initialization"] for x in d["fits"])=={"random","spectral"}
+          assert set(x["regime"] for x in d["fits"])=={"mild_overlap","severe_overlap"}
+          for name in ("mild_overlap","severe_overlap"):
+              o=[v for v in d["overlap_preflight"] if v["regime"]==name]
+              assert np.mean([v["oracle_Rstar_true_class_1NN"] for v in o])<.90
+              assert np.mean([v["source_KMeans_true_class_purity_Hungarian"] for v in o])<.90
+              assert np.mean([v["target_KMeans_true_class_purity_Hungarian"] for v in o])<.90
+          files=list((root/"plans").glob("*.npz"))
+          assert len(files)==24,len(files)
+          for f in files:
+              with np.load(f) as z:
+                  assert z["P"].shape==(4,4) and z["R"].shape==(4,4)
+                  assert z["x_rows"].shape==(160,) and z["y_rows"].shape==(160,)
+                  keys=[key for key in z.files if key.startswith("Q_")]
+                  assert len(keys)==16
+                  for k in keys:
+                      assert z[k].shape==(40,40)
+          print("PASS: 24 complete Hard-HiWA P/Q/R fits on genuinely overlapping independently sampled geometry")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DANDI138-phase1C-genuine-overlap-Hard-PQR
+          path: projects/dandi-000138-hiwa-4d/results/phase1c_genuine_overlap_hard_pilot
+          if-no-files-found: warn
