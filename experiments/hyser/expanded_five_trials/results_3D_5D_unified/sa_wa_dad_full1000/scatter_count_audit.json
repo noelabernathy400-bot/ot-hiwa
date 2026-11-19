@@ -29,7 +29,35 @@
         149
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -9.299298105982643,
+        9.510334042211392
+      ],
+      "common_2d_ylimits": [
+        -10.933802348155428,
+        9.335164867361335
+      ],
+      "native3d_montage": "PCA3_PCA3_FOLD1_ALL1000_NATIVE3D_SEPARATE_METHODS.png",
+      "native3d_separate_scatter_original_feature_coordinates": true,
+      "exact_same_xyz_limits_all_methods": true,
+      "native3d_xlim_ylim_zlim": [
+        [
+          -3.523704656789043,
+          3.5128816712937647
+        ],
+        [
+          -3.007300927206198,
+          4.02928540087661
+        ],
+        [
+          -3.195387320449698,
+          3.8411990076331097
+        ]
+      ],
+      "native3d_identical_view_and_equal_box_aspect": true
     },
     {
       "rep": "PCA3_PCA3",
@@ -60,7 +88,35 @@
         129
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -12.315664921250029,
+        13.20386944227091
+      ],
+      "common_2d_ylimits": [
+        -5.910318349592636,
+        8.694021083844241
+      ],
+      "native3d_montage": "PCA3_PCA3_FOLD2_ALL1000_NATIVE3D_SEPARATE_METHODS.png",
+      "native3d_separate_scatter_original_feature_coordinates": true,
+      "exact_same_xyz_limits_all_methods": true,
+      "native3d_xlim_ylim_zlim": [
+        [
+          -2.9379898641008717,
+          4.088242166945312
+        ],
+        [
+          -2.777200975604501,
+          4.249031055441683
+        ],
+        [
+          -3.785487949015364,
+          3.2407440820308198
+        ]
+      ],
+      "native3d_identical_view_and_equal_box_aspect": true
     },
     {
       "rep": "PCA3_PCA3",
@@ -91,7 +147,35 @@
         124
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -10.255621604637737,
+        9.843746005525455
+      ],
+      "common_2d_ylimits": [
+        -10.741819052389319,
+        10.654207080860258
+      ],
+      "native3d_montage": "PCA3_PCA3_FOLD3_ALL1000_NATIVE3D_SEPARATE_METHODS.png",
+      "native3d_separate_scatter_original_feature_coordinates": true,
+      "exact_same_xyz_limits_all_methods": true,
+      "native3d_xlim_ylim_zlim": [
+        [
+          -3.012501119460616,
+          3.629512782327569
+        ],
+        [
+          -3.0730999028502244,
+          3.5689139989379606
+        ],
+        [
+          -3.2491743637971657,
+          3.3928395379910192
+        ]
+      ],
+      "native3d_identical_view_and_equal_box_aspect": true
     },
     {
       "rep": "PCA3_PCA3",
@@ -122,7 +206,35 @@
         126
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -11.915078062999791,
+        12.2175401448701
+      ],
+      "common_2d_ylimits": [
+        -6.235938213882513,
+        10.32826582752023
+      ],
+      "native3d_montage": "PCA3_PCA3_FOLD4_ALL1000_NATIVE3D_SEPARATE_METHODS.png",
+      "native3d_separate_scatter_original_feature_coordinates": true,
+      "exact_same_xyz_limits_all_methods": true,
+      "native3d_xlim_ylim_zlim": [
+        [
+          -2.810755488908203,
+          3.9696140455332705
+        ],
+        [
+          -3.1172007605882923,
+          3.6631687738531813
+        ],
+        [
+          -3.222988714190185,
+          3.5573808202512884
+        ]
+      ],
+      "native3d_identical_view_and_equal_box_aspect": true
     },
     {
       "rep": "PCA3_PCA3",
@@ -153,7 +265,35 @@
         161
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -13.010671869329064,
+        9.788987596398394
+      ],
+      "common_2d_ylimits": [
+        -10.803133148052998,
+        9.192031842550211
+      ],
+      "native3d_montage": "PCA3_PCA3_FOLD5_ALL1000_NATIVE3D_SEPARATE_METHODS.png",
+      "native3d_separate_scatter_original_feature_coordinates": true,
+      "exact_same_xyz_limits_all_methods": true,
+      "native3d_xlim_ylim_zlim": [
+        [
+          -3.0628647979160526,
+          3.7643998409624437
+        ],
+        [
+          -3.1454768792435917,
+          3.6817877596349047
+        ],
+        [
+          -3.4577799685981088,
+          3.3694846702803876
+        ]
+      ],
+      "native3d_identical_view_and_equal_box_aspect": true
     },
     {
       "rep": "FA3_FA3",
@@ -184,7 +324,35 @@
         457
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -14.841217741199756,
+        6.718810772401573
+      ],
+      "common_2d_ylimits": [
+        -10.646438033842784,
+        12.939663147170782
+      ],
+      "native3d_montage": "FA3_FA3_FOLD1_ALL1000_NATIVE3D_SEPARATE_METHODS.png",
+      "native3d_separate_scatter_original_feature_coordinates": true,
+      "exact_same_xyz_limits_all_methods": true,
+      "native3d_xlim_ylim_zlim": [
+        [
+          -3.0262367316400276,
+          3.732568954056772
+        ],
+        [
+          -3.041696875827503,
+          3.7171088098692966
+        ],
+        [
+          -2.4348200107639024,
+          4.323985674932897
+        ]
+      ],
+      "native3d_identical_view_and_equal_box_aspect": true
     },
     {
       "rep": "FA3_FA3",
@@ -215,7 +383,35 @@
         143
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -11.054692163772463,
+        11.387345000246265
+      ],
+      "common_2d_ylimits": [
+        -9.046949571241642,
+        10.955782405066339
+      ],
+      "native3d_montage": "FA3_FA3_FOLD2_ALL1000_NATIVE3D_SEPARATE_METHODS.png",
+      "native3d_separate_scatter_original_feature_coordinates": true,
+      "exact_same_xyz_limits_all_methods": true,
+      "native3d_xlim_ylim_zlim": [
+        [
+          -4.184762408061498,
+          3.7021512121078404
+        ],
+        [
+          -3.3056180060471787,
+          4.581295614122159
+        ],
+        [
+          -3.10540945140016,
+          4.781504168769178
+        ]
+      ],
+      "native3d_identical_view_and_equal_box_aspect": true
     },
     {
       "rep": "FA3_FA3",
@@ -246,7 +442,35 @@
         118
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -13.753017532310563,
+        10.238153961412056
+      ],
+      "common_2d_ylimits": [
+        -9.597539745764294,
+        11.45733098528754
+      ],
+      "native3d_montage": "FA3_FA3_FOLD3_ALL1000_NATIVE3D_SEPARATE_METHODS.png",
+      "native3d_separate_scatter_original_feature_coordinates": true,
+      "exact_same_xyz_limits_all_methods": true,
+      "native3d_xlim_ylim_zlim": [
+        [
+          -3.4786264169789005,
+          3.6286664628357173
+        ],
+        [
+          -2.7590057053772274,
+          4.34828717443739
+        ],
+        [
+          -2.7808549648493557,
+          4.326437914965262
+        ]
+      ],
+      "native3d_identical_view_and_equal_box_aspect": true
     },
     {
       "rep": "FA3_FA3",
@@ -277,7 +501,35 @@
         164
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -12.449803067250153,
+        7.096863700802768
+      ],
+      "common_2d_ylimits": [
+        -9.694126390223209,
+        10.962100623539342
+      ],
+      "native3d_montage": "FA3_FA3_FOLD4_ALL1000_NATIVE3D_SEPARATE_METHODS.png",
+      "native3d_separate_scatter_original_feature_coordinates": true,
+      "exact_same_xyz_limits_all_methods": true,
+      "native3d_xlim_ylim_zlim": [
+        [
+          -2.5389958538892454,
+          3.9708243079338716
+        ],
+        [
+          -3.085466380138099,
+          3.424353781685018
+        ],
+        [
+          -2.460579745830028,
+          4.049240415993089
+        ]
+      ],
+      "native3d_identical_view_and_equal_box_aspect": true
     },
     {
       "rep": "FA3_FA3",
@@ -308,7 +560,35 @@
         203
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -12.670850043318577,
+        13.163255340025323
+      ],
+      "common_2d_ylimits": [
+        -9.43127888338549,
+        12.06914466399803
+      ],
+      "native3d_montage": "FA3_FA3_FOLD5_ALL1000_NATIVE3D_SEPARATE_METHODS.png",
+      "native3d_separate_scatter_original_feature_coordinates": true,
+      "exact_same_xyz_limits_all_methods": true,
+      "native3d_xlim_ylim_zlim": [
+        [
+          -3.7405686708892367,
+          4.742502782783141
+        ],
+        [
+          -4.714172847868868,
+          3.7688986058035105
+        ],
+        [
+          -4.212854339243556,
+          4.270217114428823
+        ]
+      ],
+      "native3d_identical_view_and_equal_box_aspect": true
     },
     {
       "rep": "PCA5_RAW5",
@@ -338,7 +618,17 @@
         92
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -22.110823840237895,
+        17.702431388390853
+      ],
+      "common_2d_ylimits": [
+        -11.78650760178265,
+        12.916593742930239
+      ]
     },
     {
       "rep": "PCA5_RAW5",
@@ -368,7 +658,17 @@
         84
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -12.724370813554296,
+        10.522852350435631
+      ],
+      "common_2d_ylimits": [
+        -12.138656098030243,
+        10.580332835809656
+      ]
     },
     {
       "rep": "PCA5_RAW5",
@@ -398,7 +698,17 @@
         481
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -25.23964126403887,
+        16.034956418619583
+      ],
+      "common_2d_ylimits": [
+        -22.509753856452726,
+        11.169461074247524
+      ]
     },
     {
       "rep": "PCA5_RAW5",
@@ -428,7 +738,17 @@
         73
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -21.326368139053844,
+        13.64802117517524
+      ],
+      "common_2d_ylimits": [
+        -13.467260470203373,
+        18.897317619602294
+      ]
     },
     {
       "rep": "PCA5_RAW5",
@@ -458,7 +778,17 @@
         548
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -20.23855017376377,
+        10.22017244985643
+      ],
+      "common_2d_ylimits": [
+        -15.52119406481897,
+        10.56472569583852
+      ]
     },
     {
       "rep": "FA5_RAW5",
@@ -488,7 +818,17 @@
         92
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -12.885455901909307,
+        13.38028320034434
+      ],
+      "common_2d_ylimits": [
+        -10.383711110749339,
+        12.49155685118966
+      ]
     },
     {
       "rep": "FA5_RAW5",
@@ -518,7 +858,17 @@
         84
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -10.200930183106058,
+        12.425755108859356
+      ],
+      "common_2d_ylimits": [
+        -10.99555591333352,
+        12.110207077577394
+      ]
     },
     {
       "rep": "FA5_RAW5",
@@ -548,7 +898,17 @@
         481
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -13.403672999315422,
+        13.127541898792389
+      ],
+      "common_2d_ylimits": [
+        -11.16375552011421,
+        10.395009845610513
+      ]
     },
     {
       "rep": "FA5_RAW5",
@@ -578,7 +938,17 @@
         73
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -12.16000736269051,
+        11.525720407912175
+      ],
+      "common_2d_ylimits": [
+        -16.980587437866905,
+        13.258962169430694
+      ]
     },
     {
       "rep": "FA5_RAW5",
@@ -608,10 +978,27 @@
         548
       ],
       "test_not_used_to_fit_fisher": true,
-      "source_target_labels_independent": true
+      "source_target_labels_independent": true,
+      "target_and_source_in_separate_2d_panels": true,
+      "exact_same_2d_axes_across_target_and_methods": true,
+      "common_2d_xlimits": [
+        -12.999386744178574,
+        10.964269931226093
+      ],
+      "common_2d_ylimits": [
+        -12.596607320868998,
+        11.871019856037437
+      ]
     }
   ],
-  "Fisher2D_only_for_plotting": true,
-  "each_overlay_contains_1000_source_and_1000_target": true,
-  "n_fold_gallery": 20
+  "2D_representation": "TRAIN-fitted target Fisher 2D for after-alignment panels",
+  "3D_representation": "NATIVE original full 3-dimensional model coordinates",
+  "target_and_aligned_source_never_overlaid": true,
+  "target_and_source_separate_panels": true,
+  "exact_same_axes_within_each_target_source_comparison": true,
+  "each_method_draws_all_1000_source_and_all_1000_target": true,
+  "n_fold_gallery_2d": 20,
+  "n_fold_gallery_3d": 10,
+  "n_single_method_3d_allfold": 80,
+  "n_single_method_2d_fold1": 30
 }
