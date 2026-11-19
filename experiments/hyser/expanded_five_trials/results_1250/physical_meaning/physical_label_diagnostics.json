@@ -3,7 +3,7 @@
   "n": 1250,
   "physics_label_is_ground_truth": false,
   "dataset_known_semantics": "Random contractions of arbitrary finger combinations; no prescribed four directions",
-  "force_channel_order": "thumb,index,middle (from official Hyser five-channel thumb,index,middle,ring,little)",
+  "force_channel_order": "thumb,middle,index (old 3D extraction uses columns 0,2,1 from official thumb,index,middle,ring,little header)",
   "force_summary": {
     "mins": [
       -0.5771871254442118,
