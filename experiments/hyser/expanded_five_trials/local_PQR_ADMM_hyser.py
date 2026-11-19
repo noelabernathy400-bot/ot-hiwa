@@ -86,6 +86,32 @@ def per_method_memberships(x,y,mode):
     else:raise ValueError(mode)
     return A,B
 
+def inductive_train_bank_retrieval(Xtest,Ytrain,Ytrue,R,radius):
+    """Inductive target lookup: candidates are ONLY the 1000 training-force points.
+
+    The true heldout Y_i is used only AFTER nearest-neighbor selection.
+    This eliminates transductive access to the fifth trial target distribution.
+    """
+    dist=cdist(Xtest@R.T,Ytrain,metric="euclidean")
+    ind=np.argmin(dist,axis=1)
+    geometry=dist[np.arange(len(Xtest)),ind]
+    error=np.linalg.norm(Ytrain[ind]-Ytrue,axis=1)
+    random=np.random.default_rng(2054)
+    chance=[]
+    for _ in range(250):
+        idx=random.integers(0,len(Ytrain),size=len(Ytrue))
+        chance.append(float(np.mean(np.linalg.norm(Ytrain[idx]-Ytrue,axis=1)<=radius)))
+    return {
+        "train_bank_NN_geometric_coverage":float(np.mean(geometry<=radius)),
+        "train_bank_NN_geometric_distance_mean":float(np.mean(geometry)),
+        "train_bank_NN_physically_correct":float(np.mean(error<=radius)),
+        "train_bank_NN_physical_RMSE_in_whitened_units":float(np.sqrt(np.mean((Ytrain[ind]-Ytrue)**2))),
+        "train_bank_NN_physical_error_mean":float(np.mean(error)),
+        "train_bank_random_hit_mean":float(np.mean(chance)),
+        "train_bank_random_hit_std":float(np.std(chance)),
+        "target_test_pool_not_used_for_retrieval":True
+    }
+
 def stats_or_null(diag,name):
     v=diag.get(name)
     if v is None:return None
@@ -159,6 +185,8 @@ def main():
                     if np.linalg.norm(R.T@R-np.eye(5))>1e-8:
                         raise ArithmeticError("R violates orthogonality")
                     pred=evaluate(Xte,Yte,R,rad["radius"])
+                    inductive=inductive_train_bank_retrieval(
+                        Xte,Ytr/np.sqrt(5),Yte,R,rad["radius"])
                     diagnostic=model.diagnostics
                     # Local matrix and Q are all actually learned, not skipped
                     q=model.local_couplings
@@ -196,6 +224,7 @@ def main():
                              "admm_dual_residual","transport_objective",
                              "group_sinkhorn_marginal_error","max_sinkhorn_marginal_error")},
                         "nearest":pred,
+                        "train_bank_inductive_nearest":inductive,
                         "mean_threshold":rad["radius"],
                         "threshold_training_calibration":rad,
                         "random_baseline":rr,
@@ -255,6 +284,8 @@ def main():
               "coverage":float(np.mean([r["nearest"]["target_nn_coverage_fraction"] for r in rr])),
               "physical_hit":float(np.mean([r["nearest"]["nn_retrieval_physical_neighbor_fraction"] for r in rr])),
               "exact_index":float(np.mean([r["nearest"]["nn_retrieval_exact_time_index_fraction"] for r in rr])),
+              "train_bank_physical_hit":float(np.mean([r["train_bank_inductive_nearest"]["train_bank_NN_physically_correct"] for r in rr])),
+              "train_bank_random_hit":float(np.mean([r["train_bank_inductive_nearest"]["train_bank_random_hit_mean"] for r in rr])),
               "random_hit":float(np.mean([r["random_baseline"]["random_target_assignment_hit_mean"] for r in rr])),
               "last_primal":float(np.mean([(r["diagnostics"].get("admm_primal_residual") or {}).get("last",float("nan")) for r in rr])),
               "converged_count":sum(r["numeric_convergence_ADMM_primal_and_rotation"] for r in rr),
@@ -271,12 +302,12 @@ def main():
         if args.full_training else
         "**SUBSAMPLE**: only 250 training points/domain per fold, full Q on subsample, NOT the 1000-point formal fit."),
        "Holdout is the entire remaining 250 windows, never used to train PCA/FA/ADMM.",
-       "Nearest target accuracy is based on true synchronized heldout Y, and train-only 5% inter-trial quantile radius. Coverage is not physical correctness.",
+       "Nearest target accuracy includes BOTH transductive 250-target heldout pool retrieval and INDUCTIVE 1000-point training-target bank retrieval; labels are used only AFTER nearest selection to judge physical correctness. Train-only 5% inter-trial quantile radius; geometry coverage is not physical correctness.",
        "",
-       "|Feature|Method|n|Nearest coverage|physical-neighbor hit|random neighbor hit|exact time index|",
-       "|---|---|---:|---:|---:|---:|---:|"]
+       "|Feature|Method|n|TEST-cloud coverage|TEST-cloud physical hit|TEST-cloud random hit|TRAIN-bank physical hit|TRAIN-bank random hit|exact time index|",
+       "|---|---|---:|---:|---:|---:|---:|---:|---:|"]
     for r in summary:
-        report.append(f"|{r['config']}|{r['method']}|{r['n_runs']}|{r['coverage']:.3%}|{r['physical_hit']:.3%}|{r['random_hit']:.3%}|{r['exact_index']:.3%}|")
+        report.append(f"|{r['config']}|{r['method']}|{r['n_runs']}|{r['coverage']:.3%}|{r['physical_hit']:.3%}|{r['random_hit']:.3%}|{r['train_bank_physical_hit']:.3%}|{r['train_bank_random_hit']:.3%}|{r['exact_index']:.3%}|")
     report+=["",f"Solver initialization: warm_start_local={args.warm_start_local}; ADMM mu={args.mu}; outer limit={args.maxiter}; per-pair inner limit={args.sa_maxiter}.",
         "**Do not interpret a local-ADMM run with nonconverged primal residual as a successfully converged full HiWA model.** The numerical history, P/Q block statistics and group marginal errors are saved for review.",
       "No inherited source cluster labels have been given to target. No synchronized row pair enters OT fitting."]
