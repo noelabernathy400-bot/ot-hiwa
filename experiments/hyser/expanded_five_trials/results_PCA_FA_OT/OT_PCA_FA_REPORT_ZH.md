@@ -1,6 +1,6 @@
 # Hyser PCA / FA factor representation on K4 Hard vs Soft-GCOT
 
-**120 runs = 6 representations × 5 heldout trials × 2 fixed seeds × 2 groupings.**
+**This file contains a specified subset of the predeclared six representations, evaluated on the indicated heldout trials and fixed seeds.**
 Both source and target factor methods are fitted independently on the four train trials.
 Two-level P/Q OT + global orthogonal R with 96 weighted anchors, not original full local R_kl HiWA ADMM.
 FA and PCA output coordinates are train-whitened before training both hard and soft.

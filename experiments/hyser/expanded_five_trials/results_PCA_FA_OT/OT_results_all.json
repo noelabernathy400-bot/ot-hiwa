@@ -1,10 +1,18 @@
 {
-  "study": "FA/PCA factorial, 6 representations x 5 folds x 2 seeds x 2 groupings",
+  "study": "FA/PCA factorial with predeclared representation subset x heldout folds x fixed seeds x both groupings",
   "source": "Hyser s01/s1 Random Task, five actual trials",
   "solver": "96 weighted-anchor two-level OT with a shared global orthogonal rotation; NOT original local Rij ADMM",
   "no_synchronized_pairs_in_OT_training": true,
   "force_decoder_trained_ONLY_in_target_domain": true,
   "meta": {
+    "configs": [
+      "PCA3_PCA3",
+      "FA3_PCA3",
+      "PCA3_FA3",
+      "FA3_FA3",
+      "PCA5_RAW5",
+      "FA5_RAW5"
+    ],
     "K": 4,
     "eps_s": 0.1,
     "eps_g": 0.2,
