@@ -1,0 +1,100 @@
+name: CitiBike NYC official large citywide 4month real-data preflight no OT
+on:
+  push:
+    branches:
+      - experiment/citibike-large-data-preflight-20261119
+    paths:
+      - .github/workflows/citibike-large-citywide-preflight-20261119.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  large-official-trip-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      NUMEXPR_NUM_THREADS: '1'
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install finite processing and visualization libraries
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8"
+      - name: Retrieve OFFICIAL NYC historical trip archives Apr Jul 2026, never Jersey City
+        run: |
+          mkdir -p /tmp/citibike_official
+          python -u - <<'PY'
+          import hashlib,urllib.request,zipfile
+          from pathlib import Path
+          for month in ('202604','202605','202606','202607'):
+              url=f'https://s3.amazonaws.com/tripdata/{month}-citibike-tripdata.zip'
+              path=Path('/tmp/citibike_official')/f'{month}-citibike-tripdata.zip'
+              req=urllib.request.Request(url,headers={'User-Agent':'academic-noncommercial-citibike-hierarchical-ot-study/1.0'})
+              sha=hashlib.sha256();count=0
+              with urllib.request.urlopen(req,timeout=300) as resp,path.open('wb') as f:
+                  while True:
+                      part=resp.read(8<<20)
+                      if not part:break
+                      f.write(part);count+=len(part);sha.update(part)
+              assert count>1_000_000,(month,count)
+              assert zipfile.is_zipfile(path),month
+              with zipfile.ZipFile(path) as z:
+                  assert z.testzip() is None
+              print('OFFICIAL_ARCHIVE_VERIFIED',month,count,sha.hexdigest(),flush=True)
+          PY
+      - name: Process ALL real rides in four official citywide months and draw unbiased pre-OT station structure
+        run: |
+          python -u projects/citibike-hierarchical-ot/code/preflight_official_citywide_trips.py \
+            --input-dir /tmp/citibike_official \
+            --output projects/citibike-hierarchical-ot/results/data_preflight
+      - name: Scientifically audit months counts split and no false surplus claims
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('projects/citibike-hierarchical-ot/results/data_preflight')
+          j=json.loads((p/'REAL_CITYWIDE_DATA_PREFLIGHT.json').read_text())
+          assert j['months_train']==['202604','202605','202606']
+          assert j['months_validation']==['202607']
+          assert j['months_reserved_test_not_read']==['202608','202609']
+          assert len(j['official_input_archives'])==4
+          assert j['trip_total_train']>100_000
+          assert j['trip_total_validation']>20_000
+          assert j['stations_active_with_50_plus_train_events']>=500
+          assert j['data_not_sufficient_for_actual_surplus_deficit']
+          assert j['no_true_paired_label_transfer'] and j['no_DANDI_or_Hyser_edits']
+          assert j['group_K_for_visualization_only']==12
+          for f in j['plots']:
+              assert (p/f).stat().st_size>20000
+          assert (p/'CITIBIKE_12_GROUP_REGION_SUMMARY.csv').stat().st_size>200
+          print('PASS LARGE REAL NEW YORK CITY TRIP PRECHECK; NO REAL INVENTORY/OT CLAIM')
+          PY
+      - name: Commit non-rehosted scientific summary and figures to ONLY new project
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/citibike-hierarchical-ot/results/data_preflight
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record official 4-month NYC citywide station-flow and spatial Hard-Soft preflight'
+            git pull --rebase origin experiment/citibike-large-data-preflight-20261119
+            git push origin HEAD:experiment/citibike-large-data-preflight-20261119
+          fi
+      - name: Confirm no old project file changed
+        run: |
+          git status --short
+          if git show --pretty='' --name-only HEAD | grep -E '^(experiments/hyser/|projects/dandi-000138-hiwa-4d/)'; then
+              echo 'Old project unexpectedly touched' && exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: CITIBIKE-NYC-4MONTH-LARGE-REAL-DATA-PREFLIGHT
+          path: projects/citibike-hierarchical-ot/results/data_preflight
+          if-no-files-found: warn
