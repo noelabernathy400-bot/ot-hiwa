@@ -1,0 +1,90 @@
+{
+  "source": "https://data.citybik.es/dumps/by-network/2026/202606-citi-bike-nyc-stats.parquet",
+  "original_file_bytes": 109289362,
+  "source_sha256": "ec50b1797c08b11bf79593aaa588a54a35d0effb4c1e00add6e7dd84ba394576",
+  "source_license": "CityBikes ODbL and underlying operator terms, attribution required",
+  "parquet_record_count": 12258719,
+  "parquet_row_groups": 100,
+  "schema": [
+    {
+      "name": "tag",
+      "type": "string"
+    },
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "nuid",
+      "type": "string"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "latitude",
+      "type": "double"
+    },
+    {
+      "name": "longitude",
+      "type": "double"
+    },
+    {
+      "name": "bikes",
+      "type": "int32"
+    },
+    {
+      "name": "free",
+      "type": "int32"
+    },
+    {
+      "name": "extra",
+      "type": "extension<arrow.json>"
+    },
+    {
+      "name": "timestamp",
+      "type": "timestamp[us]"
+    }
+  ],
+  "first_three_raw_rows_for_schema_illustration": [
+    {
+      "tag": "citi-bike-nyc",
+      "id": "0007398f39bd26118c9fdfd5197ccada",
+      "nuid": "7aa86431-bbc5-4d9c-8198-9630c9d32a22",
+      "name": "Chester Ave & 12 Ave",
+      "latitude": 40.644367,
+      "longitude": -73.984276,
+      "bikes": 17,
+      "free": 2,
+      "extra": "{\"uid\":\"7aa86431-bbc5-4d9c-8198-9630c9d32a22\",\"renting\":1,\"returning\":1,\"last_updated\":\"2026-06-01T00:04:57\",\"has_ebikes\":true,\"ebikes\":3,\"payment\":[\"key\",\"creditcard\"],\"payment-terminal\":true,\"slots\":21,\"rental_uris\":{\"android\":\"https://bkn.lft.to/lastmile_qr_scan\",\"ios\":\"https://bkn.lft.to/lastmile_qr_scan\"},\"virtual\":false}",
+      "timestamp": "2026-06-01 00:07:24"
+    },
+    {
+      "tag": "citi-bike-nyc",
+      "id": "0007398f39bd26118c9fdfd5197ccada",
+      "nuid": "7aa86431-bbc5-4d9c-8198-9630c9d32a22",
+      "name": "Chester Ave & 12 Ave",
+      "latitude": 40.644367,
+      "longitude": -73.984276,
+      "bikes": 18,
+      "free": 2,
+      "extra": "{\"uid\":\"7aa86431-bbc5-4d9c-8198-9630c9d32a22\",\"renting\":1,\"returning\":1,\"last_updated\":\"2026-06-01T00:06:38\",\"has_ebikes\":true,\"ebikes\":3,\"payment\":[\"key\",\"creditcard\"],\"payment-terminal\":true,\"slots\":21,\"rental_uris\":{\"android\":\"https://bkn.lft.to/lastmile_qr_scan\",\"ios\":\"https://bkn.lft.to/lastmile_qr_scan\"},\"virtual\":false}",
+      "timestamp": "2026-06-01 00:08:22"
+    },
+    {
+      "tag": "citi-bike-nyc",
+      "id": "0007398f39bd26118c9fdfd5197ccada",
+      "nuid": "7aa86431-bbc5-4d9c-8198-9630c9d32a22",
+      "name": "Chester Ave & 12 Ave",
+      "latitude": 40.644367,
+      "longitude": -73.984276,
+      "bikes": 18,
+      "free": 1,
+      "extra": "{\"uid\":\"7aa86431-bbc5-4d9c-8198-9630c9d32a22\",\"renting\":1,\"returning\":1,\"last_updated\":\"2026-06-01T00:28:45\",\"has_ebikes\":true,\"ebikes\":3,\"payment\":[\"key\",\"creditcard\"],\"payment-terminal\":true,\"slots\":21,\"rental_uris\":{\"android\":\"https://bkn.lft.to/lastmile_qr_scan\",\"ios\":\"https://bkn.lft.to/lastmile_qr_scan\"},\"virtual\":false}",
+      "timestamp": "2026-06-01 00:29:23"
+    }
+  ],
+  "status": "REAL verified 2026-06 inventory history source; no P/Q OT fit",
+  "data_not_claiming_actual_optimal_dispatch": true
+}
