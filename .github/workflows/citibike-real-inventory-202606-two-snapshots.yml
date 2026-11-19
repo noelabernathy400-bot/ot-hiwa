@@ -1,0 +1,82 @@
+name: CitiBike real historical June inventories and physically meaningful stock plot
+on:
+  push:
+    branches:
+      - experiment/citibike-large-data-preflight-20261119
+    paths:
+      - .github/workflows/citibike-real-inventory-202606-two-snapshots.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  true-stock-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "pyarrow>=15" "numpy>=1.26" "matplotlib>=3.8"
+      - name: Fetch archived authentic Citi Bike inventory June status Parquet
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,urllib.request
+          url='https://data.citybik.es/dumps/by-network/2026/202606-citi-bike-nyc-stats.parquet'
+          req=urllib.request.Request(url,headers={'User-Agent':'noncommercial-academic-stock-preflight/1.0'})
+          p=Path('/tmp/citybikes-202606-real-station-status.parquet');n=0;sha=hashlib.sha256()
+          with urllib.request.urlopen(req,timeout=300) as r,p.open('wb') as f:
+              while True:
+                  block=r.read(8<<20)
+                  if not block:break
+                  f.write(block);sha.update(block);n+=len(block)
+          assert n==109289362
+          assert sha.hexdigest()=='ec50b1797c08b11bf79593aaa588a54a35d0effb4c1e00add6e7dd84ba394576'
+          print('REAL_STOCK_SOURCE_VERIFIED',n,sha.hexdigest(),flush=True)
+          PY
+      - name: Extract original observed bikes/free and illustrative half-capacity policy surplus
+        run: |
+          python -u projects/citibike-hierarchical-ot/code/preflight_actual_inventory_snapshots.py \
+            --input /tmp/citybikes-202606-real-station-status.parquet \
+            --output projects/citibike-hierarchical-ot/results/real_inventory_snapshots
+      - name: Validate strict distinction between true stock and policy assumption
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('projects/citibike-hierarchical-ot/results/real_inventory_snapshots')
+          d=json.loads((p/'REAL_HISTORICAL_INVENTORY_PREFLIGHT.json').read_text())
+          assert d['metadata']['total_parquet_rows_read']==12258719
+          assert d['no_hiwa_or_soft_model_fit']
+          assert d['true_observed_bikes_and_free_vs_hypothetical_target_distinguished']
+          assert d['no_historical_operator_relations_claim']
+          assert len(d['slices'])==2
+          assert all(s['real_station_statuses']>1000 for s in d['slices'])
+          assert all(s['observed_bikes_total']>1000 for s in d['slices'])
+          assert all(s['not_actual_bike_relocation_demand'] for s in d['slices'])
+          assert (p/'NYC_REAL_STATION_INVENTORY_AND_ILLUSTRATIVE_SURPLUS.png').stat().st_size>60000
+          print('PASS REAL INVENTORY MAP WITHOUT CLAIMING OBSERVED DEFICITS')
+          PY
+      - name: Commit only non-raw preflight to new project
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/citibike-hierarchical-ot/results/real_inventory_snapshots
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish true June Citi Bike station inventory maps and explicitly policy-only supply deficit preflight'
+            git pull --rebase origin experiment/citibike-large-data-preflight-20261119
+            git push origin HEAD:experiment/citibike-large-data-preflight-20261119
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: CITIBIKE-REAL-JUNE-INVENTORY-SNAPSHOT-MAPS
+          path: projects/citibike-hierarchical-ot/results/real_inventory_snapshots
+          if-no-files-found: warn
