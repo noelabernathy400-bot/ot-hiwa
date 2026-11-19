@@ -222,7 +222,7 @@ def main():
         (axes[1],"soft_minus_hard_physical_RMSE",
             "Soft - Hard actual physical force RMSE (all five fingers)")]:
         mu=[];sd=[]
-        for conf,_ in CONFS:
+        for conf,_ in selected:
             folds=[]
             for fold in args.folds:
                 vv=[r[k] for r in pairs if r["representation"]==conf and r["fold"]==fold]
