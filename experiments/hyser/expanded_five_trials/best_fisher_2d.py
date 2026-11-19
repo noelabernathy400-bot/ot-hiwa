@@ -55,6 +55,10 @@ def main():
     p.add_argument("--fold",type=Path,required=True)
     p.add_argument("--frozen-results",type=Path,required=True)
     p.add_argument("--out",type=Path,required=True)
+    p.add_argument("--config",choices=["PCA5_RAW5","FA5_RAW5"],default="FA5_RAW5")
+    p.add_argument("--heldout-fold",type=int,default=1)
+    p.add_argument("--seed",type=int,default=42)
+    p.add_argument("--method",choices=["hard","soft05"],default="soft05")
     a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
     with np.load(a.fold) as z:
         Xtr=np.array(z["X_train"])/np.sqrt(5)
@@ -66,8 +70,8 @@ def main():
     fs=fisher2(Xtr,kmx.labels_)
     ft=fisher2(Ytr,kmy.labels_)
     runs=json.loads(a.frozen_results.read_text())["runs"]
-    r=next(v for v in runs if v["representation"]=="FA5_RAW5"
-           and v["fold"]==1 and v["seed"]==42 and v["method"]=="soft05")
+    r=next(v for v in runs if v["representation"]==a.config
+           and v["fold"]==a.heldout_fold and v["seed"]==a.seed and v["method"]==a.method)
     R=np.array(r["R"])
     # Independent latent views, not a common 2D alignment metric
     sx=(Xte-fs["mean"])@fs["basis"]
@@ -77,10 +81,11 @@ def main():
     scatter(axes[0],sx,kmx.predict(Xte),"Source train-fitted Fisher 2D")
     scatter(axes[1],ty,kmy.predict(Yte),"Target train-fitted Fisher 2D")
     scatter(axes[2],aligned,kmx.predict(Xte),"Aligned source in TARGET Fisher axes")
-    fig.suptitle("5D Hyser FA5 fold1 seed42 Soft: max Fisher 2D views, heldout points")
+    fig.suptitle(f"5D Hyser {a.config} fold{a.heldout_fold} seed{a.seed} {a.method}: train-only Fisher 2D views")
     fig.savefig(a.out/"fiveD_to_fisher_optimal_2D_independent.png",dpi=185,bbox_inches="tight")
     plt.close(fig)
-    doc={"mathematical_criterion":"maximize between-cluster scatter / within-cluster scatter using top 2 generalized eigenvectors; not global silhouette maximization",
+    doc={"config":a.config,"heldout_fold":a.heldout_fold,"method":a.method,"seed":a.seed,
+         "mathematical_criterion":"maximize between-cluster scatter / within-cluster scatter using top 2 generalized eigenvectors; not global silhouette maximization",
          "trained_only_on_four_training_trials":True,
          "used_pseudo_labels_for_visualization_ONLY":True,
          "source":{"train_fisher_eigenvalues":fs["eigenvalues"].tolist(),
