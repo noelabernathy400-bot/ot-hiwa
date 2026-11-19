@@ -50,7 +50,7 @@ jobs:
             P=np.array(r["P"])
             assert np.max(abs(P.sum(0)-.2))<1e-6 and np.max(abs(P.sum(1)-.2))<1e-6
             assert r["pair_synchrony_never_used_in_training"]
-            assert "after" in r["heldout_common_hard_K4_reference"]
+            assert "after" in r["heldout_common_hard_K5_reference"]
           print("K5 3D verified: 20 runs")
           PY
       - name: Commit isolated K5 evidence without modifying K4 baseline
