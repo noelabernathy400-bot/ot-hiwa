@@ -1,0 +1,77 @@
+name: Hyser frozen full1000 local HiWA shared K3 K4 hierarchical heldout P Q T J
+
+on:
+  push:
+    paths:
+      - ".github/workflows/hyser-shared-hierarchical-full250-evaluation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install "numpy>=1.26,<3" "scipy>=1.12,<2" "scikit-learn>=1.4,<2" "matplotlib>=3.8,<4"
+      - name: Fetch trial-disjoint real Hyser 3D and 5D fold representations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyser_shared_hier"
+          gh release download hyser-s01-s1-random-5trials-v1 \
+            --pattern hyser_pca_fa_both_domains_trainonly_6configs_v1.zip \
+            --dir "$RUNNER_TEMP/hyser_shared_hier"
+          unzip -q "$RUNNER_TEMP/hyser_shared_hier/hyser_pca_fa_both_domains_trainonly_6configs_v1.zip" \
+            -d "$RUNNER_TEMP/hyser_shared_hier"
+      - name: Recompute evaluation-only P and Q at frozen R, K3 and K4 common references
+        run: |
+          python experiments/hyser/expanded_five_trials/shared_reference_full_hiwa_audit.py \
+            --features "$RUNNER_TEMP/hyser_shared_hier" \
+            --frozen experiments/hyser/expanded_five_trials \
+            --out experiments/hyser/expanded_five_trials/results_3D_5D_unified/shared_hierarchical_full250
+      - name: Verify complete 3D and 5D 80 pairs across two references, retaining invalid runs
+        run: |
+          python - <<'PY'
+          import csv,json,pathlib
+          p=pathlib.Path("experiments/hyser/expanded_five_trials/results_3D_5D_unified/shared_hierarchical_full250")
+          a=list(csv.DictReader((p/"shared_reference_full250_all_runs.csv").open()))
+          b=list(csv.DictReader((p/"shared_reference_summary.csv").open()))
+          c=list(csv.DictReader((p/"paired_shared_reference_effects.csv").open()))
+          assert len(a)==160 and len(b)==16 and len(c)==80,(len(a),len(b),len(c))
+          assert (p/"shared_hierarchical_T_hard_soft.png").stat().st_size>10000
+          assert set(x["reference_K"] for x in a)=={"3","4"}
+          z=json.loads((p/"shared_reference_P_C_entropy_diagnostics.json").read_text())
+          assert "records" in z
+          print("Verified complete common-reference hierarchical audit, all invalid rows retained")
+          PY
+      - name: Commit results without altering archived models
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/hyser/expanded_five_trials/results_3D_5D_unified/shared_hierarchical_full250
+          if ! git diff --cached --quiet; then
+            git commit -m "Report frozen Hyser shared reference full250 P Q T J comparisons"
+            for attempt in 1 2 3 4 5 6; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then exit 0; fi
+              sleep 2
+            done
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyser-shared-reference-3D5D-full250
+          path: experiments/hyser/expanded_five_trials/results_3D_5D_unified/shared_hierarchical_full250
+          retention-days: 90
+          if-no-files-found: warn
