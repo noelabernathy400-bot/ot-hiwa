@@ -62,7 +62,7 @@ jobs:
           p=Path('projects/citibike-hierarchical-ot/results/first_actual_ot_pilot')
           j=json.loads((p/'CITIBIKE_FIRST_ACTUAL_OT_RESULTS.json').read_text())
           assert not j['in_progress'] and len(j['runs'])==2
-          for r in j['runs']:
+          for snapshot_idx,r in enumerate(j['runs']):
               assert (r['gross_policy_supply_bikes'],r['gross_policy_deficit_bikes'],r['unserved_policy_deficit_bikes']) in ((5777,9392,3615),(5953,9724,3771))
               assert r['supply_station_count']>=600
               assert r['served_demand_station_count']>=800
@@ -78,7 +78,7 @@ jobs:
                   assert model['P_col_max_error']<1e-5
                   assert model['q_max_conditional_marginal_error']<3e-6
                   assert model['Q_conditioned_included_in_artifact']
-                  source=p/f"0_{name}_P_GAMMA_Q.npz"
+                  source=p/f"{snapshot_idx}_{name}_P_GAMMA_Q.npz"
                   assert source.stat().st_size>25000
                   with np.load(source,allow_pickle=False) as z:
                       assert len([key for key in z.files if key.startswith('Q_')])==model['K']**2
