@@ -1,0 +1,116 @@
+name: CitiBike FIRST actual historic stock OT vs exact mincost WA-I Hard Soft weighted PQ
+on:
+  push:
+    branches:
+      - experiment/citibike-large-data-preflight-20261119
+    paths:
+      - .github/workflows/citibike-first-actual-stock-hierarchical-ot-20261120.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  test-real-stock-hierarchical-ot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      NUMEXPR_NUM_THREADS: '1'
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install precise mincost flow, finite geometry and Parquet tools
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8" "pyarrow>=15" "ortools>=9.10"
+      - name: Download SHA-checked REAL 2026 June historical Citi Bike station stock, no inferred inventory
+        run: |
+          python -u - <<'PY'
+          from pathlib import Path
+          import urllib.request,hashlib
+          u='https://data.citybik.es/dumps/by-network/2026/202606-citi-bike-nyc-stats.parquet'
+          req=urllib.request.Request(u,headers={'User-Agent':'academic-noncommercial-citibike-fixed-R-hierarchical-OT/1.0'})
+          path=Path('/tmp/202606-citi-bike-nyc-stats.parquet')
+          h=hashlib.sha256();n=0
+          with urllib.request.urlopen(req,timeout=360) as src,path.open('wb') as out:
+              while True:
+                  b=src.read(8<<20)
+                  if not b:break
+                  out.write(b);h.update(b);n+=len(b)
+          assert n==109289362
+          assert h.hexdigest()=='ec50b1797c08b11bf79593aaa588a54a35d0effb4c1e00add6e7dd84ba394576'
+          print('REAL_NYC_HISTORIC_STOCK_VERIFIED',n,h.hexdigest(),flush=True)
+          PY
+      - name: Run exact flat min-cost + same-stock Hard Soft hierarchical Q/P real transportation study
+        run: |
+          python -u projects/citibike-hierarchical-ot/code/run_first_real_stock_hierarchical_ot.py \
+            --input /tmp/202606-citi-bike-nyc-stats.parquet \
+            --output projects/citibike-hierarchical-ot/results/first_actual_ot_pilot \
+            --snapshots 0 \
+            --K 4 8 \
+            --reg 2.5
+      - name: Confirm full-city source demand, shared mass edges and flat exact cost lower bound
+        run: |
+          python - <<'PY'
+          import json,numpy as np
+          from pathlib import Path
+          p=Path('projects/citibike-hierarchical-ot/results/first_actual_ot_pilot')
+          j=json.loads((p/'CITIBIKE_FIRST_ACTUAL_OT_RESULTS.json').read_text())
+          assert not j['in_progress'] and len(j['runs'])==1
+          for r in j['runs']:
+              assert r['gross_policy_supply_bikes']==5777
+              assert r['gross_policy_deficit_bikes']==9392
+              assert r['unserved_policy_deficit_bikes']==3615
+              assert r['supply_station_count']>=600
+              assert r['served_demand_station_count']>=800
+              exact=r['exact_flat_integer_min_cost_flow']['cost_integer_km']
+              assert exact>0
+              assert r['greedy_cost_km']>=exact-.05
+              assert r['flat_sinkhorn_WA_identity']['cost_km']>=exact-.2
+              assert set(r['models'])=={'Hard_K4','Soft_K4','Hard_K8','Soft_K8'}
+              for name,model in r['models'].items():
+                  assert model['hier_transport_km']>=exact-.2,name
+                  assert model['Gamma_max_marginal_error_bikes']<.008
+                  assert model['P_row_max_error']<1e-5
+                  assert model['P_col_max_error']<1e-5
+                  assert model['q_max_conditional_marginal_error']<3e-6
+                  assert model['Q_conditioned_included_in_artifact']
+                  source=p/f"0_{name}_P_GAMMA_Q.npz"
+                  assert source.stat().st_size>25000
+                  with np.load(source,allow_pickle=False) as z:
+                      assert len([key for key in z.files if key.startswith('Q_')])==model['K']**2
+                      g=z['Gamma']
+                      assert g.shape==(r['supply_station_count'],r['served_demand_station_count'])
+                      assert np.max(abs(g.sum(1)-z['source_supply_bikes']))<.008
+                      assert np.max(abs(g.sum(0)-z['target_served_demand_bikes']))<.008
+          assert (p/'CITIBIKE_FIRST_ACTUAL_OT_REPORT.md').stat().st_size>900
+          assert len(list(p.glob('*SUPPLY_AND_TRANSPORT.png')))>=1
+          print('PASS real stock, exact flat full graph, 4 independent Hard/Soft P/Q models and mass flow audit')
+          PY
+      - name: Commit only actual results report and visualizations, no raw CityBikes dataset or massive Q plans to Git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/citibike-hierarchical-ot/results/first_actual_ot_pilot/*.json
+          git add -- projects/citibike-hierarchical-ot/results/first_actual_ot_pilot/*.md
+          git add -- projects/citibike-hierarchical-ot/results/first_actual_ot_pilot/*.png
+          if ! git diff --cached --quiet; then
+            git commit -m 'Complete first real Citi Bike stock full mincost versus weighted hard soft P/Q experiments'
+            git pull --rebase origin experiment/citibike-large-data-preflight-20261119
+            git push origin HEAD:experiment/citibike-large-data-preflight-20261119
+          fi
+      - name: Check no edits to DANDI and Hyser original scientific projects
+        run: |
+          if git show --pretty='' --name-only HEAD | grep -E '^(experiments/hyser/|projects/dandi-000138-hiwa-4d/)'; then
+            echo 'FORBIDDEN OLD SCIENCE PROJECT MODIFICATION' && exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: CITIBIKE-FIRST-REAL-2026JUNE-EXACT-FLAT-HARD-SOFT-WA-TRANSPORT
+          path: projects/citibike-hierarchical-ot/results/first_actual_ot_pilot
+          if-no-files-found: warn
