@@ -216,38 +216,48 @@ def hierarchical(a,b,c,Ax,By,regularization=2.5):
 
 
 def plot_scene(out,name,locations,sources,targets,c,items):
+    """Separate interpretable geographic panels; never overlay 3 algorithms."""
+    from matplotlib.patches import FancyArrowPatch
     lat=np.array([x["lat"] for x in locations])
     lon=np.array([x["lon"] for x in locations])
-    src=np.flatnonzero(sources>0);tgt=np.flatnonzero(targets>0)
-    fig,axs=plt.subplots(1,2,figsize=(15,7),layout="constrained")
+    src=np.flatnonzero(sources>0)
+    tgt=np.flatnonzero(targets>0)
+    fig,axs=plt.subplots(2,2,figsize=(14,13),layout="constrained")
+    axs=list(axs.flat)
     for ax in axs:
-        ax.scatter(lon,lat,s=3,c="lightgray",alpha=.36,label="All stations")
-        ax.scatter(lon[src],lat[src],s=7+sources[src]*1.7,
-                   alpha=.52,c="#2a77b7",label="Supply stations")
-        ax.scatter(lon[tgt],lat[tgt],s=7+targets[tgt]*1.7,
-                   alpha=.50,c="#d67637",label="Served deficit stations")
-        ax.set_xlabel("Longitude");ax.set_ylabel("Latitude")
+        ax.scatter(lon,lat,s=2,c="#b3b3b3",alpha=.28,zorder=1,rasterized=True)
+        ax.scatter(lon[src],lat[src],s=5+sources[src]*.80,
+                   alpha=.65,c="#267abb",label="Supply",zorder=3,rasterized=True)
+        ax.scatter(lon[tgt],lat[tgt],s=5+targets[tgt]*.80,
+                   alpha=.56,c="#d76b29",label="Demand",zorder=3,rasterized=True)
+        ax.set_xlabel("Longitude")
+        ax.set_ylabel("Latitude")
         ax.set_aspect(1./np.cos(np.deg2rad(lat.mean())))
-        ax.grid(alpha=.2)
-    axs[0].set_title("Observed stock, assumed half-full policy: supply vs served deficit")
-    axs[0].legend(fontsize=9)
-    # Compare transportation arrows by the largest flow mass, do not plot
-    # every entropic edge and imply its fractional dust is a vehicle shipment.
-    for label,flow,colour in items:
-        ff=flow.copy()
-        ii,jj=np.unravel_index(np.argsort(ff.ravel())[-90:],ff.shape)
-        for i,j in zip(ii,jj):
-            if ff[i,j]<=0:continue
-            xs=lon[src[i]];xt=lon[tgt[j]]
-            ys=lat[src[i]];yt=lat[tgt[j]]
-            axs[1].plot([xs,xt],[ys,yt],
-                        color=colour,alpha=.17,lw=min(4.,.25+float(ff[i,j])*.055))
-    axs[1].set_title("Largest 90 arrows of each transport plan (overlaid)")
-    for label,flow,colour in items:
-        axs[1].plot([],[],color=colour,lw=2,label=label)
-    axs[1].legend(fontsize=9)
-    fig.suptitle(f"REAL NYC Citi Bike historical stock {name} | all transport needs are POLICY assumptions",fontsize=13)
-    fig.savefig(out/f"{name.replace(' ','_')}_SUPPLY_AND_TRANSPORT.png",dpi=165)
+        ax.grid(alpha=.13)
+    axs[0].set_title("Real stock; assumed half-full supply and served deficit")
+    axs[0].legend(loc="upper left",fontsize=8)
+    for ax,(label,flow,colour) in zip(axs[1:],items):
+        nn=150
+        flat=np.argpartition(flow.ravel(),-nn)[-nn:]
+        flat=flat[np.argsort(flow.ravel()[flat])]
+        values=flow.ravel()[flat]
+        maxval=float(values.max())
+        for q,val in zip(flat,values):
+            if val<=0:continue
+            i,j=np.unravel_index(int(q),flow.shape)
+            p0=(lon[src[i]],lat[src[i]])
+            p1=(lon[tgt[j]],lat[tgt[j]])
+            arrow=FancyArrowPatch(p0,p1,arrowstyle="-|>",
+                mutation_scale=5.,linewidth=.4+1.75*(float(val)/maxval)**.6,
+                color=colour,alpha=.55,zorder=2)
+            ax.add_patch(arrow)
+        ax.set_title(f"{label} | TOP 150 transported pairs")
+    fig.suptitle(
+        f"REAL Citi Bike NYC inventory {name} | fixed R=I, shared serviced deficits\n"
+        "Arrows show high-MASS shipments; Hard/Soft arrows are FRACTIONAL, not yet integer dispatches",
+        fontsize=13)
+    fig.savefig(out/f"{name.replace(' ','_')}_SUPPLY_AND_TRANSPORT.png",
+                dpi=165,bbox_inches="tight")
     plt.close(fig)
 
 
