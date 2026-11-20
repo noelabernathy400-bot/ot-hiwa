@@ -1,0 +1,118 @@
+name: CitiBike real fixed-R OT epsilon K softness cost and integer sweep
+on:
+  push:
+    branches:
+      - experiment/citibike-large-data-preflight-20261119
+    paths:
+      - .github/workflows/citibike-real-ot-epsilon-tau-and-integer-sweep-20261120.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sweep-real-station-stock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      NUMEXPR_NUM_THREADS: '1'
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install native linear and integer OT solvers
+        run: python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.4" "matplotlib>=3.8" "pyarrow>=15" "ortools>=9.10"
+      - name: Download and VERIFY REAL original June 2026 Citi Bike station inventory
+        run: |
+          python -u - <<'PY'
+          from pathlib import Path
+          import hashlib,urllib.request
+          url='https://data.citybik.es/dumps/by-network/2026/202606-citi-bike-nyc-stats.parquet'
+          req=urllib.request.Request(url,headers={'User-Agent':'academic-citibike-real-hierarchical-sensitivity/1.0'})
+          out=Path('/tmp/202606-citi-bike-nyc-stats.parquet')
+          h=hashlib.sha256();n=0
+          with urllib.request.urlopen(req,timeout=360) as src,out.open('wb') as f:
+              while True:
+                  b=src.read(8<<20)
+                  if not b:break
+                  f.write(b);h.update(b);n+=len(b)
+          assert n==109289362
+          assert h.hexdigest()=='ec50b1797c08b11bf79593aaa588a54a35d0effb4c1e00add6e7dd84ba394576'
+          print('VERIFIED_SAME_REAL_STOCK_AND_SHA',n,h.hexdigest(),flush=True)
+          PY
+      - name: Run predeclared BOTH stock snapshots entropy K temperature sweeps and exact integer rounding
+        run: |
+          python -u projects/citibike-hierarchical-ot/code/sweep_real_stock_ot_epsilon_groups_softness.py \
+            --input /tmp/202606-citi-bike-nyc-stats.parquet \
+            --output projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity \
+            --snapshots 0 1
+      - name: Audit original 2 snapshots, positive controls, masses, all fitted settings and curves
+        run: |
+          python - <<'PY'
+          import json,csv,numpy as np
+          from pathlib import Path
+          p=Path('projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity')
+          j=json.loads((p/'CITIBIKE_OT_SWEEP_REAL_RESULTS.json').read_text())
+          assert j['eps_grid_km']==[.25,.5,1.,2.5]
+          assert j['K_grid']==[4,8]
+          assert j['soft_tau_multipliers']==[.1,.25,.5,1.,2.,4.]
+          assert len(j['snapshots'])==2
+          assert j['no_inferred_actual_operator_demand']
+          for r in j['snapshots']:
+              assert (r['source_nodes'],r['target_nodes']) in ((666,875),(670,997))
+              assert r['bikes'] in (5777,5953)
+              exact=r['exact_flat_integer']['cost_integer_km']
+              assert exact>0 and r['greedy_cost_bike_km']>=exact-.2
+              assert len(r['parameter_runs'])==42,len(r['parameter_runs'])
+              for x in r['parameter_runs']:
+                  if x['converged']:
+                      assert x['cost_bike_km']>=exact-.3,(x['configuration'],x['cost_bike_km'],exact)
+                      assert x['gap_percent']>=-.003
+                  else:assert x.get('error_reason') or x['configuration']=='flat_sinkhorn_WA_I'
+              for mode in ('Hard','Soft'):
+                  rec=r['physical_integer_rounding_eps05_K8'][mode]
+                  assert 'rounding_cost_bike_km' in rec,rec
+                  assert rec['rounding_cost_bike_km']>=exact-.2
+                  with np.load(p/f"snapshot{r['snapshot_id']}_{mode}_K8_eps05_integer.npz",
+                                   allow_pickle=False) as f:
+                      v=f['integer_transport']
+                      assert v.dtype.kind in 'iu'
+                      assert np.array_equal(v.sum(0),f['served_deficit_bikes'])
+                      assert np.array_equal(v.sum(1),f['supply_bikes'])
+          for f in ('FIG_EPSILON_HARD_SOFT_K4_K8_COST_GAP.png',
+                    'FIG_SOFT_TEMPERATURE_GROUP_OVERLAP_COST_GAP.png',
+                    'FIG_INTEGER_ROUNDING_HARD_SOFT_VS_EXACT.png'):
+              assert (p/f).stat().st_size>28000,f
+          with (p/'CITIBIKE_REAL_OT_SWEEP.csv').open() as f:
+              assert len(list(csv.reader(f)))==85
+          print('PASS real two snapshot epsilon K tau sensitivity, 84 model-sweep points and 4 exact integer roundings')
+          PY
+      - name: Commit only scientific actual results and figures, not large raw Parquet/NPZ
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/*.json
+          git add -- projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/*.md
+          git add -- projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/*.csv
+          git add -- projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/*.png
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record actual citywide stock epsilon K tau OT curves and feasible integer transportation'
+            git pull --rebase origin experiment/citibike-large-data-preflight-20261119
+            git push origin HEAD:experiment/citibike-large-data-preflight-20261119
+          fi
+      - name: Old projects untouched
+        run: |
+          if git show --pretty='' --name-only HEAD | grep -E '^(experiments/hyser/|projects/dandi-000138-hiwa-4d/)'; then
+            echo 'DANDI or Hyser change forbidden'; exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: CITIBIKE-REAL-STOCK-EPSILON-K-SOFTNESS-SWEEP-AND-INTEGER-PLANS
+          path: projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity
+          if-no-files-found: warn
