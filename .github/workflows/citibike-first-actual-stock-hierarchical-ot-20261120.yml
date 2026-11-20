@@ -5,6 +5,7 @@ on:
       - experiment/citibike-large-data-preflight-20261119
     paths:
       - .github/workflows/citibike-first-actual-stock-hierarchical-ot-20261120.yml
+      - projects/citibike-hierarchical-ot/code/run_first_real_stock_hierarchical_ot.py
   workflow_dispatch:
 permissions:
   contents: write
