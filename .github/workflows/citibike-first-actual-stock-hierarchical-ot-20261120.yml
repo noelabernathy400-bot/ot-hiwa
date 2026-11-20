@@ -51,7 +51,7 @@ jobs:
           python -u projects/citibike-hierarchical-ot/code/run_first_real_stock_hierarchical_ot.py \
             --input /tmp/202606-citi-bike-nyc-stats.parquet \
             --output projects/citibike-hierarchical-ot/results/first_actual_ot_pilot \
-            --snapshots 0 \
+            --snapshots 0 1 \
             --K 4 8 \
             --reg 2.5
       - name: Confirm full-city source demand, shared mass edges and flat exact cost lower bound
@@ -61,11 +61,9 @@ jobs:
           from pathlib import Path
           p=Path('projects/citibike-hierarchical-ot/results/first_actual_ot_pilot')
           j=json.loads((p/'CITIBIKE_FIRST_ACTUAL_OT_RESULTS.json').read_text())
-          assert not j['in_progress'] and len(j['runs'])==1
+          assert not j['in_progress'] and len(j['runs'])==2
           for r in j['runs']:
-              assert r['gross_policy_supply_bikes']==5777
-              assert r['gross_policy_deficit_bikes']==9392
-              assert r['unserved_policy_deficit_bikes']==3615
+              assert (r['gross_policy_supply_bikes'],r['gross_policy_deficit_bikes'],r['unserved_policy_deficit_bikes']) in ((5777,9392,3615),(5953,9724,3771))
               assert r['supply_station_count']>=600
               assert r['served_demand_station_count']>=800
               exact=r['exact_flat_integer_min_cost_flow']['cost_integer_km']
@@ -89,7 +87,7 @@ jobs:
                       assert np.max(abs(g.sum(1)-z['source_supply_bikes']))<.008
                       assert np.max(abs(g.sum(0)-z['target_served_demand_bikes']))<.008
           assert (p/'CITIBIKE_FIRST_ACTUAL_OT_REPORT.md').stat().st_size>900
-          assert len(list(p.glob('*SUPPLY_AND_TRANSPORT.png')))>=1
+          assert len(list(p.glob('*SUPPLY_AND_TRANSPORT.png')))>=2
           print('PASS real stock, exact flat full graph, 4 independent Hard/Soft P/Q models and mass flow audit')
           PY
       - name: Commit only actual results report and visualizations, no raw CityBikes dataset or massive Q plans to Git
