@@ -1,0 +1,70 @@
+name: CitiBike final postfit REAL Soft minus Hard epsilon K and rounding fidelity report
+on:
+  push:
+    branches:
+      - experiment/citibike-large-data-preflight-20261119
+    paths:
+      - .github/workflows/citibike-postfit-soft-hard-effect-and-integer-audit-20261120.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  analyze-existing-real-results-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install "numpy>=1.26" "matplotlib>=3.8"
+      - name: Render real Soft minus Hard effect and integerization transport-fidelity analysis
+        run: |
+          python projects/citibike-hierarchical-ot/code/finish_real_stock_sensitivity_analysis.py \
+            --source projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/CITIBIKE_OT_SWEEP_REAL_RESULTS.json \
+            --out projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity
+      - name: Verify exact empirical pairs, two research figures and caveats
+        run: |
+          python - <<'PY'
+          import csv
+          from pathlib import Path
+          p=Path('projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity')
+          with (p/'SOFT_MINUS_HARD_REAL_STOCK_EPS_K.csv').open() as r:
+              rows=list(csv.DictReader(r))
+          assert len(rows)==16,len(rows)
+          for r in rows:
+              diff=float(r['hard_bike_km'])-float(r['soft_bike_km'])
+              assert abs(100*diff/float(r['hard_bike_km'])-
+                         float(r['soft_reduces_cost_relative_to_hard_percent']))<.0001
+          assert (p/'SOFT_VS_HARD_DIRECT_COST_GAIN_BY_EPSILON_K.png').stat().st_size>15000
+          assert (p/'INTEGER_ROUNDING_CHANGE_IN_TRANSPORT_MASS.png').stat().st_size>15000
+          text=(p/'REAL_OT_PARAMETER_SWEEP_SCIENTIFIC_INTERPRETATION_ZH.md').read_text()
+          assert '65–75%' not in text or 'minimal-L1' in text
+          assert 'SA/DAD' in text and 'not' in text.lower()
+          print('PASS genuine Soft Hard pure-cost effect Kxepsilon, integer TV and caveats')
+          PY
+      - name: Commit ONLY final new CitiBike research post-analysis, never alter original DANDI or Hyser
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/SOFT_MINUS_HARD_REAL_STOCK_EPS_K.csv
+          git add -- projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/SOFT_VS_HARD_DIRECT_COST_GAIN_BY_EPSILON_K.png
+          git add -- projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/INTEGER_ROUNDING_CHANGE_IN_TRANSPORT_MASS.png
+          git add -- projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/REAL_OT_PARAMETER_SWEEP_SCIENTIFIC_INTERPRETATION_ZH.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish scientific Citi Bike pure transport Soft-Hard gains and rounding-mass risk diagnostics'
+            git pull --rebase origin experiment/citibike-large-data-preflight-20261119
+            git push origin HEAD:experiment/citibike-large-data-preflight-20261119
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CITIBIKE-REAL-OT-SOFT-HARD-EFFECT-AND-ROUNDING-REPORT
+          path: |
+            projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/SOFT_MINUS_HARD_REAL_STOCK_EPS_K.csv
+            projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/SOFT_VS_HARD_DIRECT_COST_GAIN_BY_EPSILON_K.png
+            projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/INTEGER_ROUNDING_CHANGE_IN_TRANSPORT_MASS.png
+            projects/citibike-hierarchical-ot/results/real_stock_parameter_sensitivity/REAL_OT_PARAMETER_SWEEP_SCIENTIFIC_INTERPRETATION_ZH.md
