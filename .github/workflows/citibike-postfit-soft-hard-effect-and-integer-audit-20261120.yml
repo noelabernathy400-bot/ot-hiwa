@@ -5,6 +5,7 @@ on:
       - experiment/citibike-large-data-preflight-20261119
     paths:
       - .github/workflows/citibike-postfit-soft-hard-effect-and-integer-audit-20261120.yml
+      - projects/citibike-hierarchical-ot/code/finish_real_stock_sensitivity_analysis.py
   workflow_dispatch:
 permissions:
   contents: write
