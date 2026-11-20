@@ -68,7 +68,7 @@ jobs:
               assert r['bikes'] in (5777,5953)
               exact=r['exact_flat_integer']['cost_integer_km']
               assert exact>0 and r['greedy_cost_bike_km']>=exact-.2
-              assert len(r['parameter_runs'])==42,len(r['parameter_runs'])
+              assert len(r['parameter_runs'])==26,len(r['parameter_runs'])
               for x in r['parameter_runs']:
                   if x['converged']:
                       assert x['cost_bike_km']>=exact-.3,(x['configuration'],x['cost_bike_km'],exact)
@@ -76,21 +76,24 @@ jobs:
                   else:assert x.get('error_reason') or x['configuration']=='flat_sinkhorn_WA_I'
               for mode in ('Hard','Soft'):
                   rec=r['physical_integer_rounding_eps05_K8'][mode]
-                  assert 'rounding_cost_bike_km' in rec,rec
-                  assert rec['rounding_cost_bike_km']>=exact-.2
+                  assert all(k in rec for k in ('min_cost','min_L1')),rec
+                  for rmode in ('min_cost','min_L1'):
+                      assert rec[rmode]['rounding_cost_bike_km']>=exact-.2
+                      assert 0<=rec[rmode]['total_variation_fraction_of_mass']<=1.01
                   with np.load(p/f"snapshot{r['snapshot_id']}_{mode}_K8_eps05_integer.npz",
                                    allow_pickle=False) as f:
-                      v=f['integer_transport']
-                      assert v.dtype.kind in 'iu'
-                      assert np.array_equal(v.sum(0),f['served_deficit_bikes'])
-                      assert np.array_equal(v.sum(1),f['supply_bikes'])
+                      for rmode in ('min_cost','min_L1'):
+                          v=f['integer_transport_'+rmode]
+                          assert v.dtype.kind in 'iu'
+                          assert np.array_equal(v.sum(0),f['served_deficit_bikes'])
+                          assert np.array_equal(v.sum(1),f['supply_bikes'])
           for f in ('FIG_EPSILON_HARD_SOFT_K4_K8_COST_GAP.png',
                     'FIG_SOFT_TEMPERATURE_GROUP_OVERLAP_COST_GAP.png',
                     'FIG_INTEGER_ROUNDING_HARD_SOFT_VS_EXACT.png'):
               assert (p/f).stat().st_size>28000,f
           with (p/'CITIBIKE_REAL_OT_SWEEP.csv').open() as f:
-              assert len(list(csv.reader(f)))==85
-          print('PASS real two snapshot epsilon K tau sensitivity, 84 model-sweep points and 4 exact integer roundings')
+              assert len(list(csv.reader(f)))==53
+          print('PASS two snapshots, 52 frozen numeric sweep points and 8 integer plans, full feasibility and exact mincost controls')
           PY
       - name: Commit only scientific actual results and figures, not large raw Parquet/NPZ
         run: |
