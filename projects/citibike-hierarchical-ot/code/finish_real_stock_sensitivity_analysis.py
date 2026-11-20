@@ -68,7 +68,9 @@ def main():
                              m["rounding_cost_bike_km"]))
         pos=np.arange(len(data))
         bars=ax.bar(pos,[q[2] for q in data],
-                    color=[cols[q[0]] for q in data],alpha=[.55,1.,.55,1.])
+                    color=[cols[q[0]] for q in data])
+        for bar,row in zip(bars,data):
+            bar.set_alpha(.55 if row[1]=="min_cost" else 1.)
         ax.set_xticks(pos,labels=[q[0]+"\n"+q[1] for q in data])
         ax.set_title(z["snapshot"])
         ax.set_ylabel("Total variation in transport mass after rounding (%)")
