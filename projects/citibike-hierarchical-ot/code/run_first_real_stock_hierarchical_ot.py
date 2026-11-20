@@ -44,7 +44,7 @@ def dist_km(latx,lonx,laty,lony):
 
 def balanced_service(demand,actual_supply):
     """Serve a proportional integer quota; unmet demand remains explicit."""
-    count=int(actual_supply.sum())
+    count=int(actual_supply.sum()) if hasattr(actual_supply,'sum') else int(actual_supply)
     gross=int(demand.sum())
     if gross<count: raise ValueError("pilot assumes deficit>=supply")
     scaled=demand.astype(float)*count/gross
