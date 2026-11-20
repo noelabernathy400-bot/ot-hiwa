@@ -166,13 +166,14 @@ def conditional_Q_pairwise(a,b,C,A,B,epsilon,save_plan=False):
     assert abs(meta["Gamma_direct_cost_bike_km"]-total)<.005
     return gamma,meta
 
-def round_integer_preserving_exact_marginals(gamma,a,b,C):
-    """Exact integral b-matching on Gamma fractional support, using floor + flow.
+def round_integer_preserving_exact_marginals(gamma,a,b,C,objective="min_cost"):
+    """Exact integer station marginals, on floor/ceil of the fractional plan.
 
-    Guarantees integer station inventories at every endpoint. Residual
-    individual pair differs by <1 from Gamma. Optimizes original cost of
-    residual rounding, but output is NOT necessarily original hierarchical
-    algorithm's optimum (report separately).
+    'min_cost' heavily REOPTIMIZES nearly all (initially fractional) bikes;
+    it is NOT faithful to HiWA/GCOT and cannot establish a Soft advantage.
+    'min_L1' prioritizes minimizing transport matrix L1 difference and
+    breaks nearly equal deviations by geographic transport cost.
+    Report total variation of the integerized plan vs input Gamma.
     """
     floors=np.floor(gamma+1e-10).astype(np.int32)
     ra=a-floors.sum(1)
@@ -184,8 +185,18 @@ def round_integer_preserving_exact_marginals(gamma,a,b,C):
     edges=[]
     nz=np.nonzero(frac>1e-9)
     for i,j in zip(*nz):
+        if objective=="min_cost":
+            unit=int(round(float(C[i,j])*1000))
+        elif objective=="min_L1":
+            # Each selected rounded-UP edge changes L1 by (1-2*frac),
+            # and the number of selected edges is fixed.  Thus minimizing
+            # sum(1-frac) is equivalent to minimizing total L1 deviation.
+            # 1e6 fractional multiplier; 1e-2 geographic cost tie-break.
+            unit=int(round((1.-float(frac[i,j]))*1_000_000+
+                           float(C[i,j])*100))
+        else:raise ValueError(f"unsupported integer rounding {objective}")
         arc=solver.add_arc_with_capacity_and_unit_cost(
-            int(i),int(n+j),1,int(round(float(C[i,j])*1000)))
+            int(i),int(n+j),1,unit)
         edges.append((arc,int(i),int(j)))
     for i in range(n):solver.set_node_supply(int(i),int(ra[i]))
     for j in range(m):solver.set_node_supply(int(n+j),int(-rb[j]))
@@ -200,8 +211,12 @@ def round_integer_preserving_exact_marginals(gamma,a,b,C):
     assert np.array_equal(out.sum(1),a)
     assert np.array_equal(out.sum(0),b)
     assert np.max(abs(out-gamma))<1.001
-    return out,{"rounding_cost_bike_km":float((out*C).sum()),
+    l1=float(np.abs(out-gamma).sum())
+    return out,{"rounding_objective":objective,
+                "rounding_cost_bike_km":float((out*C).sum()),
                 "rounding_time_s":secs,"integer_routes":int(np.count_nonzero(out)),
+                "total_variation_fraction_of_mass":l1/(2.*a.sum()),
+                "L1_coupling_change_bikes":l1,
                 "max_pairwise_rounding_error_bikes":float(np.max(abs(out-gamma))),
                 "residual_vehicles_rounded":int(ra.sum())}
 
@@ -332,16 +347,21 @@ def main():
             if gamma is None:
                 result["physical_integer_rounding_eps05_K8"][mode]={"converged":False,"reason":md.get("reason")}
                 continue
-            integer,im=round_integer_preserving_exact_marginals(gamma,a,b,C)
+            im={}
+            payload={"Gamma":gamma.astype(np.float32),
+                     "supply_bikes":a,"served_deficit_bikes":b,
+                     "P":np.array(md["P"],dtype=float),
+                     "source_indices":d["ii"],"target_indices":d["jj"]}
+            for strategy in ("min_cost","min_L1"):
+                integer,z=round_integer_preserving_exact_marginals(
+                    gamma,a,b,C,objective=strategy)
+                z["rounded_integer_gap_percent"]=100*(z["rounding_cost_bike_km"]/exact_cost-1)
+                im[strategy]=z
+                payload[f"integer_transport_{strategy}"]=integer
             im["fractional_cost_bike_km"]=md["cost_bike_km"]
             im["fractional_gap_percent"]=100*(md["cost_bike_km"]/exact_cost-1)
-            im["rounded_integer_gap_percent"]=100*(im["rounding_cost_bike_km"]/exact_cost-1)
             result["physical_integer_rounding_eps05_K8"][mode]=im
-            np.savez_compressed(out/f"snapshot{ident}_{mode}_K8_eps05_integer.npz",
-                Gamma=gamma.astype(np.float32),integer_transport=integer,
-                supply_bikes=a,served_deficit_bikes=b,
-                P=np.array(md["P"],dtype=float),
-                source_indices=d["ii"],target_indices=d["jj"])
+            np.savez_compressed(out/f"snapshot{ident}_{mode}_K8_eps05_integer.npz",**payload)
             print("INTEGERIZED",ident,mode,im,flush=True)
         # Persist incremental results if any unanticipated numerical issue.
         results["snapshots"].append(result)
@@ -409,13 +429,13 @@ def main():
             exact=res["exact_flat_integer"]["cost_integer_km"]
             hard=next((r["cost_bike_km"] for r in res["parameter_runs"] if r["configuration"]=="Hard" and r["K"]==8 and r["epsilon_km"]==.5),None)
             soft=next((r["cost_bike_km"] for r in res["parameter_runs"] if r["configuration"]=="Soft" and r["K"]==8 and r["epsilon_km"]==.5),None)
-            h=res["physical_integer_rounding_eps05_K8"]["Hard"].get("rounding_cost_bike_km")
-            s=res["physical_integer_rounding_eps05_K8"]["Soft"].get("rounding_cost_bike_km")
+            h=res["physical_integer_rounding_eps05_K8"]["Hard"].get("min_L1",{}).get("rounding_cost_bike_km")
+            s=res["physical_integer_rounding_eps05_K8"]["Soft"].get("min_L1",{}).get("rounding_cost_bike_km")
             vals=[exact,res["greedy_cost_bike_km"],hard,h,soft,s]
             ax.bar(x,vals,color=["#575757","#97a0a9","#2a77ae","#7ca7cf","#de8034","#f2b57a"])
             ax.set_xticks(x,labels=names,rotation=25,ha="right")
             ax.set_title(res["snapshot"]);ax.set_ylabel("bike-km")
-        f.suptitle("Integerization preserves real station supply and target served bikes, but can change transport cost")
+        f.suptitle("Minimal-L1 integer rounding retains marginals; changes to Gamma MUST be audited")
         f.savefig(out/"FIG_INTEGER_ROUNDING_HARD_SOFT_VS_EXACT.png",dpi=180)
         plt.close(f)
     charts()
@@ -440,9 +460,17 @@ def main():
         exact=res["exact_flat_integer"]["cost_integer_km"]
         for mode in ("Hard","Soft"):
             ff=next((r["cost_bike_km"] for r in res["parameter_runs"] if r["configuration"]==mode and r["K"]==8 and r["epsilon_km"]==.5),None)
-            rr=res["physical_integer_rounding_eps05_K8"][mode].get("rounding_cost_bike_km")
-            report.append(f"| {res['snapshot']} | {mode} | {ff if ff is not None else 'N/A'} | {rr if rr is not None else 'FAILED'} | {exact:.3f} |")
-    report.extend(["","## Figures",
+            round_results=res["physical_integer_rounding_eps05_K8"][mode]
+            rr=round_results.get("min_L1",{}).get("rounding_cost_bike_km")
+            tv=round_results.get("min_L1",{}).get("total_variation_fraction_of_mass")
+            report.append(f"| {res['snapshot']} | {mode} | {ff if ff is not None else 'N/A'} | {rr if rr is not None else 'FAILED'} (TV={tv:.3f}) | {exact:.3f} |")
+    report.extend(["",
+      "NOTE ON INTEGRAL DISPATCH: Exact residual min-cost rounding can nearly reoptimize the plan; "
+      "its cheap routes are NOT evidence the original Soft hierarchy is more efficient. "
+      "Min-L1 rounding follows the original fractional plan as closely as achievable on the fractional-edge support. "
+      "Both disclose total variation fraction of total transported mass. "
+      "Neither corresponds to an operator-approved dispatch.",
+      "","## Figures",
                    "- [Epsilon cost-gap curves](FIG_EPSILON_HARD_SOFT_K4_K8_COST_GAP.png)",
                    "- [Soft temperature curves](FIG_SOFT_TEMPERATURE_GROUP_OVERLAP_COST_GAP.png)",
                    "- [True integer rounding](FIG_INTEGER_ROUNDING_HARD_SOFT_VS_EXACT.png)",
